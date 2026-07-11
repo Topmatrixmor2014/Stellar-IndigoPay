@@ -45,8 +45,8 @@ export default function MilestoneTracker({
     return (
       <div className="card text-center py-12">
         <p className="text-4xl mb-3">🎯</p>
-        <p className="font-display text-lg text-forest-900 mb-1">No milestones yet</p>
-        <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body">
+        <p className="font-display text-lg text-[#0F172A] dark:text-[#E2E8F0] mb-1">No milestones yet</p>
+        <p className="text-sm text-[#475569] dark:text-[#94A3B8] font-body">
           Milestones will appear here as the project sets goals.
         </p>
       </div>
@@ -57,18 +57,18 @@ export default function MilestoneTracker({
     <div className="card animate-fade-in">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="font-display text-lg font-semibold text-forest-900">
+          <h3 className="font-display text-lg font-semibold text-[#0F172A] dark:text-[#E2E8F0]">
             Project Milestones
           </h3>
-          <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body">
+          <p className="text-sm text-[#475569] dark:text-[#94A3B8] font-body">
             {completedCount} of {sorted.length} completed
           </p>
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-forest-700">{progress}%</div>
-          <div className="w-24 h-2 bg-forest-100 rounded-full mt-1">
+          <div className="text-2xl font-bold text-[#4F46E5] dark:text-[#818CF8]">{progress}%</div>
+          <div className="w-24 h-2 bg-[rgba(99,102,241,0.10)] dark:bg-[rgba(129,140,248,0.12)] rounded-full mt-1">
             <div
-              className="h-full bg-forest-500 rounded-full transition-all"
+              className="h-full bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] rounded-full transition-all"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -78,7 +78,7 @@ export default function MilestoneTracker({
       {/* Timeline */}
       <div className="relative">
         {/* Vertical line */}
-        <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-forest-200" />
+        <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-[rgba(99,102,241,0.12)] dark:bg-[rgba(129,140,248,0.15)]" />
 
         <div className="space-y-6">
           {sorted.map((milestone, index) => {
@@ -92,8 +92,8 @@ export default function MilestoneTracker({
                   className={clsx(
                     "relative z-10 flex items-center justify-center w-10 h-10 rounded-full border-2 flex-shrink-0",
                     isCompleted
-                      ? "bg-forest-500 border-forest-500 text-white"
-                      : "bg-white border-forest-300 text-forest-400"
+                      ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] border-0 text-white"
+                      : "bg-white dark:bg-[#14142D] border-[rgba(99,102,241,0.30)] dark:border-[rgba(129,140,248,0.35)] text-[#64748B] dark:text-[#94A3B8]"
                   )}
                 >
                   {isCompleted ? (
@@ -109,7 +109,7 @@ export default function MilestoneTracker({
                 <div
                   className={clsx(
                     "flex-1 pb-6",
-                    !isLast && "border-b border-forest-100"
+                    !isLast && "border-b border-[rgba(99,102,241,0.08)] dark:border-[rgba(129,140,248,0.10)]"
                   )}
                 >
                   <div className="flex items-start justify-between gap-4">
@@ -117,13 +117,13 @@ export default function MilestoneTracker({
                       <h4
                         className={clsx(
                           "font-display font-semibold",
-                          isCompleted ? "text-forest-500 line-through" : "text-forest-900"
+                          isCompleted ? "text-[#4F46E5] dark:text-[#818CF8] line-through" : "text-[#0F172A] dark:text-[#E2E8F0]"
                         )}
                       >
                         {milestone.title}
                       </h4>
                       {milestone.description && (
-                        <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body mt-1">
+                        <p className="text-sm text-[#475569] dark:text-[#94A3B8] font-body mt-1">
                           {milestone.description}
                         </p>
                       )}
@@ -139,12 +139,12 @@ export default function MilestoneTracker({
                     )}
                   </div>
 
-                  <div className="flex items-center gap-3 mt-2 text-xs text-[#8aaa8a] dark:text-forest-300 font-body">
+                  <div className="flex items-center gap-3 mt-2 text-xs text-[#64748B] dark:text-[#94A3B8] font-body">
                     <span>
                       📅 Target: {new Date(milestone.targetDate).toLocaleDateString()}
                     </span>
                     {isCompleted && milestone.completedAt && (
-                      <span className="text-forest-500">
+                      <span className="text-[#4F46E5] dark:text-[#818CF8]">
                         ✅ Completed: {new Date(milestone.completedAt).toLocaleDateString()}
                       </span>
                     )}

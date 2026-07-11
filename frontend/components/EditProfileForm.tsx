@@ -65,22 +65,22 @@ export default function EditProfileForm({ publicKey }: EditProfileFormProps) {
   };
 
   return (
-    <div className="card shadow-sm border border-forest-100 p-6 md:p-8 bg-white/50 backdrop-blur-sm">
+    <div className="card shadow-sm border border-[rgba(99,102,241,0.10)] dark:border-[rgba(129,140,248,0.12)] p-6 md:p-8 bg-white/50 dark:bg-[#14142D]/50 backdrop-blur-sm">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-full bg-forest-100 flex items-center justify-center text-xl">👤</div>
-        <h2 className="font-display text-xl font-bold text-forest-900">Edit Profile</h2>
+        <div className="w-10 h-10 rounded-full bg-[rgba(99,102,241,0.08)] dark:bg-[rgba(129,140,248,0.10)] flex items-center justify-center text-xl">👤</div>
+        <h2 className="font-display text-xl font-bold text-[#0F172A] dark:text-[#E2E8F0]">Edit Profile</h2>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="displayName" className="block text-sm font-semibold text-forest-700 mb-1.5 uppercase tracking-wider">
+          <label htmlFor="displayName" className="block text-sm font-semibold text-[#4F46E5] dark:text-[#818CF8] mb-1.5 uppercase tracking-wider">
             Display Name
           </label>
           <input
             id="displayName"
             type="text"
-            className={`w-full px-4 py-2.5 rounded-xl border font-body text-forest-900 focus:outline-none focus:ring-2 transition-all ${
-              errors.displayName ? "border-red-300 focus:ring-red-100" : "border-forest-200 focus:ring-forest-100"
+            className={`w-full px-4 py-2.5 rounded-xl border font-body text-[#0F172A] dark:text-[#E2E8F0] focus:outline-none focus:ring-2 transition-all ${
+              errors.displayName ? "border-red-300 focus:ring-red-100" : "border-[rgba(99,102,241,0.15)] dark:border-[rgba(129,140,248,0.20)] focus:ring-[rgba(99,102,241,0.15)]"
             }`}
             placeholder="e.g. Alice_Green"
             value={displayName}
@@ -91,19 +91,19 @@ export default function EditProfileForm({ publicKey }: EditProfileFormProps) {
         </div>
 
         <div>
-          <label htmlFor="bio" className="block text-sm font-semibold text-forest-700 mb-1.5 uppercase tracking-wider">
+          <label htmlFor="bio" className="block text-sm font-semibold text-[#4F46E5] dark:text-[#818CF8] mb-1.5 uppercase tracking-wider">
             Bio
           </label>
           <textarea
             id="bio"
             rows={3}
-            className="w-full px-4 py-2.5 rounded-xl border border-forest-200 font-body text-forest-900 focus:outline-none focus:ring-2 focus:ring-forest-100 transition-all resize-none"
+            className="w-full px-4 py-2.5 rounded-xl border border-[rgba(99,102,241,0.15)] dark:border-[rgba(129,140,248,0.20)] font-body text-[#0F172A] dark:text-[#E2E8F0] focus:outline-none focus:ring-2 focus:ring-[rgba(99,102,241,0.15)] transition-all resize-none"
             placeholder="Tell us why you support climate projects..."
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             maxLength={200}
           />
-          <p className="mt-1.5 text-right text-[10px] text-[#8aaa8a] dark:text-forest-300 uppercase font-bold tracking-widest leading-none">
+          <p className="mt-1.5 text-right text-[10px] text-[#64748B] dark:text-[#94A3B8] uppercase font-bold tracking-widest leading-none">
             {bio.length}/200
           </p>
         </div>

@@ -73,20 +73,20 @@ function AccordionItem({
   }, [isOpen, lines]);
 
   return (
-    <div className="rounded-2xl border border-forest-100 bg-white overflow-hidden">
+    <div className="rounded-2xl border border-[rgba(99,102,241,0.10)] dark:border-[rgba(129,140,248,0.12)] bg-white dark:bg-[#14142D] overflow-hidden">
       <button
         type="button"
         onClick={onToggle}
-        className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left hover:bg-forest-50/60 transition-colors"
+        className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left hover:bg-[rgba(99,102,241,0.04)] dark:hover:bg-[rgba(129,140,248,0.06)] transition-colors"
         aria-expanded={isOpen}
       >
         <div className="min-w-0">
-          <p className="font-semibold text-forest-900 font-body">{title}</p>
+          <p className="font-semibold text-[#0F172A] dark:text-[#E2E8F0] font-body">{title}</p>
           {!isOpen && (
-            <p className="text-xs text-forest-500 font-body mt-0.5">{lines.length} line{lines.length !== 1 ? "s" : ""}</p>
+            <p className="text-xs text-[#4F46E5] dark:text-[#818CF8] font-body mt-0.5">{lines.length} line{lines.length !== 1 ? "s" : ""}</p>
           )}
         </div>
-        <span className="text-forest-500 flex-shrink-0">
+        <span className="text-[#4F46E5] dark:text-[#818CF8] flex-shrink-0">
           {isOpen ? "−" : "+"}
         </span>
       </button>
@@ -96,7 +96,7 @@ function AccordionItem({
         style={{ maxHeight, transition: "max-height 320ms ease" }}
       >
         <div ref={contentRef} className="pb-4">
-          <p className="text-[#5a7a5a] dark:text-[#8aaa8a] leading-relaxed text-sm whitespace-pre-wrap font-body">
+          <p className="text-[#475569] dark:text-[#94A3B8] leading-relaxed text-sm whitespace-pre-wrap font-body">
             {lines.join("\n").trim()}
           </p>
         </div>
@@ -111,7 +111,7 @@ export default function DescriptionAccordion({ description }: { description: str
 
   if (!sections) {
     return (
-      <p className="text-[#5a7a5a] dark:text-[#8aaa8a] leading-relaxed text-sm whitespace-pre-wrap font-body">
+      <p className="text-[#475569] dark:text-[#94A3B8] leading-relaxed text-sm whitespace-pre-wrap font-body">
         {description}
       </p>
     );
