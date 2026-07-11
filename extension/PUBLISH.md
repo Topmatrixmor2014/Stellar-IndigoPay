@@ -30,12 +30,15 @@ All assets must be committed to `extension/store-assets/`:
 ## Store Listing Details
 
 ### Summary (140 characters max)
+
 "Donate to sustainable projects worldwide via Stellar. One-click climate action."
 
 ### Full Description
+
 "IndigoPay Companion makes climate action effortless. Discover vetted sustainable projects and donate via Stellar blockchain in seconds.
 
 Key Features:
+
 - Detect Stellar addresses on any web page and donate instantly
 - Browse curated climate and conservation projects
 - Track your impact with transparent on-chain transactions
@@ -93,6 +96,7 @@ Similar process, but additional developer verification required.
 ## Versioning
 
 When updating the extension:
+
 1. Increment version in `manifest.json` and `manifest.firefox.json`
 2. Run `npm run build` to regenerate `dist/`
 3. Create `indigopay-extension-v1.x.x.zip` for release

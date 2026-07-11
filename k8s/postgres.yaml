@@ -42,7 +42,8 @@ spec:
               mountPath: /var/lib/postgresql/data
           readinessProbe:
             exec:
-              command: ["pg_isready", "-U", "postgres", "-d", "stellar_indigopay"]
+              command:
+                ["pg_isready", "-U", "postgres", "-d", "stellar_indigopay"]
             initialDelaySeconds: 5
             periodSeconds: 5
           resources:
@@ -69,7 +70,7 @@ metadata:
 spec:
   selector:
     app: postgres
-  clusterIP: None  # Headless service for StatefulSet
+  clusterIP: None # Headless service for StatefulSet
   ports:
     - port: 5432
       targetPort: 5432

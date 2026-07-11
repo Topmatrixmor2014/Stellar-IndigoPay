@@ -21,10 +21,10 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
-} from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
+} from "react-native";
+import { useLocalSearchParams } from "expo-router";
+import { useEffect, useRef, useState } from "react";
+import axios from "axios";
 import {
   Keypair,
   Server,
@@ -33,18 +33,18 @@ import {
   Operation,
   Asset,
   Memo,
-} from '@stellar/stellar-sdk';
-import { useBiometricAuth } from '../../hooks/useBiometricAuth';
-import type { BiometricAuthOutcome } from '../../hooks/useBiometricAuth';
-import { useTheme } from '../theme';
+} from "@stellar/stellar-sdk";
+import { useBiometricAuth } from "../../hooks/useBiometricAuth";
+import type { BiometricAuthOutcome } from "../../hooks/useBiometricAuth";
+import { useTheme } from "../theme";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4000';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:4000";
 const HORIZON_URL =
-  process.env.EXPO_PUBLIC_HORIZON_URL || 'https://horizon-testnet.stellar.org';
+  process.env.EXPO_PUBLIC_HORIZON_URL || "https://horizon-testnet.stellar.org";
 
-const PRESET_AMOUNTS = ['5', '10', '25'];
+const PRESET_AMOUNTS = ["5", "10", "25"];
 const MIN_AMOUNT_XLM = 1;
-const DONATE_PROMPT = 'Authenticate to send your donation';
+const DONATE_PROMPT = "Authenticate to send your donation";
 
 interface ClimateProject {
   id: string;
@@ -53,7 +53,7 @@ interface ClimateProject {
   walletAddress: string;
 }
 
-type StatusKind = 'success' | 'error' | 'info' | null;
+type StatusKind = "success" | "error" | "info" | null;
 
 /**
  * Render-time hint shown above the Donate button. Reassures the user
@@ -63,10 +63,12 @@ type StatusKind = 'success' | 'error' | 'info' | null;
 function buildBioHint(
   available: boolean,
   enrolled: boolean,
-  label: string
+  label: string,
 ): string {
-  if (!available) return 'No biometric sensor — donations will require your device PIN.';
-  if (!enrolled) return 'No biometric enrolled — donations will require your device PIN.';
+  if (!available)
+    return "No biometric sensor — donations will require your device PIN.";
+  if (!enrolled)
+    return "No biometric enrolled — donations will require your device PIN.";
   return `You will be asked to authenticate with ${label} before signing.`;
 }
 
@@ -84,13 +86,13 @@ export default function DonateScreen() {
   }, []);
 
   const [projects, setProjects] = useState<ClimateProject[]>([]);
-  const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>(
-    id as string | undefined
-  );
-  const [amount, setAmount] = useState('1');
-  const [message, setMessage] = useState('');
-  const [secretKey, setSecretKey] = useState('');
-  const [publicKey, setPublicKey] = useState('');
+  const [selectedProjectId, setSelectedProjectId] = useState<
+    string | undefined
+  >(id as string | undefined);
+  const [amount, setAmount] = useState("1");
+  const [message, setMessage] = useState("");
+  const [secretKey, setSecretKey] = useState("");
+  const [publicKey, setPublicKey] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -105,14 +107,16 @@ export default function DonateScreen() {
     setStatusMessage(null);
     try {
       const res = await axios.get(`${API_URL}/api/projects`);
-      const list: ClimateProject[] = Array.isArray(res.data?.data) ? res.data.data : [];
+      const list: ClimateProject[] = Array.isArray(res.data?.data)
+        ? res.data.data
+        : [];
       setProjects(list);
       const initialProjectId = (id as string | undefined) || list[0]?.id;
       setSelectedProjectId(initialProjectId);
     } catch (error) {
-      console.error('Error loading projects:', error);
-      setStatusType('error');
-      setStatusMessage('Unable to load projects. Please try again later.');
+      console.error("Error loading projects:", error);
+      setStatusType("error");
+      setStatusMessage("Unable to load projects. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -126,23 +130,25 @@ export default function DonateScreen() {
    */
   const surfaceAuthFailure = (outcome: BiometricAuthOutcome) => {
     switch (outcome) {
-      case 'cancel':
-        setStatusType('info');
-        setStatusMessage('Authentication cancelled — donation not sent.');
+      case "cancel":
+        setStatusType("info");
+        setStatusMessage("Authentication cancelled — donation not sent.");
         return;
-      case 'fallback':
-        setStatusType('info');
-        setStatusMessage('Use your device PIN to confirm the donation next time.');
-        return;
-      case 'error':
-        setStatusType('error');
+      case "fallback":
+        setStatusType("info");
         setStatusMessage(
-          'Biometric authentication failed. Please try again or tap "Use Passcode" / "Cancel" and retry.'
+          "Use your device PIN to confirm the donation next time.",
+        );
+        return;
+      case "error":
+        setStatusType("error");
+        setStatusMessage(
+          'Biometric authentication failed. Please try again or tap "Use Passcode" / "Cancel" and retry.',
         );
         return;
       default:
-        setStatusType('error');
-        setStatusMessage('Authentication required to send a donation.');
+        setStatusType("error");
+        setStatusMessage("Authentication required to send a donation.");
     }
   };
 
@@ -151,28 +157,35 @@ export default function DonateScreen() {
     setStatusType(null);
 
     if (!selectedProject) {
-      Alert.alert('Error', 'Please choose a project to donate to.');
+      Alert.alert("Error", "Please choose a project to donate to.");
       return;
     }
 
     const donationAmount = parseFloat(amount);
-    if (!amount || Number.isNaN(donationAmount) || donationAmount < MIN_AMOUNT_XLM) {
+    if (
+      !amount ||
+      Number.isNaN(donationAmount) ||
+      donationAmount < MIN_AMOUNT_XLM
+    ) {
       Alert.alert(
-        'Error',
-        `Please enter a valid amount (minimum ${MIN_AMOUNT_XLM} XLM).`
+        "Error",
+        `Please enter a valid amount (minimum ${MIN_AMOUNT_XLM} XLM).`,
       );
       return;
     }
 
     if (!publicKey) {
-      Alert.alert('Wallet Required', 'Please connect your Stellar wallet first.');
+      Alert.alert(
+        "Wallet Required",
+        "Please connect your Stellar wallet first.",
+      );
       return;
     }
 
     if (!secretKey.trim()) {
       Alert.alert(
-        'Secret Required',
-        'Please enter your Stellar secret key to sign the transaction.'
+        "Secret Required",
+        "Please enter your Stellar secret key to sign the transaction.",
       );
       return;
     }
@@ -181,14 +194,17 @@ export default function DonateScreen() {
     try {
       keypair = Keypair.fromSecret(secretKey.trim());
     } catch {
-      Alert.alert('Invalid Secret Key', 'The secret key you entered is not valid.');
+      Alert.alert(
+        "Invalid Secret Key",
+        "The secret key you entered is not valid.",
+      );
       return;
     }
 
     if (keypair.publicKey() !== publicKey) {
       Alert.alert(
-        'Key Mismatch',
-        'The secret key does not match the connected public key. Please use the same account.'
+        "Key Mismatch",
+        "The secret key does not match the connected public key. Please use the same account.",
       );
       return;
     }
@@ -210,15 +226,15 @@ export default function DonateScreen() {
     }
 
     setSubmitting(true);
-    setStatusType('info');
-    setStatusMessage('Signing and submitting your donation...');
+    setStatusType("info");
+    setStatusMessage("Signing and submitting your donation...");
 
     try {
       const server = new Server(HORIZON_URL);
       const sourceAccount = await server.loadAccount(publicKey);
 
       const transaction = new TransactionBuilder(sourceAccount, {
-        fee: '100',
+        fee: "100",
         networkPassphrase: Networks.TESTNET,
       })
         .addOperation(
@@ -226,7 +242,7 @@ export default function DonateScreen() {
             destination: selectedProject.walletAddress,
             asset: Asset.native(),
             amount: donationAmount.toFixed(7),
-          })
+          }),
         )
         .addMemo(Memo.text(`IndigoPay:${selectedProject.id.slice(0, 16)}`))
         .setTimeout(60)
@@ -241,23 +257,25 @@ export default function DonateScreen() {
         donorAddress: publicKey,
         amountXLM: donationAmount.toFixed(7),
         amount: donationAmount.toFixed(7),
-        currency: 'XLM',
+        currency: "XLM",
         message: message.trim() || undefined,
         transactionHash,
       });
 
-      setStatusType('success');
-      setStatusMessage(`Donation successful! Transaction hash: ${transactionHash}`);
-      setAmount('1');
-      setMessage('');
-      setSecretKey('');
+      setStatusType("success");
+      setStatusMessage(
+        `Donation successful! Transaction hash: ${transactionHash}`,
+      );
+      setAmount("1");
+      setMessage("");
+      setSecretKey("");
     } catch (error: any) {
-      console.error('Donation failed:', error);
-      setStatusType('error');
+      console.error("Donation failed:", error);
+      setStatusType("error");
       setStatusMessage(
         error?.response?.data?.message ||
           error?.message ||
-          'Donation failed. Please try again.'
+          "Donation failed. Please try again.",
       );
     } finally {
       setSubmitting(false);
@@ -266,30 +284,33 @@ export default function DonateScreen() {
 
   const connectWallet = () => {
     Alert.alert(
-      'Connect Wallet',
-      'Enter your Stellar public key:',
+      "Connect Wallet",
+      "Enter your Stellar public key:",
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: "Cancel", style: "cancel" },
         {
-          text: 'OK',
+          text: "OK",
           onPress: (input: any) => {
-            const trimmed = String(input || '').trim();
+            const trimmed = String(input || "").trim();
             if (/^G[A-Z0-9]{55}$/.test(trimmed)) {
               setPublicKey(trimmed);
             } else {
-              Alert.alert('Invalid Key', 'Please enter a valid Stellar public key');
+              Alert.alert(
+                "Invalid Key",
+                "Please enter a valid Stellar public key",
+              );
             }
           },
         },
       ],
-      'plain-text-input'
+      "plain-text-input",
     );
   };
 
   if (loading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color={colors.primary ?? '#227239'} />
+        <ActivityIndicator size="large" color={colors.primary ?? "#227239"} />
         <Text style={[styles.loadingText, { color: colors.primaryText }]}>
           Loading project...
         </Text>
@@ -300,10 +321,12 @@ export default function DonateScreen() {
   const bioHint = buildBioHint(bio.available, bio.enrolled, bio.label);
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.primaryText }]}>
-          Donate to {selectedProject?.name || 'a project'}
+          Donate to {selectedProject?.name || "a project"}
         </Text>
         <Text style={[styles.subtitle, { color: colors.secondaryText }]}>
           Choose a project and donate XLM on testnet.
@@ -364,7 +387,9 @@ export default function DonateScreen() {
           accessibilityLabel="Connect Stellar wallet"
           accessibilityRole="button"
         >
-          <Text style={[styles.connectButtonText, { color: colors.buttonText }]}>
+          <Text
+            style={[styles.connectButtonText, { color: colors.buttonText }]}
+          >
             Connect Wallet
           </Text>
         </TouchableOpacity>
@@ -393,7 +418,9 @@ export default function DonateScreen() {
           { backgroundColor: colors.surface, borderColor: colors.cardBorder },
         ]}
       >
-        <Text style={[styles.label, { color: colors.primaryText }]}>Amount (XLM)</Text>
+        <Text style={[styles.label, { color: colors.primaryText }]}>
+          Amount (XLM)
+        </Text>
         <View style={styles.presetRow}>
           {PRESET_AMOUNTS.map((preset) => {
             const isActive = amount === preset;
@@ -442,7 +469,9 @@ export default function DonateScreen() {
           accessibilityLabel="Custom donation amount in XLM"
         />
 
-        <Text style={[styles.label, { color: colors.primaryText }]}>Secret Key</Text>
+        <Text style={[styles.label, { color: colors.primaryText }]}>
+          Secret Key
+        </Text>
         <TextInput
           style={[
             styles.input,
@@ -495,11 +524,11 @@ export default function DonateScreen() {
         <View
           style={[
             styles.statusBox,
-            statusType === 'success'
+            statusType === "success"
               ? styles.successBox
-              : statusType === 'error'
-              ? styles.errorBox
-              : styles.infoBox,
+              : statusType === "error"
+                ? styles.errorBox
+                : styles.infoBox,
           ]}
         >
           <Text style={styles.statusText}>{statusMessage}</Text>
@@ -519,13 +548,15 @@ export default function DonateScreen() {
         onPress={handleDonate}
         disabled={submitting || !publicKey || bio.isAuthenticating}
         accessibilityRole="button"
-        accessibilityLabel={`Donate ${amount || '1'} XLM`}
+        accessibilityLabel={`Donate ${amount || "1"} XLM`}
       >
         {bio.isAuthenticating ? (
           <ActivityIndicator color={colors.buttonText} />
         ) : (
           <Text style={[styles.donateButtonText, { color: colors.buttonText }]}>
-            {submitting ? 'Sending donation...' : `🌱 Donate ${amount || '1'} XLM`}
+            {submitting
+              ? "Sending donation..."
+              : `🌱 Donate ${amount || "1"} XLM`}
           </Text>
         )}
       </TouchableOpacity>
@@ -539,7 +570,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 16,
   },
   header: {
@@ -547,7 +578,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   subtitle: {
     fontSize: 14,
@@ -555,15 +586,15 @@ const styles = StyleSheet.create({
   },
   scannedBanner: {
     marginTop: 10,
-    backgroundColor: 'rgba(76,175,80,0.15)',
+    backgroundColor: "rgba(76,175,80,0.15)",
     borderRadius: 8,
     padding: 8,
     borderWidth: 1,
-    borderColor: '#4caf50',
+    borderColor: "#4caf50",
   },
   scannedBannerText: {
     fontSize: 12,
-    color: '#1b5e20',
+    color: "#1b5e20",
   },
   selectorCard: {
     marginHorizontal: 16,
@@ -573,11 +604,11 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 12,
   },
   projectList: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   projectOption: {
     paddingVertical: 10,
@@ -588,18 +619,18 @@ const styles = StyleSheet.create({
   },
   projectOptionText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   connectButton: {
     padding: 16,
     marginHorizontal: 16,
     marginTop: 8,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   connectButtonText: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   walletCard: {
     margin: 16,
@@ -612,7 +643,7 @@ const styles = StyleSheet.create({
   },
   walletAddress: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: "700",
     marginTop: 4,
   },
   card: {
@@ -623,11 +654,11 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 8,
   },
   presetRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 12,
     gap: 8,
   },
@@ -639,7 +670,7 @@ const styles = StyleSheet.create({
   },
   presetChipText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   input: {
     borderWidth: 1,
@@ -649,8 +680,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   bioHintRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 4,
   },
   bioHintIcon: {
@@ -669,31 +700,31 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   successBox: {
-    backgroundColor: '#ecfdf5',
-    borderColor: '#34d399',
+    backgroundColor: "#ecfdf5",
+    borderColor: "#34d399",
     borderWidth: 1,
   },
   errorBox: {
-    backgroundColor: '#fef2f2',
-    borderColor: '#f87171',
+    backgroundColor: "#fef2f2",
+    borderColor: "#f87171",
     borderWidth: 1,
   },
   infoBox: {
-    backgroundColor: '#eff6ff',
-    borderColor: '#60a5fa',
+    backgroundColor: "#eff6ff",
+    borderColor: "#60a5fa",
     borderWidth: 1,
   },
   statusText: {
-    color: '#0f172a',
+    color: "#0f172a",
   },
   donateButton: {
     padding: 16,
     margin: 16,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   donateButtonText: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });

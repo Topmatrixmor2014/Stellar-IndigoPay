@@ -128,7 +128,9 @@ export default function FreelancerProfilePage() {
               </dt>
               <dd className="text-2xl font-bold text-forest-900">
                 {profile.totalEarnedXLM}{" "}
-                <span className="text-sm font-normal text-[#5a7a5a] dark:text-[#8aaa8a]">XLM</span>
+                <span className="text-sm font-normal text-[#5a7a5a] dark:text-[#8aaa8a]">
+                  XLM
+                </span>
               </dd>
             </div>
           </dl>

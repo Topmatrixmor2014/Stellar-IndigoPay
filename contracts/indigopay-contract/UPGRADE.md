@@ -34,17 +34,17 @@ The current persisted keys are:
 - `DataKey::HasDonated(String, Address)`
 - `DataKey::Proposal(String)`
 - `DataKey::HasVoted(String, Address)`
-- `DataKey::DonorProjectTotal(String, Address)` *(v1.1 milestone-NFT support)*
-- `DataKey::ProjectMilestoneNFT(String, Address)` *(v1.1 milestone-NFT support)*
-- `DataKey::VoterList(String)` *(v1.2 governance UI support)*
-- `DataKey::ProjectIdsAll` *(v1.2 bulk admin support)*
-- `DataKey::USDCTokenAddress` *(v1.2 multi-currency)*
-- `DataKey::OracleAddress` *(v1.2 price oracle)*
-- `DataKey::PendingAdmin` *(Phase A two-step admin)*
-- `DataKey::ContractPaused` *(Phase A contract-level pause)*
-- `DataKey::PendingUpgrade` *(Phase A 48h timelock)*
-- `DataKey::UpgradeEffectiveAt` *(Phase A 48h timelock)*
-- `DataKey::LastExecutedUpgrade` *(Phase A 48h timelock)*
+- `DataKey::DonorProjectTotal(String, Address)` _(v1.1 milestone-NFT support)_
+- `DataKey::ProjectMilestoneNFT(String, Address)` _(v1.1 milestone-NFT support)_
+- `DataKey::VoterList(String)` _(v1.2 governance UI support)_
+- `DataKey::ProjectIdsAll` _(v1.2 bulk admin support)_
+- `DataKey::USDCTokenAddress` _(v1.2 multi-currency)_
+- `DataKey::OracleAddress` _(v1.2 price oracle)_
+- `DataKey::PendingAdmin` _(Phase A two-step admin)_
+- `DataKey::ContractPaused` _(Phase A contract-level pause)_
+- `DataKey::PendingUpgrade` _(Phase A 48h timelock)_
+- `DataKey::UpgradeEffectiveAt` _(Phase A 48h timelock)_
+- `DataKey::LastExecutedUpgrade` _(Phase A 48h timelock)_
 
 Do not rename or remove these variants, change their argument order, or reorder/remove fields from stored structs such as `Project`, `DonorStats`, `ImpactNFT`, `ProjectMilestoneNFT`, `VoteProposal`, or `GlobalStats` without adding an explicit migration path. New fields should be handled through a new storage version or a new key namespace so existing v1 values remain decodable.
 

@@ -13,18 +13,21 @@ React Native + Expo mobile app for Stellar IndigoPay climate donation platform.
 ## Setup
 
 1. Install dependencies:
+
 ```bash
 cd mobile
 npm install
 ```
 
 2. Configure environment:
+
 ```bash
 cp .env.example .env
 # Edit .env with your API URL and Stellar network settings
 ```
 
 3. Run on device/simulator:
+
 ```bash
 # iOS
 npm run ios
@@ -54,6 +57,7 @@ The mobile app shares the API client logic with the web frontend. The API functi
 ## Wallet Integration
 
 The app integrates with mobile Stellar wallets via deep links:
+
 - Freighter Mobile: `freighter://tx?xdr=...`
 - Other wallets can be added via similar deep link schemes
 
@@ -68,6 +72,7 @@ The app integrates with mobile Stellar wallets via deep links:
 ## Environment Variables
 
 See `.env.example` for required variables:
+
 - `EXPO_PUBLIC_API_URL`: Backend API URL
 - `EXPO_PUBLIC_STELLAR_NETWORK`: testnet or mainnet
 - `EXPO_PUBLIC_HORIZON_URL`: Stellar Horizon URL

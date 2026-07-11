@@ -14,14 +14,14 @@ Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
 
 Install the following before cloning:
 
-| Tool | Version | Install |
-|------|---------|---------|
-| Node.js | ≥ 18.x | [nodejs.org](https://nodejs.org) or `nvm install 18` |
-| npm | latest | bundled with Node |
-| Docker | latest | [docs.docker.com/get-docker](https://docs.docker.com/get-docker/) |
-| Rust + Cargo | ≥ 1.74 | `curl https://sh.rustup.rs -sSf \| sh` |
-| Soroban CLI | latest | `cargo install --locked soroban-cli` |
-| Freighter Wallet | latest | See below |
+| Tool             | Version | Install                                                           |
+| ---------------- | ------- | ----------------------------------------------------------------- |
+| Node.js          | ≥ 18.x  | [nodejs.org](https://nodejs.org) or `nvm install 18`              |
+| npm              | latest  | bundled with Node                                                 |
+| Docker           | latest  | [docs.docker.com/get-docker](https://docs.docker.com/get-docker/) |
+| Rust + Cargo     | ≥ 1.74  | `curl https://sh.rustup.rs -sSf \| sh`                            |
+| Soroban CLI      | latest  | `cargo install --locked soroban-cli`                              |
+| Freighter Wallet | latest  | See below                                                         |
 
 ### 🦊 Install Freighter & Switch to Testnet
 
@@ -37,11 +37,13 @@ Freighter is the Stellar browser wallet needed to sign transactions in the app.
 The Stellar Friendbot instantly credits 10,000 test XLM to any new Testnet account.
 
 **Option A — browser:**
+
 ```
 https://friendbot.stellar.org/?addr=YOUR_PUBLIC_KEY
 ```
 
 **Option B — curl:**
+
 ```bash
 curl "https://friendbot.stellar.org/?addr=YOUR_PUBLIC_KEY"
 ```
@@ -149,4 +151,3 @@ We use Sentry to capture unhandled exceptions and performance traces.
 Quick test (backend): throw an error in any route and confirm it appears in your Sentry project within ~30s.
 
 If you don't have a Sentry project, create one at https://sentry.io and copy the DSN into the env files above.
-

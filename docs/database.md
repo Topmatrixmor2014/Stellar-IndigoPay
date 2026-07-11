@@ -24,6 +24,7 @@ postgres:
 ```
 
 **Default credentials** (development only):
+
 - Username: `postgres`
 - Password: `postgres`
 - Database: `indigopay`
@@ -32,6 +33,7 @@ postgres:
 ### Production Database
 
 For production deployments:
+
 - Use strong, randomly generated passwords
 - Enable SSL/TLS connections
 - Configure proper firewall rules
@@ -57,6 +59,7 @@ Backups are configured via GitHub Actions workflow: `.github/workflows/database-
 **Schedule:** Daily at 2 AM UTC (configurable)
 
 **Storage Options:**
+
 - **AWS S3:** Default option for AWS deployments
 - **Google Cloud Storage:** Option for GCP deployments
 
@@ -65,6 +68,7 @@ Backups are configured via GitHub Actions workflow: `.github/workflows/database-
 For GitHub Actions secrets, configure the following:
 
 **Common:**
+
 - `DB_HOST`: Database hostname/IP
 - `DB_PORT`: Database port (default: 5432)
 - `DB_USER`: Database user
@@ -73,6 +77,7 @@ For GitHub Actions secrets, configure the following:
 - `BACKUP_RETENTION_DAYS`: Days to retain backups (default: 30)
 
 **For S3 Backups:**
+
 - `AWS_ACCESS_KEY_ID`: AWS access key
 - `AWS_SECRET_ACCESS_KEY`: AWS secret key
 - `AWS_REGION`: AWS region (default: us-east-1)
@@ -80,6 +85,7 @@ For GitHub Actions secrets, configure the following:
 - `S3_PREFIX`: S3 prefix for backups (default: `backups/`)
 
 **For GCS Backups:**
+
 - `GCS_SA_KEY`: Google Cloud Service Account JSON key (base64 encoded)
 - `GCP_PROJECT_ID`: GCP project ID
 - `GCS_BUCKET`: GCS bucket name
@@ -111,6 +117,7 @@ bash scripts/backup-db.sh
 ```
 
 **Local backup only (without cloud upload):**
+
 ```bash
 pg_dump -h localhost -p 5432 -U postgres indigopay | gzip > indigopay_backup_$(date +%Y%m%d_%H%M%S).sql.gz
 ```
@@ -120,6 +127,7 @@ pg_dump -h localhost -p 5432 -U postgres indigopay | gzip > indigopay_backup_$(d
 ### Prerequisites
 
 Before restoring, ensure:
+
 1. PostgreSQL client tools are installed
 2. Target PostgreSQL server is running and accessible
 3. You have credentials with database creation privileges
@@ -222,8 +230,8 @@ After restoring, verify the backup:
 psql -h localhost -U postgres indigopay
 
 # Check table counts
-SELECT schemaname, COUNT(*) as table_count 
-FROM pg_tables 
+SELECT schemaname, COUNT(*) as table_count
+FROM pg_tables
 WHERE schemaname NOT IN ('pg_catalog', 'information_schema')
 GROUP BY schemaname;
 
@@ -294,6 +302,7 @@ docker rm postgres-test
 ### Backup Fails with "could not connect to server"
 
 **Solution:**
+
 - Verify database credentials in GitHub Actions secrets
 - Check database hostname/IP accessibility from GitHub Actions runners
 - Ensure database user has backup permissions
@@ -302,6 +311,7 @@ docker rm postgres-test
 ### Restore Fails with "permission denied"
 
 **Solution:**
+
 ```bash
 # Restore with appropriate role/owner
 pg_restore -h localhost -U postgres --role=postgres indigopay_backup.sql
@@ -310,6 +320,7 @@ pg_restore -h localhost -U postgres --role=postgres indigopay_backup.sql
 ### Backup File Corrupted
 
 **Solution:**
+
 1. Verify file integrity: `file indigopay_backup_*.sql.gz`
 2. Try to decompress: `gunzip -t indigopay_backup_*.sql.gz`
 3. Try alternate backup from S3/GCS
@@ -318,6 +329,7 @@ pg_restore -h localhost -U postgres --role=postgres indigopay_backup.sql
 ### Out of Disk Space During Restore
 
 **Solution:**
+
 ```bash
 # Use streaming restore instead
 psql -h localhost -U postgres indigopay < backup.sql | head -n 1000
@@ -367,5 +379,6 @@ psql -h localhost -U postgres indigopay \
 ## Contact & Support
 
 For database issues or backup concerns:
+
 - Create an issue: [GitHub Issues](https://github.com/Stellar-IndigoPay/Stellar-IndigoPay/issues)
 - Check existing documentation: [README.md](../README.md)

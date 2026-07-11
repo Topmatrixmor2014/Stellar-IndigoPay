@@ -13,8 +13,11 @@ import type { ClimateProject } from "@/utils/types";
 const CIRCLE_BRIDGE_URL = "https://bridge.circle.com";
 
 export default function BridgePage() {
-  const [sourceChain, setSourceChain] = useState<"ethereum" | "polygon">("ethereum");
-  const [destinationChain, setDestinationChain] = useState<"stellar">("stellar");
+  const [sourceChain, setSourceChain] = useState<"ethereum" | "polygon">(
+    "ethereum",
+  );
+  const [destinationChain, setDestinationChain] =
+    useState<"stellar">("stellar");
   const [ethBalance, setEthBalance] = useState<string | null>(null);
   const [stellarAddress, setStellarAddress] = useState<string | null>(null);
   const [bridgeHistory, setBridgeHistory] = useState<any[]>([]);
@@ -72,9 +75,10 @@ export default function BridgePage() {
 
       if (accounts.length > 0) {
         // Get USDC balance (read-only)
-        const usdcContractAddress = sourceChain === "ethereum"
-          ? "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" // Ethereum USDC
-          : "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"; // Polygon USDC
+        const usdcContractAddress =
+          sourceChain === "ethereum"
+            ? "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" // Ethereum USDC
+            : "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"; // Polygon USDC
 
         const balance = await (window as any).ethereum.request({
           method: "eth_call",
@@ -142,7 +146,9 @@ export default function BridgePage() {
       setSelectedProject("");
       alert("Bridge donation recorded successfully!");
     } catch (err) {
-      setRecordError(err instanceof Error ? err.message : "Failed to record donation");
+      setRecordError(
+        err instanceof Error ? err.message : "Failed to record donation",
+      );
     } finally {
       setRecording(false);
     }
@@ -188,7 +194,8 @@ export default function BridgePage() {
     {
       number: 3,
       title: "Open Circle Bridge",
-      description: "Click the button to open Circle's CCTP bridge with pre-filled parameters",
+      description:
+        "Click the button to open Circle's CCTP bridge with pre-filled parameters",
     },
     {
       number: 4,
@@ -201,7 +208,10 @@ export default function BridgePage() {
     <>
       <Head>
         <title>Bridge USDC | Stellar IndigoPay</title>
-        <meta name="description" content="Bridge USDC from Ethereum to Stellar using Circle CCTP" />
+        <meta
+          name="description"
+          content="Bridge USDC from Ethereum to Stellar using Circle CCTP"
+        />
       </Head>
 
       <div className="min-h-screen bg-leaf">
@@ -211,7 +221,8 @@ export default function BridgePage() {
               Bridge USDC to Stellar
             </h1>
             <p className="text-[#475569] dark:text-[#94A3B8] font-body">
-              Transfer your Ethereum-based USDC to Stellar using Circle&apos;s Cross-Chain Transfer Protocol (CCTP)
+              Transfer your Ethereum-based USDC to Stellar using Circle&apos;s
+              Cross-Chain Transfer Protocol (CCTP)
             </p>
           </div>
 
@@ -220,10 +231,14 @@ export default function BridgePage() {
             <h2 className="label mb-4">Select Networks</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-semibold text-[#0F172A] dark:text-[#E2E8F0] mb-2 block">Source (Ethereum)</label>
+                <label className="text-sm font-semibold text-[#0F172A] dark:text-[#E2E8F0] mb-2 block">
+                  Source (Ethereum)
+                </label>
                 <select
                   value={sourceChain}
-                  onChange={(e) => setSourceChain(e.target.value as "ethereum" | "polygon")}
+                  onChange={(e) =>
+                    setSourceChain(e.target.value as "ethereum" | "polygon")
+                  }
                   className="w-full p-3 border border-forest-200 rounded-xl bg-white"
                 >
                   <option value="ethereum">Ethereum Mainnet</option>
@@ -231,10 +246,14 @@ export default function BridgePage() {
                 </select>
               </div>
               <div>
-                <label className="text-sm font-semibold text-[#0F172A] dark:text-[#E2E8F0] mb-2 block">Destination (Stellar)</label>
+                <label className="text-sm font-semibold text-[#0F172A] dark:text-[#E2E8F0] mb-2 block">
+                  Destination (Stellar)
+                </label>
                 <select
                   value={destinationChain}
-                  onChange={(e) => setDestinationChain(e.target.value as "stellar")}
+                  onChange={(e) =>
+                    setDestinationChain(e.target.value as "stellar")
+                  }
                   className="w-full p-3 border border-forest-200 rounded-xl bg-white"
                   disabled
                 >
@@ -249,7 +268,9 @@ export default function BridgePage() {
             {/* Ethereum Wallet */}
             <div className="card">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-display font-semibold text-[#0F172A] dark:text-[#E2E8F0]">Ethereum Wallet</h3>
+                <h3 className="font-display font-semibold text-[#0F172A] dark:text-[#E2E8F0]">
+                  Ethereum Wallet
+                </h3>
                 <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-semibold">
                   {sourceChain === "ethereum" ? "ETH" : "MATIC"}
                 </span>
@@ -257,8 +278,12 @@ export default function BridgePage() {
               {ethBalance !== null ? (
                 <div className="space-y-3">
                   <div className="p-3 bg-blue-50 rounded-xl">
-                    <p className="text-xs text-blue-600 font-semibold mb-1">USDC Balance</p>
-                    <p className="text-2xl font-bold text-blue-900">${ethBalance} USDC</p>
+                    <p className="text-xs text-blue-600 font-semibold mb-1">
+                      USDC Balance
+                    </p>
+                    <p className="text-2xl font-bold text-blue-900">
+                      ${ethBalance} USDC
+                    </p>
                   </div>
                   <button
                     onClick={connectMetaMask}
@@ -281,7 +306,9 @@ export default function BridgePage() {
             {/* Stellar Wallet */}
             <div className="card">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-display font-semibold text-[#0F172A] dark:text-[#E2E8F0]">Stellar Wallet</h3>
+                <h3 className="font-display font-semibold text-[#0F172A] dark:text-[#E2E8F0]">
+                  Stellar Wallet
+                </h3>
                 <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-semibold">
                   XLM
                 </span>
@@ -289,7 +316,9 @@ export default function BridgePage() {
               {stellarAddress ? (
                 <div className="space-y-3">
                   <div className="p-3 bg-emerald-50 rounded-xl">
-                    <p className="text-xs text-emerald-600 font-semibold mb-1">Destination Address</p>
+                    <p className="text-xs text-emerald-600 font-semibold mb-1">
+                      Destination Address
+                    </p>
                     <p className="text-sm font-mono text-emerald-900 break-all">
                       {shortenAddress(stellarAddress, 8)}
                     </p>
@@ -321,22 +350,26 @@ export default function BridgePage() {
                   key={s.number}
                   className={`flex gap-4 p-4 rounded-xl border-2 transition-all ${
                     step === s.number
-                    ? "border-[#4F46E5] dark:border-[#818CF8] bg-[rgba(99,102,241,0.04)] dark:bg-[rgba(129,140,248,0.06)]"
-                    : "border-[rgba(99,102,241,0.10)] dark:border-[rgba(129,140,248,0.12)] bg-white dark:bg-[#14142D]"
+                      ? "border-[#4F46E5] dark:border-[#818CF8] bg-[rgba(99,102,241,0.04)] dark:bg-[rgba(129,140,248,0.06)]"
+                      : "border-[rgba(99,102,241,0.10)] dark:border-[rgba(129,140,248,0.12)] bg-white dark:bg-[#14142D]"
                   }`}
                 >
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
                       step === s.number
-                    ? "btn-primary text-white"
-                    : "bg-[rgba(99,102,241,0.10)] dark:bg-[rgba(129,140,248,0.12)] text-[#4F46E5] dark:text-[#818CF8]"
+                        ? "btn-primary text-white"
+                        : "bg-[rgba(99,102,241,0.10)] dark:bg-[rgba(129,140,248,0.12)] text-[#4F46E5] dark:text-[#818CF8]"
                     }`}
                   >
                     {s.number}
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-[#0F172A] dark:text-[#E2E8F0] mb-1">{s.title}</h3>
-                    <p className="text-sm text-[#475569] dark:text-[#94A3B8]">{s.description}</p>
+                    <h3 className="font-semibold text-[#0F172A] dark:text-[#E2E8F0] mb-1">
+                      {s.title}
+                    </h3>
+                    <p className="text-sm text-[#475569] dark:text-[#94A3B8]">
+                      {s.description}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -364,7 +397,8 @@ export default function BridgePage() {
             <div className="card mb-6">
               <h2 className="label mb-4">🌱 Record as Project Donation</h2>
               <p className="text-sm text-[#475569] dark:text-[#94A3B8] font-body mb-4">
-                After bridging USDC, record it as a donation to a climate project.
+                After bridging USDC, record it as a donation to a climate
+                project.
               </p>
 
               <div className="space-y-4">
@@ -405,7 +439,8 @@ export default function BridgePage() {
 
                 <button
                   onClick={recordBridgeDonation}
-                  disabled={!selectedProject || !bridgeAmount || recording}                    className="btn-primary w-full py-3 px-4"
+                  disabled={!selectedProject || !bridgeAmount || recording}
+                  className="btn-primary w-full py-3 px-4"
                 >
                   {recording ? "Recording..." : "🎯 Record Donation"}
                 </button>
@@ -453,12 +488,15 @@ export default function BridgePage() {
 
           {/* Info Section */}
           <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-xl">
-            <h3 className="font-display font-semibold text-blue-900 mb-2">ℹ️ About Circle CCTP</h3>
+            <h3 className="font-display font-semibold text-blue-900 mb-2">
+              ℹ️ About Circle CCTP
+            </h3>
             <p className="text-sm text-blue-800 leading-relaxed">
-              Circle&apos;s Cross-Chain Transfer Protocol (CCTP) is a permissionless on-chain messaging protocol
-              that allows USDC to move between blockchains without wrapping or liquidity pools. Your USDC
-              is burned on the source chain and minted on the destination chain, maintaining a 1:1 peg.
-              Learn more at{" "}
+              Circle&apos;s Cross-Chain Transfer Protocol (CCTP) is a
+              permissionless on-chain messaging protocol that allows USDC to
+              move between blockchains without wrapping or liquidity pools. Your
+              USDC is burned on the source chain and minted on the destination
+              chain, maintaining a 1:1 peg. Learn more at{" "}
               <a
                 href="https://developers.circle.com/stablecoins/cctp-getting-started"
                 target="_blank"

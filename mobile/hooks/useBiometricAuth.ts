@@ -27,10 +27,10 @@
  *    hard block and not submit any Stellar / Soroban transaction in that
  *    case.
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
-import * as LocalAuthentication from 'expo-local-authentication';
+import { useCallback, useEffect, useRef, useState } from "react";
+import * as LocalAuthentication from "expo-local-authentication";
 
-export type BiometricAuthOutcome = 'success' | 'cancel' | 'fallback' | 'error';
+export type BiometricAuthOutcome = "success" | "cancel" | "fallback" | "error";
 
 export interface BiometricAuthResult {
   /** `true` only when the user successfully authenticated. */
@@ -69,8 +69,8 @@ export interface UseBiometricAuthReturn extends BiometricCapabilities {
   refresh: () => Promise<void>;
 }
 
-const DEFAULT_PROMPT = 'Confirm your identity to proceed';
-const PIN_PROMPT = 'Enter your device PIN to proceed';
+const DEFAULT_PROMPT = "Confirm your identity to proceed";
+const PIN_PROMPT = "Enter your device PIN to proceed";
 
 /**
  * Resolve the strongest biometric label available on the device so the
@@ -79,19 +79,21 @@ const PIN_PROMPT = 'Enter your device PIN to proceed';
 async function resolveBiometricLabel(): Promise<string> {
   try {
     const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
-    if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
-      return 'Face ID';
+    if (
+      types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)
+    ) {
+      return "Face ID";
     }
     if (types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
-      return 'Fingerprint';
+      return "Fingerprint";
     }
     if (types.includes(LocalAuthentication.AuthenticationType.IRIS)) {
-      return 'Iris';
+      return "Iris";
     }
   } catch {
     // fall through to generic label
   }
-  return 'Biometrics';
+  return "Biometrics";
 }
 
 /**
@@ -100,7 +102,7 @@ async function resolveBiometricLabel(): Promise<string> {
  * should prefer {@link useBiometricAuth}.
  */
 export async function authenticate(
-  promptMessage: string = DEFAULT_PROMPT
+  promptMessage: string = DEFAULT_PROMPT,
 ): Promise<boolean> {
   const result = await runAuthentication(promptMessage);
   return result.success;
@@ -111,7 +113,7 @@ export async function authenticate(
  * standalone helper so behavior stays consistent.
  */
 async function runAuthentication(
-  promptMessage: string
+  promptMessage: string,
 ): Promise<BiometricAuthResult> {
   let hasHardware = false;
   let enrolled = false;
@@ -123,8 +125,8 @@ async function runAuthentication(
   } catch (error: any) {
     return {
       success: false,
-      outcome: 'error',
-      error: error?.message ?? 'Unable to query biometric capabilities',
+      outcome: "error",
+      error: error?.message ?? "Unable to query biometric capabilities",
     };
   }
 
@@ -134,8 +136,8 @@ async function runAuthentication(
     // No biometrics available — drop directly to device PIN/passcode.
     const result = await LocalAuthentication.authenticateAsync({
       promptMessage: PIN_PROMPT,
-      fallbackLabel: '',
-      cancelLabel: 'Cancel',
+      fallbackLabel: "",
+      cancelLabel: "Cancel",
       disableDeviceFallback: false,
     });
     return mapResult(result);
@@ -143,8 +145,8 @@ async function runAuthentication(
 
   const result = await LocalAuthentication.authenticateAsync({
     promptMessage,
-    fallbackLabel: `Use ${label === 'Face ID' ? 'Passcode' : 'PIN'}`,
-    cancelLabel: 'Cancel',
+    fallbackLabel: `Use ${label === "Face ID" ? "Passcode" : "PIN"}`,
+    cancelLabel: "Cancel",
     disableDeviceFallback: false,
   });
   return mapResult(result);
@@ -156,19 +158,23 @@ async function runAuthentication(
  * cancel from error so downstream UI can show the right message.
  */
 function mapResult(
-  result: LocalAuthentication.LocalAuthenticationResult
+  result: LocalAuthentication.LocalAuthenticationResult,
 ): BiometricAuthResult {
   if (result.success) {
-    return { success: true, outcome: 'success' };
+    return { success: true, outcome: "success" };
   }
   const code = result.error;
-  if (code === 'user_cancel' || code === 'system_cancel' || code === 'app_cancel') {
-    return { success: false, outcome: 'cancel', error: code };
+  if (
+    code === "user_cancel" ||
+    code === "system_cancel" ||
+    code === "app_cancel"
+  ) {
+    return { success: false, outcome: "cancel", error: code };
   }
-  if (code === 'user_fallback') {
-    return { success: false, outcome: 'fallback', error: code };
+  if (code === "user_fallback") {
+    return { success: false, outcome: "fallback", error: code };
   }
-  return { success: false, outcome: 'error', error: code };
+  return { success: false, outcome: "error", error: code };
 }
 
 /**
@@ -179,9 +185,11 @@ function mapResult(
 export function useBiometricAuth(): UseBiometricAuthReturn {
   const [available, setAvailable] = useState(false);
   const [enrolled, setEnrolled] = useState(false);
-  const [label, setLabel] = useState('Biometrics');
+  const [label, setLabel] = useState("Biometrics");
   const [isAuthenticating, setIsAuthenticating] = useState(false);
-  const [lastResult, setLastResult] = useState<BiometricAuthResult | null>(null);
+  const [lastResult, setLastResult] = useState<BiometricAuthResult | null>(
+    null,
+  );
 
   // Internal mount guard prevents setState-after-unmount warnings when the
   // consumer navigates away while the OS biometric prompt is open.
@@ -245,7 +253,7 @@ export function useBiometricAuth(): UseBiometricAuthReturn {
     // No reactive deps — we deliberately use callback identity so
     // components can include `authenticate` in their own memo deps
     // without re-firing on every render.
-    []
+    [],
   );
 
   return {

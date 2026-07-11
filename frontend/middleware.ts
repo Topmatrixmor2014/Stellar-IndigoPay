@@ -1,32 +1,34 @@
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse, type NextRequest } from "next/server";
 
 const STELLAR_CONNECT = [
-  'https://horizon-testnet.stellar.org',
-  'https://horizon.stellar.org',
-  'https://soroban-testnet.stellar.org',
-  'https://soroban.stellar.org',
-  'https://friendbot.stellar.org',
-].join(' ')
+  "https://horizon-testnet.stellar.org",
+  "https://horizon.stellar.org",
+  "https://soroban-testnet.stellar.org",
+  "https://soroban.stellar.org",
+  "https://friendbot.stellar.org",
+].join(" ");
 
 // Leaflet tile servers — the {s} subdomain expands to a/b/c at runtime.
 // All three tile subdomains must be allow-listed explicitly.
 const LEAFLET_TILE_SOURCES = [
-  'https://a.tile.openstreetmap.org',
-  'https://b.tile.openstreetmap.org',
-  'https://c.tile.openstreetmap.org',
-].join(' ')
+  "https://a.tile.openstreetmap.org",
+  "https://b.tile.openstreetmap.org",
+  "https://c.tile.openstreetmap.org",
+].join(" ");
 
 // unpkg.com serves the Leaflet CSS loaded dynamically in ProjectMap.tsx.
-const UNPKG = 'https://unpkg.com'
+const UNPKG = "https://unpkg.com";
 
 function buildCsp(nonce: string, isWidget: boolean): string {
   // API origin: 'self' covers same-origin deploys; localhost:4000 covers local dev.
   const connectSrc = [
     "'self'",
     STELLAR_CONNECT,
-    'https://api.coingecko.com',
-    ...(process.env.NODE_ENV === 'development' ? ['http://localhost:4000'] : []),
-  ].join(' ')
+    "https://api.coingecko.com",
+    ...(process.env.NODE_ENV === "development"
+      ? ["http://localhost:4000"]
+      : []),
+  ].join(" ");
 
   const directives = [
     "default-src 'self'",
@@ -45,27 +47,29 @@ function buildCsp(nonce: string, isWidget: boolean): string {
     "form-action 'self'",
     isWidget ? "frame-ancestors *" : "frame-ancestors 'none'",
     "upgrade-insecure-requests",
-  ]
+  ];
 
-  return directives.join('; ')
+  return directives.join("; ");
 }
 
 export function middleware(request: NextRequest) {
-  const nonce = btoa(crypto.randomUUID())
-  const isWidget = request.nextUrl.pathname.startsWith('/widget/')
-  const csp = buildCsp(nonce, isWidget)
+  const nonce = btoa(crypto.randomUUID());
+  const isWidget = request.nextUrl.pathname.startsWith("/widget/");
+  const csp = buildCsp(nonce, isWidget);
 
-  const requestHeaders = new Headers(request.headers)
+  const requestHeaders = new Headers(request.headers);
   // x-nonce is read in pages/_document.tsx to stamp <Head> and <NextScript>
-  requestHeaders.set('x-nonce', nonce)
+  requestHeaders.set("x-nonce", nonce);
 
-  const response = NextResponse.next({ request: { headers: requestHeaders } })
-  response.headers.set('Content-Security-Policy', csp)
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set("Content-Security-Policy", csp);
 
-  return response
+  return response;
 }
 
 export const config = {
   // Skip static assets — CSP is only meaningful on HTML responses.
-  matcher: ['/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:png|ico|svg|webp)$).*)'],
-}
+  matcher: [
+    "/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:png|ico|svg|webp)$).*)",
+  ],
+};

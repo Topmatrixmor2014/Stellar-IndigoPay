@@ -11,7 +11,12 @@ interface Section {
   lines: string[];
 }
 
-const SECTION_TITLES: SectionKey[] = ["Overview", "Goals", "How funds are used", "Team"];
+const SECTION_TITLES: SectionKey[] = [
+  "Overview",
+  "Goals",
+  "How funds are used",
+  "Team",
+];
 
 function normalizeHeading(input: string) {
   const cleaned = input
@@ -23,7 +28,8 @@ function normalizeHeading(input: string) {
 
   if (cleaned === "overview") return "Overview";
   if (cleaned === "goals") return "Goals";
-  if (cleaned === "how funds are used" || cleaned === "how funds are used ") return "How funds are used";
+  if (cleaned === "how funds are used" || cleaned === "how funds are used ")
+    return "How funds are used";
   if (cleaned === "team") return "Team";
   return null;
 }
@@ -46,9 +52,12 @@ function parseSections(description: string): Section[] | null {
     sections.get(current)?.push(rawLine);
   }
 
-  const result = SECTION_TITLES
-    .filter((t) => (sections.get(t) || []).some((l) => l.trim().length > 0))
-    .map((t) => ({ title: t, lines: (sections.get(t) || []).filter((l) => l.trimEnd().length > 0) }));
+  const result = SECTION_TITLES.filter((t) =>
+    (sections.get(t) || []).some((l) => l.trim().length > 0),
+  ).map((t) => ({
+    title: t,
+    lines: (sections.get(t) || []).filter((l) => l.trimEnd().length > 0),
+  }));
 
   return result.length ? result : null;
 }
@@ -81,9 +90,13 @@ function AccordionItem({
         aria-expanded={isOpen}
       >
         <div className="min-w-0">
-          <p className="font-semibold text-[#0F172A] dark:text-[#E2E8F0] font-body">{title}</p>
+          <p className="font-semibold text-[#0F172A] dark:text-[#E2E8F0] font-body">
+            {title}
+          </p>
           {!isOpen && (
-            <p className="text-xs text-[#4F46E5] dark:text-[#818CF8] font-body mt-0.5">{lines.length} line{lines.length !== 1 ? "s" : ""}</p>
+            <p className="text-xs text-[#4F46E5] dark:text-[#818CF8] font-body mt-0.5">
+              {lines.length} line{lines.length !== 1 ? "s" : ""}
+            </p>
           )}
         </div>
         <span className="text-[#4F46E5] dark:text-[#818CF8] flex-shrink-0">
@@ -105,7 +118,11 @@ function AccordionItem({
   );
 }
 
-export default function DescriptionAccordion({ description }: { description: string }) {
+export default function DescriptionAccordion({
+  description,
+}: {
+  description: string;
+}) {
   const sections = useMemo(() => parseSections(description), [description]);
   const [open, setOpen] = useState<SectionKey | null>("Overview");
 
@@ -125,7 +142,9 @@ export default function DescriptionAccordion({ description }: { description: str
           title={s.title}
           lines={s.lines}
           isOpen={open === s.title}
-          onToggle={() => setOpen((prev) => (prev === s.title ? null : s.title))}
+          onToggle={() =>
+            setOpen((prev) => (prev === s.title ? null : s.title))
+          }
         />
       ))}
     </div>

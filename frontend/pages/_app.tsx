@@ -21,12 +21,17 @@ export default function App({ Component, pageProps }: AppProps) {
           <PriceProvider>
             <WalletProvider>
               <Head>
-                <title>Stellar-IndigoPay — Fund the planet. One XLM at a time.</title>
+                <title>
+                  Stellar-IndigoPay — Fund the planet. One XLM at a time.
+                </title>
                 <meta
                   name="description"
                   content="Donate directly to verified climate projects on Stellar. 100% on-chain, zero fees, maximum impact."
                 />
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <meta
+                  name="viewport"
+                  content="width=device-width, initial-scale=1"
+                />
               </Head>
               <Component {...pageProps} />
               <ThemeTiedToaster />

@@ -21,18 +21,18 @@ import {
   StyleSheet,
   TouchableOpacity,
   Animated,
-} from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
-import { useTheme } from '../theme';
+} from "react-native";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { useEffect, useRef, useState } from "react";
+import axios from "axios";
+import { useTheme } from "../theme";
 import {
   getPushToken,
   followProject,
   unfollowProject,
-} from '../../utils/notifications';
+} from "../../utils/notifications";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4000';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:4000";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -51,7 +51,7 @@ interface ClimateProject {
   status: string;
 }
 
-type ToastVariant = 'success' | 'error';
+type ToastVariant = "success" | "error";
 
 interface ToastState {
   message: string;
@@ -93,7 +93,7 @@ function Toast({
     });
   }, []);
 
-  const bg = variant === 'success' ? '#227239' : '#b91c1c';
+  const bg = variant === "success" ? "#227239" : "#b91c1c";
 
   return (
     <Animated.View
@@ -102,7 +102,7 @@ function Toast({
       accessibilityLiveRegion="polite"
     >
       <Text style={toastStyles.text}>
-        {variant === 'success' ? '✓ ' : '✕ '}
+        {variant === "success" ? "✓ " : "✕ "}
         {message}
       </Text>
     </Animated.View>
@@ -111,7 +111,7 @@ function Toast({
 
 const toastStyles = StyleSheet.create({
   container: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 96,
     left: 16,
     right: 16,
@@ -119,17 +119,17 @@ const toastStyles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 18,
     zIndex: 999,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 6,
     elevation: 8,
   },
   text: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 15,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
   },
 });
 
@@ -159,7 +159,7 @@ export default function ProjectDetailScreen() {
 
   // ── helpers ────────────────────────────────────────────────────────────────
 
-  const showToast = (message: string, variant: ToastVariant = 'success') => {
+  const showToast = (message: string, variant: ToastVariant = "success") => {
     setToast({ message, variant });
   };
 
@@ -178,11 +178,13 @@ export default function ProjectDetailScreen() {
   const checkFollowStatus = async (projectId: string, token: string) => {
     try {
       const response = await fetch(
-        `${API_URL}/api/notifications/follows?token=${encodeURIComponent(token)}`
+        `${API_URL}/api/notifications/follows?token=${encodeURIComponent(token)}`,
       );
       const data = await response.json();
       if (data.success) {
-        setIsFollowing(data.data.some((p: { id: string }) => p.id === projectId));
+        setIsFollowing(
+          data.data.some((p: { id: string }) => p.id === projectId),
+        );
       }
     } catch {
       // Silently ignore — follow state will default to false
@@ -206,7 +208,7 @@ export default function ProjectDetailScreen() {
     if (!project) return;
 
     if (!pushToken) {
-      showToast('Enable notifications to follow projects', 'error');
+      showToast("Enable notifications to follow projects", "error");
       return;
     }
 
@@ -216,13 +218,13 @@ export default function ProjectDetailScreen() {
         const ok = await unfollowProject(
           project.id,
           pushToken,
-          project.walletAddress ? undefined : undefined  // no wallet on device
+          project.walletAddress ? undefined : undefined, // no wallet on device
         );
         if (ok) {
           setIsFollowing(false);
           showToast(`Unfollowed ${project.name}`);
         } else {
-          showToast('Could not unfollow. Please try again.', 'error');
+          showToast("Could not unfollow. Please try again.", "error");
         }
       } else {
         const ok = await followProject(project.id, pushToken);
@@ -230,11 +232,11 @@ export default function ProjectDetailScreen() {
           setIsFollowing(true);
           showToast(`You're now following ${project.name}! 🔔`);
         } else {
-          showToast('Could not follow project. Please try again.', 'error');
+          showToast("Could not follow project. Please try again.", "error");
         }
       }
     } catch {
-      showToast('Something went wrong. Please try again.', 'error');
+      showToast("Something went wrong. Please try again.", "error");
     } finally {
       setFollowLoading(false);
     }
@@ -252,9 +254,9 @@ export default function ProjectDetailScreen() {
   // ── follow button label ───────────────────────────────────────────────────
 
   const followButtonLabel = (() => {
-    if (followLoading) return '⏳ Loading…';
-    if (isFollowing) return '✓ Following · Tap to unfollow';
-    return '🔔 Follow for Updates';
+    if (followLoading) return "⏳ Loading…";
+    if (isFollowing) return "✓ Following · Tap to unfollow";
+    return "🔔 Follow for Updates";
   })();
 
   // ── render ────────────────────────────────────────────────────────────────
@@ -321,13 +323,17 @@ export default function ProjectDetailScreen() {
               <Text style={[styles.statValue, { color: colors.accent }]}>
                 {project.donorCount}
               </Text>
-              <Text style={[styles.statLabel, { color: colors.muted }]}>Donors</Text>
+              <Text style={[styles.statLabel, { color: colors.muted }]}>
+                Donors
+              </Text>
             </View>
             <View style={styles.stat}>
               <Text style={[styles.statValue, { color: colors.accent }]}>
                 {project.co2OffsetKg.toFixed(0)}
               </Text>
-              <Text style={[styles.statLabel, { color: colors.muted }]}>kg CO₂</Text>
+              <Text style={[styles.statLabel, { color: colors.muted }]}>
+                kg CO₂
+              </Text>
             </View>
           </View>
         </View>
@@ -346,7 +352,9 @@ export default function ProjectDetailScreen() {
           <Text style={[styles.progressTitle, { color: colors.primaryText }]}>
             Fundraising Progress
           </Text>
-          <View style={[styles.progressBar, { backgroundColor: colors.border }]}>
+          <View
+            style={[styles.progressBar, { backgroundColor: colors.border }]}
+          >
             <View
               style={[
                 styles.progressFill,
@@ -402,9 +410,7 @@ export default function ProjectDetailScreen() {
               isFollowing && styles.followButtonTextActive,
             ]}
           >
-            {pushToken
-              ? followButtonLabel
-              : '🔔 Follow for Updates'}
+            {pushToken ? followButtonLabel : "🔔 Follow for Updates"}
           </Text>
           {isFollowing && (
             <Text style={styles.unfollowHint}>Tap again to unfollow</Text>
@@ -413,7 +419,10 @@ export default function ProjectDetailScreen() {
 
         {/* Donate button */}
         <TouchableOpacity
-          style={[styles.donateButton, { backgroundColor: colors.buttonBackground }]}
+          style={[
+            styles.donateButton,
+            { backgroundColor: colors.buttonBackground },
+          ]}
           onPress={() => router.push(`/donate/${project.id}`)}
         >
           <Text style={[styles.donateButtonText, { color: colors.buttonText }]}>
@@ -442,28 +451,28 @@ export default function ProjectDetailScreen() {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    position: 'relative',
+    position: "relative",
   },
   container: {
     flex: 1,
   },
   loadingText: {
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 40,
   },
   errorText: {
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 40,
   },
   header: {
     padding: 24,
   },
   headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
   },
   headerTextGroup: {
     flex: 1,
@@ -473,9 +482,9 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "rgba(255,255,255,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: 4,
   },
   shareIcon: {
@@ -483,12 +492,12 @@ const styles = StyleSheet.create({
   },
   category: {
     fontSize: 14,
-    textTransform: 'uppercase',
-    fontWeight: '600',
+    textTransform: "uppercase",
+    fontWeight: "600",
   },
   name: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 8,
   },
   location: {
@@ -506,15 +515,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   statRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
   stat: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   statValue: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   statLabel: {
     fontSize: 12,
@@ -532,26 +541,26 @@ const styles = StyleSheet.create({
   },
   progressTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 12,
   },
   progressBar: {
     height: 12,
     borderRadius: 6,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progressFill: {
-    height: '100%',
+    height: "100%",
   },
   progressText: {
     fontSize: 14,
     marginTop: 8,
-    textAlign: 'center',
+    textAlign: "center",
   },
   goalText: {
     fontSize: 12,
     marginTop: 4,
-    textAlign: 'center',
+    textAlign: "center",
   },
   descriptionCard: {
     margin: 16,
@@ -565,7 +574,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
   },
   description: {
@@ -573,32 +582,32 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   followButton: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingVertical: 14,
     paddingHorizontal: 16,
     marginHorizontal: 16,
     marginTop: 8,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
     borderWidth: 2,
-    borderColor: '#227239',
+    borderColor: "#227239",
   },
   followButtonActive: {
-    backgroundColor: '#227239',
+    backgroundColor: "#227239",
   },
   followButtonDisabled: {
     opacity: 0.6,
   },
   followButtonText: {
-    color: '#227239',
+    color: "#227239",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   followButtonTextActive: {
-    color: '#fff',
+    color: "#fff",
   },
   unfollowHint: {
-    color: 'rgba(255,255,255,0.75)',
+    color: "rgba(255,255,255,0.75)",
     fontSize: 12,
     marginTop: 3,
   },
@@ -607,10 +616,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 12,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   donateButtonText: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });

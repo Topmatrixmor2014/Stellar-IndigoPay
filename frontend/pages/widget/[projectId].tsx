@@ -24,7 +24,8 @@ export default function WidgetPage() {
   const [loading, setLoading] = useState(true);
   const theme = (router.query.theme as "light" | "dark") || "light";
   const accent = (router.query.accent as string) || "#059669";
-  const buttonText = (router.query.buttonText as string) || "Donate on IndigoPay";
+  const buttonText =
+    (router.query.buttonText as string) || "Donate on IndigoPay";
   const currency = (router.query.currency as Currency) || "XLM";
 
   useEffect(() => {
@@ -37,15 +38,22 @@ export default function WidgetPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderBottomColor: accent }} />
+      <div
+        className={`min-h-screen flex items-center justify-center ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}
+      >
+        <div
+          className="animate-spin rounded-full h-12 w-12 border-b-2"
+          style={{ borderBottomColor: accent }}
+        />
       </div>
     );
   }
 
   if (!project) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
+      <div
+        className={`min-h-screen flex items-center justify-center ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}
+      >
         <p className={theme === "dark" ? "text-gray-300" : "text-gray-600"}>
           Project not found
         </p>
@@ -68,14 +76,22 @@ export default function WidgetPage() {
   };
 
   return (
-    <div className={`min-h-screen ${bgClass} p-4 flex items-center justify-center`}>
-      <div className={`w-full max-w-sm rounded-xl border ${borderClass} overflow-hidden shadow-lg`}>
+    <div
+      className={`min-h-screen ${bgClass} p-4 flex items-center justify-center`}
+    >
+      <div
+        className={`w-full max-w-sm rounded-xl border ${borderClass} overflow-hidden shadow-lg`}
+      >
         {/* Header */}
         <div
           className="p-4 text-white"
-          style={{ background: `linear-gradient(to right, ${accent}, ${accent}dd)` }}
+          style={{
+            background: `linear-gradient(to right, ${accent}, ${accent}dd)`,
+          }}
         >
-          <h3 className="font-display text-lg font-bold truncate">{project.name}</h3>
+          <h3 className="font-display text-lg font-bold truncate">
+            {project.name}
+          </h3>
           <p className="text-sm opacity-90 truncate">{project.category}</p>
         </div>
 
@@ -108,15 +124,23 @@ export default function WidgetPage() {
               className="p-2 rounded"
               style={{ backgroundColor: `rgba(${hexToRgb(accent)}, 0.1)` }}
             >
-              <p className={`text-xs ${secondaryClass} font-semibold`}>Donors</p>
-              <p className={`text-lg font-bold ${textClass}`}>{project.donorCount}</p>
+              <p className={`text-xs ${secondaryClass} font-semibold`}>
+                Donors
+              </p>
+              <p className={`text-lg font-bold ${textClass}`}>
+                {project.donorCount}
+              </p>
             </div>
             <div
               className="p-2 rounded"
               style={{ backgroundColor: `rgba(${hexToRgb(accent)}, 0.08)` }}
             >
-              <p className={`text-xs ${secondaryClass} font-semibold`}>CO₂ Offset</p>
-              <p className={`text-lg font-bold ${textClass}`}>{formatCO2(project.co2OffsetKg)}</p>
+              <p className={`text-xs ${secondaryClass} font-semibold`}>
+                CO₂ Offset
+              </p>
+              <p className={`text-lg font-bold ${textClass}`}>
+                {formatCO2(project.co2OffsetKg)}
+              </p>
             </div>
           </div>
 
@@ -127,15 +151,21 @@ export default function WidgetPage() {
             rel="noopener noreferrer"
             className="block w-full py-3 rounded-lg font-semibold text-center transition-colors text-white"
             style={{ backgroundColor: accent }}
-            onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.9"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = "0.9";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = "1";
+            }}
           >
             {buttonText}
           </Link>
         </div>
 
         {/* Footer */}
-        <div className={`px-4 py-2 border-t ${borderClass} flex items-center justify-center`}>
+        <div
+          className={`px-4 py-2 border-t ${borderClass} flex items-center justify-center`}
+        >
           <a
             href="https://indigopay.app"
             target="_blank"

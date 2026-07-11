@@ -67,7 +67,9 @@ export default function SubmitProjectPage() {
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState("");
   const [reviewTimeline, setReviewTimeline] = useState("");
-  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [fieldErrors, setFieldErrors] = useState<
+    Partial<Record<keyof FormData, string>>
+  >({});
 
   const [form, setForm] = useState<FormData>({
     orgName: "",
@@ -87,12 +89,16 @@ export default function SubmitProjectPage() {
     impactMetrics: [],
   });
 
-  const set = (field: keyof FormData) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    setForm((prev) => ({ ...prev, [field]: e.target.value }));
-    setFieldErrors((prev) => ({ ...prev, [field]: undefined }));
-  };
+  const set =
+    (field: keyof FormData) =>
+    (
+      e: React.ChangeEvent<
+        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      >,
+    ) => {
+      setForm((prev) => ({ ...prev, [field]: e.target.value }));
+      setFieldErrors((prev) => ({ ...prev, [field]: undefined }));
+    };
 
   const toggleImpactMetric = (value: string) => {
     setForm((prev) => ({
@@ -117,12 +123,14 @@ export default function SubmitProjectPage() {
       if (!form.projectName.trim()) errs.projectName = "Required";
       if (!form.description.trim()) errs.description = "Required";
       if (!form.location.trim()) errs.location = "Required";
-      if (!form.goalXLM || Number(form.goalXLM) <= 0) errs.goalXLM = "Must be greater than 0";
+      if (!form.goalXLM || Number(form.goalXLM) <= 0)
+        errs.goalXLM = "Must be greater than 0";
     }
 
     if (step === "wallet") {
       if (!STELLAR_ADDRESS_RE.test(form.walletAddress.trim()))
-        errs.walletAddress = "Must be a valid Stellar address (starts with G, 56 chars)";
+        errs.walletAddress =
+          "Must be a valid Stellar address (starts with G, 56 chars)";
     }
 
     if (step === "methodology") {
@@ -210,10 +218,13 @@ export default function SubmitProjectPage() {
         </p>
         <p className="text-[#5a7a5a] dark:text-[#8aaa8a] font-body mb-8">
           Our team will review your submission within{" "}
-          <strong>{reviewTimeline || "5–10 business days"}</strong>. We&apos;ll contact you at{" "}
-          <strong>{form.contactEmail}</strong> with the outcome.
+          <strong>{reviewTimeline || "5–10 business days"}</strong>. We&apos;ll
+          contact you at <strong>{form.contactEmail}</strong> with the outcome.
         </p>
-        <button className="btn-primary" onClick={() => router.push("/projects")}>
+        <button
+          className="btn-primary"
+          onClick={() => router.push("/projects")}
+        >
           Browse Projects
         </button>
       </div>
@@ -226,7 +237,8 @@ export default function SubmitProjectPage() {
         Submit Your Project
       </h1>
       <p className="text-[#5a7a5a] dark:text-[#8aaa8a] font-body mb-8 text-sm">
-        Organizations can submit climate projects for verification and funding on Stellar IndigoPay.
+        Organizations can submit climate projects for verification and funding
+        on Stellar IndigoPay.
       </p>
 
       {/* Step indicator */}
@@ -238,21 +250,25 @@ export default function SubmitProjectPage() {
                 i < stepIndex
                   ? "bg-emerald-600 border-emerald-600 text-white"
                   : i === stepIndex
-                  ? "border-emerald-600 text-emerald-700 bg-white"
-                  : "border-forest-200 text-[#8aaa8a] dark:text-forest-300 bg-white"
+                    ? "border-emerald-600 text-emerald-700 bg-white"
+                    : "border-forest-200 text-[#8aaa8a] dark:text-forest-300 bg-white"
               }`}
             >
               {i < stepIndex ? "✓" : i + 1}
             </div>
             <span
               className={`text-xs font-body hidden sm:block ${
-                i === stepIndex ? "text-forest-900 font-semibold" : "text-[#8aaa8a] dark:text-forest-300"
+                i === stepIndex
+                  ? "text-forest-900 font-semibold"
+                  : "text-[#8aaa8a] dark:text-forest-300"
               }`}
             >
               {STEP_LABELS[s]}
             </span>
             {i < progressSteps.length - 1 && (
-              <div className={`flex-1 h-px ${i < stepIndex ? "bg-emerald-400" : "bg-forest-200"}`} />
+              <div
+                className={`flex-1 h-px ${i < stepIndex ? "bg-emerald-400" : "bg-forest-200"}`}
+              />
             )}
           </div>
         ))}
@@ -262,18 +278,41 @@ export default function SubmitProjectPage() {
         {/* Step: org */}
         {step === "org" && (
           <>
-            <h2 className="font-display text-xl font-bold text-forest-900">Organization Info</h2>
+            <h2 className="font-display text-xl font-bold text-forest-900">
+              Organization Info
+            </h2>
             <Field label="Organization Name *" error={fieldErrors.orgName}>
-              <input className="input-field" value={form.orgName} onChange={set("orgName")} placeholder="Acme Climate Foundation" />
+              <input
+                className="input-field"
+                value={form.orgName}
+                onChange={set("orgName")}
+                placeholder="Acme Climate Foundation"
+              />
             </Field>
             <Field label="Website" error={fieldErrors.orgWebsite}>
-              <input className="input-field" value={form.orgWebsite} onChange={set("orgWebsite")} placeholder="https://acme.org" />
+              <input
+                className="input-field"
+                value={form.orgWebsite}
+                onChange={set("orgWebsite")}
+                placeholder="https://acme.org"
+              />
             </Field>
             <Field label="Country" error={fieldErrors.orgCountry}>
-              <input className="input-field" value={form.orgCountry} onChange={set("orgCountry")} placeholder="Kenya" />
+              <input
+                className="input-field"
+                value={form.orgCountry}
+                onChange={set("orgCountry")}
+                placeholder="Kenya"
+              />
             </Field>
             <Field label="Contact Email *" error={fieldErrors.contactEmail}>
-              <input className="input-field" type="email" value={form.contactEmail} onChange={set("contactEmail")} placeholder="hello@acme.org" />
+              <input
+                className="input-field"
+                type="email"
+                value={form.contactEmail}
+                onChange={set("contactEmail")}
+                placeholder="hello@acme.org"
+              />
             </Field>
           </>
         )}
@@ -281,14 +320,27 @@ export default function SubmitProjectPage() {
         {/* Step: project */}
         {step === "project" && (
           <>
-            <h2 className="font-display text-xl font-bold text-forest-900">Project Details</h2>
+            <h2 className="font-display text-xl font-bold text-forest-900">
+              Project Details
+            </h2>
             <Field label="Project Name *" error={fieldErrors.projectName}>
-              <input className="input-field" value={form.projectName} onChange={set("projectName")} placeholder="Acme Solar Farm Phase 1" />
+              <input
+                className="input-field"
+                value={form.projectName}
+                onChange={set("projectName")}
+                placeholder="Acme Solar Farm Phase 1"
+              />
             </Field>
             <Field label="Category *" error={fieldErrors.category}>
-              <select className="input-field" value={form.category} onChange={set("category")}>
+              <select
+                className="input-field"
+                value={form.category}
+                onChange={set("category")}
+              >
                 {PROJECT_CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
                 ))}
               </select>
             </Field>
@@ -301,10 +353,23 @@ export default function SubmitProjectPage() {
               />
             </Field>
             <Field label="Location *" error={fieldErrors.location}>
-              <input className="input-field" value={form.location} onChange={set("location")} placeholder="Nairobi, Kenya" />
+              <input
+                className="input-field"
+                value={form.location}
+                onChange={set("location")}
+                placeholder="Nairobi, Kenya"
+              />
             </Field>
             <Field label="Funding Goal (XLM) *" error={fieldErrors.goalXLM}>
-              <input className="input-field" type="number" min="1" step="any" value={form.goalXLM} onChange={set("goalXLM")} placeholder="50000" />
+              <input
+                className="input-field"
+                type="number"
+                min="1"
+                step="any"
+                value={form.goalXLM}
+                onChange={set("goalXLM")}
+                placeholder="50000"
+              />
             </Field>
           </>
         )}
@@ -312,11 +377,17 @@ export default function SubmitProjectPage() {
         {/* Step: wallet */}
         {step === "wallet" && (
           <>
-            <h2 className="font-display text-xl font-bold text-forest-900">Stellar Wallet</h2>
+            <h2 className="font-display text-xl font-bold text-forest-900">
+              Stellar Wallet
+            </h2>
             <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body">
-              Donations will be sent directly to this Stellar address. Make sure you control it.
+              Donations will be sent directly to this Stellar address. Make sure
+              you control it.
             </p>
-            <Field label="Stellar Wallet Address *" error={fieldErrors.walletAddress}>
+            <Field
+              label="Stellar Wallet Address *"
+              error={fieldErrors.walletAddress}
+            >
               <input
                 className="input-field font-mono text-sm"
                 value={form.walletAddress}
@@ -326,7 +397,8 @@ export default function SubmitProjectPage() {
               />
             </Field>
             <p className="text-xs text-[#8aaa8a] dark:text-forest-300 font-body">
-              Starts with G and is 56 characters long. Testnet and mainnet addresses are both accepted.
+              Starts with G and is 56 characters long. Testnet and mainnet
+              addresses are both accepted.
             </p>
           </>
         )}
@@ -334,27 +406,67 @@ export default function SubmitProjectPage() {
         {/* Step: methodology */}
         {step === "methodology" && (
           <>
-            <h2 className="font-display text-xl font-bold text-forest-900">CO₂ Methodology</h2>
+            <h2 className="font-display text-xl font-bold text-forest-900">
+              CO₂ Methodology
+            </h2>
             <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body">
               Tell us how your project measures and verifies carbon reduction.
             </p>
-            <Field label="Methodology Name *" error={fieldErrors.co2MethodologyName}>
-              <input className="input-field" value={form.co2MethodologyName} onChange={set("co2MethodologyName")} placeholder="Verra VM0007" />
+            <Field
+              label="Methodology Name *"
+              error={fieldErrors.co2MethodologyName}
+            >
+              <input
+                className="input-field"
+                value={form.co2MethodologyName}
+                onChange={set("co2MethodologyName")}
+                placeholder="Verra VM0007"
+              />
             </Field>
-            <Field label="Verification Body" error={fieldErrors.co2VerificationBody}>
-              <input className="input-field" value={form.co2VerificationBody} onChange={set("co2VerificationBody")} placeholder="Gold Standard, Verra, etc." />
+            <Field
+              label="Verification Body"
+              error={fieldErrors.co2VerificationBody}
+            >
+              <input
+                className="input-field"
+                value={form.co2VerificationBody}
+                onChange={set("co2VerificationBody")}
+                placeholder="Gold Standard, Verra, etc."
+              />
             </Field>
-            <Field label="Annual CO₂ Reduction (tonnes) *" error={fieldErrors.co2AnnualTonnes}>
-              <input className="input-field" type="number" min="1" step="any" value={form.co2AnnualTonnes} onChange={set("co2AnnualTonnes")} placeholder="1200" />
+            <Field
+              label="Annual CO₂ Reduction (tonnes) *"
+              error={fieldErrors.co2AnnualTonnes}
+            >
+              <input
+                className="input-field"
+                type="number"
+                min="1"
+                step="any"
+                value={form.co2AnnualTonnes}
+                onChange={set("co2AnnualTonnes")}
+                placeholder="1200"
+              />
             </Field>
-            <Field label="Supporting Document URL" error={fieldErrors.co2DocumentUrl}>
-              <input className="input-field" value={form.co2DocumentUrl} onChange={set("co2DocumentUrl")} placeholder="https://…" />
+            <Field
+              label="Supporting Document URL"
+              error={fieldErrors.co2DocumentUrl}
+            >
+              <input
+                className="input-field"
+                value={form.co2DocumentUrl}
+                onChange={set("co2DocumentUrl")}
+                placeholder="https://…"
+              />
             </Field>
 
             <Field label="Impact Metrics">
               <div className="flex flex-col gap-2 rounded-xl border border-[rgba(34,114,57,0.12)] bg-[#f8fcf8] p-3">
                 {IMPACT_METRICS.map((metric) => (
-                  <label key={metric.value} className="flex items-center gap-2 text-sm text-[#5a7a5a]">
+                  <label
+                    key={metric.value}
+                    className="flex items-center gap-2 text-sm text-[#5a7a5a]"
+                  >
                     <input
                       type="checkbox"
                       className="h-4 w-4 rounded border-[#8aaa8a] text-emerald-600 focus:ring-emerald-500"

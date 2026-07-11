@@ -32,12 +32,12 @@ export interface ClimateProject {
   category: ProjectCategory;
   location: string;
   imageUrl?: string;
-  walletAddress: string;       // Stellar address that receives donations
-  goalXLM: string;             // fundraising goal
-  raisedXLM: string;           // total raised so far
+  walletAddress: string; // Stellar address that receives donations
+  goalXLM: string; // fundraising goal
+  raisedXLM: string; // total raised so far
   donorCount: number;
-  co2OffsetKg: number;         // estimated CO2 offset in kg
-  co2_per_xlm?: number;        // CO2 offset per XLM donated
+  co2OffsetKg: number; // estimated CO2 offset in kg
+  co2_per_xlm?: number; // CO2 offset per XLM donated
   status: ProjectStatus;
   rejectionReason?: string | null;
   verified: boolean;
@@ -200,7 +200,6 @@ export interface DonateProject {
  * Props provided to the donate page.
  */
 export interface DonatePageProps {
-  
   project: DonateProject | null;
   presetAmount: number | null;
 }

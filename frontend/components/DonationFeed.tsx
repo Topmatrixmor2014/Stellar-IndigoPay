@@ -15,9 +15,14 @@ interface DonationFeedProps {
   onNewDonation?: (donation: Donation) => void;
 }
 
-export default function DonationFeed({ projectId, walletAddress, refreshKey = 0, onNewDonation }: DonationFeedProps) {
+export default function DonationFeed({
+  projectId,
+  walletAddress,
+  refreshKey = 0,
+  onNewDonation,
+}: DonationFeedProps) {
   const [donations, setDonations] = useState<Donation[]>([]);
-  const [loading,   setLoading]   = useState(true);
+  const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [newIds, setNewIds] = useState<Set<string>>(new Set());
@@ -39,50 +44,57 @@ export default function DonationFeed({ projectId, walletAddress, refreshKey = 0,
   }, [projectId, refreshKey]);
 
   // Handle incoming SSE payment
-  const handleNewPayment = useCallback((payment: {
-    id: string;
-    from: string;
-    amount: string;
-    asset: string;
-    createdAt: string;
-    transactionHash: string;
-  }) => {
-    const newDonation: Donation = {
-      id: payment.id,
-      projectId,
-      donorAddress: payment.from,
-      amountXLM: payment.amount,
-      amount: payment.amount,
-      currency: (payment.asset === "XLM" ? "XLM" : "USDC") as "XLM" | "USDC",
-      transactionHash: payment.transactionHash,
-      createdAt: payment.createdAt,
-    };
+  const handleNewPayment = useCallback(
+    (payment: {
+      id: string;
+      from: string;
+      amount: string;
+      asset: string;
+      createdAt: string;
+      transactionHash: string;
+    }) => {
+      const newDonation: Donation = {
+        id: payment.id,
+        projectId,
+        donorAddress: payment.from,
+        amountXLM: payment.amount,
+        amount: payment.amount,
+        currency: (payment.asset === "XLM" ? "XLM" : "USDC") as "XLM" | "USDC",
+        transactionHash: payment.transactionHash,
+        createdAt: payment.createdAt,
+      };
 
-    setDonations((prev) => {
-      if (prev.some((d) => d.id === newDonation.id)) return prev;
-      return [newDonation, ...prev];
-    });
-
-    setNewIds((prev) => new Set(prev).add(payment.id));
-    setTimeout(() => {
-      setNewIds((prev) => {
-        const next = new Set(prev);
-        next.delete(payment.id);
-        return next;
+      setDonations((prev) => {
+        if (prev.some((d) => d.id === newDonation.id)) return prev;
+        return [newDonation, ...prev];
       });
-    }, 2000);
 
-    onNewDonation?.(newDonation);
+      setNewIds((prev) => new Set(prev).add(payment.id));
+      setTimeout(() => {
+        setNewIds((prev) => {
+          const next = new Set(prev);
+          next.delete(payment.id);
+          return next;
+        });
+      }, 2000);
 
-    latestIdRef.current = payment.id;
-  }, [projectId, onNewDonation]);
+      onNewDonation?.(newDonation);
+
+      latestIdRef.current = payment.id;
+    },
+    [projectId, onNewDonation],
+  );
 
   // Start SSE stream once initial data is loaded
   useEffect(() => {
     if (loading || !walletAddress) return;
 
     const cursor = latestIdRef.current || undefined;
-    const closeStream = streamProjectPayments(walletAddress, handleNewPayment, cursor);
+    const closeStream = streamProjectPayments(
+      walletAddress,
+      handleNewPayment,
+      cursor,
+    );
 
     return () => {
       closeStream();
@@ -93,8 +105,9 @@ export default function DonationFeed({ projectId, walletAddress, refreshKey = 0,
     if (!nextCursor || loadingMore) return;
     setLoadingMore(true);
     try {
-      const { donations: newDonations, nextCursor: cursor } = await fetchProjectDonations(projectId, 10, nextCursor);
-      setDonations(prev => [...prev, ...newDonations]);
+      const { donations: newDonations, nextCursor: cursor } =
+        await fetchProjectDonations(projectId, 10, nextCursor);
+      setDonations((prev) => [...prev, ...newDonations]);
       setNextCursor(cursor);
     } catch (error) {
       console.error(error);
@@ -103,31 +116,38 @@ export default function DonationFeed({ projectId, walletAddress, refreshKey = 0,
     }
   };
 
-  if (loading) return (
-    <div className="space-y-3">
-      {[1, 2, 3].map(i => (
-        <div key={i} className="animate-pulse flex gap-3 p-3 rounded-xl bg-[rgba(99,102,241,0.04)] dark:bg-[rgba(129,140,248,0.06)]">
-          <div className="w-8 h-8 rounded-full bg-[rgba(99,102,241,0.10)] dark:bg-[rgba(129,140,248,0.12)] flex-shrink-0" />
-          <div className="flex-1 space-y-2">
-            <div className="h-3 bg-[rgba(99,102,241,0.10)] dark:bg-[rgba(129,140,248,0.12)] rounded w-1/2" />
-            <div className="h-2 bg-[rgba(99,102,241,0.06)] dark:bg-[rgba(129,140,248,0.08)] rounded w-1/3" />
+  if (loading)
+    return (
+      <div className="space-y-3">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="animate-pulse flex gap-3 p-3 rounded-xl bg-[rgba(99,102,241,0.04)] dark:bg-[rgba(129,140,248,0.06)]"
+          >
+            <div className="w-8 h-8 rounded-full bg-[rgba(99,102,241,0.10)] dark:bg-[rgba(129,140,248,0.12)] flex-shrink-0" />
+            <div className="flex-1 space-y-2">
+              <div className="h-3 bg-[rgba(99,102,241,0.10)] dark:bg-[rgba(129,140,248,0.12)] rounded w-1/2" />
+              <div className="h-2 bg-[rgba(99,102,241,0.06)] dark:bg-[rgba(129,140,248,0.08)] rounded w-1/3" />
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
-  );
+        ))}
+      </div>
+    );
 
-  if (donations.length === 0) return (
-    <div>
-      {walletAddress && (
-        <div className="flex items-center gap-2 mb-3 text-xs text-[#4F46E5] dark:text-[#818CF8] font-body">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          Listening for live donations…
-        </div>
-      )}
-      <p className="text-center text-[#475569] dark:text-[#94A3B8] text-sm py-6 font-body">No donations yet — be the first! 🌱</p>
-    </div>
-  );
+  if (donations.length === 0)
+    return (
+      <div>
+        {walletAddress && (
+          <div className="flex items-center gap-2 mb-3 text-xs text-[#4F46E5] dark:text-[#818CF8] font-body">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            Listening for live donations…
+          </div>
+        )}
+        <p className="text-center text-[#475569] dark:text-[#94A3B8] text-sm py-6 font-body">
+          No donations yet — be the first! 🌱
+        </p>
+      </div>
+    );
 
   return (
     <div className="space-y-2">
@@ -151,9 +171,13 @@ export default function DonationFeed({ projectId, walletAddress, refreshKey = 0,
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-semibold text-[#0F172A] dark:text-[#E2E8F0] text-sm font-body">{shortenAddress(d.donorAddress, 5)}</span>
+              <span className="font-semibold text-[#0F172A] dark:text-[#E2E8F0] text-sm font-body">
+                {shortenAddress(d.donorAddress, 5)}
+              </span>
               <span className="font-mono font-bold text-[#4F46E5] dark:text-[#818CF8] text-sm">
-                {d.currency === "USDC" ? `$${parseFloat(d.amount || "0").toFixed(2)} USDC` : formatXLM(d.amountXLM || d.amount || "0")}
+                {d.currency === "USDC"
+                  ? `$${parseFloat(d.amount || "0").toFixed(2)} USDC`
+                  : formatXLM(d.amountXLM || d.amount || "0")}
               </span>
               {d.isMatched && (
                 <span className="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full font-body font-semibold">
@@ -166,11 +190,21 @@ export default function DonationFeed({ projectId, walletAddress, refreshKey = 0,
                 </span>
               )}
             </div>
-            {d.message && <p className="text-xs text-[#475569] dark:text-[#94A3B8] mt-0.5 italic font-body">&quot;{d.message}&quot;</p>}
+            {d.message && (
+              <p className="text-xs text-[#475569] dark:text-[#94A3B8] mt-0.5 italic font-body">
+                &quot;{d.message}&quot;
+              </p>
+            )}
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs text-[#64748B] dark:text-[#94A3B8] font-body">{timeAgo(d.createdAt)}</span>
-              <a href={explorerUrl(d.transactionHash)} target="_blank" rel="noopener noreferrer"
-                className="text-xs text-[#4F46E5] dark:text-[#818CF8] hover:text-[#6366F1] transition-colors font-body">
+              <span className="text-xs text-[#64748B] dark:text-[#94A3B8] font-body">
+                {timeAgo(d.createdAt)}
+              </span>
+              <a
+                href={explorerUrl(d.transactionHash)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-[#4F46E5] dark:text-[#818CF8] hover:text-[#6366F1] transition-colors font-body"
+              >
                 View tx ↗
               </a>
             </div>

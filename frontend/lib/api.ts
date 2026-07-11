@@ -28,7 +28,11 @@ const api = axios.create({
 // Rewrite `/api/*` request paths to `/api/v1/*` from a single place so every
 // helper below stays on the unversioned path string.
 api.interceptors.request.use((config) => {
-  if (config.url && config.url.startsWith("/api/") && !config.url.startsWith("/api/v1/")) {
+  if (
+    config.url &&
+    config.url.startsWith("/api/") &&
+    !config.url.startsWith("/api/v1/")
+  ) {
     config.url = config.url.replace(/^\/api\//, "/api/v1/");
   }
   return config;
@@ -46,7 +50,8 @@ async function refreshCsrfToken() {
 
 api.interceptors.request.use(async (config) => {
   const method = config.method?.toUpperCase();
-  const isMutating = method && ["POST", "PUT", "PATCH", "DELETE"].includes(method);
+  const isMutating =
+    method && ["POST", "PUT", "PATCH", "DELETE"].includes(method);
 
   if (isMutating) {
     if (!csrfToken) {
@@ -161,10 +166,10 @@ export async function generateProjectSummary(
   projectId: string,
   adminAddress: string,
 ): Promise<AISummaryResponse> {
-  const { data } = await api.post<{ success: boolean; data: AISummaryResponse }>(
-    `/api/projects/${projectId}/generate-summary`,
-    { adminAddress },
-  );
+  const { data } = await api.post<{
+    success: boolean;
+    data: AISummaryResponse;
+  }>(`/api/projects/${projectId}/generate-summary`, { adminAddress });
   return data.data;
 }
 
@@ -500,7 +505,9 @@ export async function fetchTagSuggestions(query: string): Promise<string[]> {
 /**
  * Notify an admin (placeholder function for future use).
  */
-export async function notifyAdmin(payload: AdminNotificationPayload): Promise<void> {
+export async function notifyAdmin(
+  payload: AdminNotificationPayload,
+): Promise<void> {
   await api.post("/api/admin/notify", payload);
 }
 
@@ -510,10 +517,10 @@ export async function notifyAdmin(payload: AdminNotificationPayload): Promise<vo
  * @returns Updated follow state and count.
  */
 export async function followProject(projectId: string, walletAddress: string) {
-  const { data } = await api.post<{ success: boolean; data: { isFollowing: boolean; followCount: number } }>(
-    `/api/projects/${projectId}/follow`,
-    { walletAddress },
-  );
+  const { data } = await api.post<{
+    success: boolean;
+    data: { isFollowing: boolean; followCount: number };
+  }>(`/api/projects/${projectId}/follow`, { walletAddress });
   return data.data;
 }
 
@@ -521,11 +528,14 @@ export async function followProject(projectId: string, walletAddress: string) {
  * Unfollow a project.
  * @returns Updated follow state and count.
  */
-export async function unfollowProject(projectId: string, walletAddress: string) {
-  const { data } = await api.delete<{ success: boolean; data: { isFollowing: boolean; followCount: number } }>(
-    `/api/projects/${projectId}/follow`,
-    { data: { walletAddress } },
-  );
+export async function unfollowProject(
+  projectId: string,
+  walletAddress: string,
+) {
+  const { data } = await api.delete<{
+    success: boolean;
+    data: { isFollowing: boolean; followCount: number };
+  }>(`/api/projects/${projectId}/follow`, { data: { walletAddress } });
   return data.data;
 }
 
@@ -589,20 +599,23 @@ export async function fetchUnreadNotificationCount({
 
 // ── Update Likes ─────────────────────────────────────────────────
 export async function toggleUpdateLike(updateId: string, donorAddress: string) {
-  const { data } = await api.post<{ success: boolean; data: { liked: boolean; likeCount: number } }>(
-    `/api/updates/${updateId}/like`,
-    { donorAddress },
-  );
+  const { data } = await api.post<{
+    success: boolean;
+    data: { liked: boolean; likeCount: number };
+  }>(`/api/updates/${updateId}/like`, { donorAddress });
   return data.data;
 }
 
-export async function fetchUpdateLikes(updateId: string, donorAddress?: string) {
+export async function fetchUpdateLikes(
+  updateId: string,
+  donorAddress?: string,
+) {
   const params: Record<string, string> = {};
   if (donorAddress) params.donorAddress = donorAddress;
-  const { data } = await api.get<{ success: boolean; data: { liked: boolean; likeCount: number } }>(
-    `/api/updates/${updateId}/likes`,
-    { params },
-  );
+  const { data } = await api.get<{
+    success: boolean;
+    data: { liked: boolean; likeCount: number };
+  }>(`/api/updates/${updateId}/likes`, { params });
   return data.data;
 }
 
@@ -664,10 +677,13 @@ export interface ImpactDonorStats {
   topCategory: string | null;
 }
 
-export async function fetchImpactProject(projectId: string): Promise<ImpactProjectStats> {
-  const { data } = await api.get<{ success: boolean; data: ImpactProjectStats }>(
-    `/api/impact/project/${projectId}`,
-  );
+export async function fetchImpactProject(
+  projectId: string,
+): Promise<ImpactProjectStats> {
+  const { data } = await api.get<{
+    success: boolean;
+    data: ImpactProjectStats;
+  }>(`/api/impact/project/${projectId}`);
   return data.data;
 }
 
@@ -678,7 +694,9 @@ export async function fetchImpactGlobal(): Promise<ImpactGlobalStats> {
   return data.data;
 }
 
-export async function fetchImpactDonor(publicKey: string): Promise<ImpactDonorStats> {
+export async function fetchImpactDonor(
+  publicKey: string,
+): Promise<ImpactDonorStats> {
   const { data } = await api.get<{ success: boolean; data: ImpactDonorStats }>(
     `/api/impact/donor/${publicKey}`,
   );
@@ -717,11 +735,13 @@ export interface AdminNotificationPayload {
   impactMetrics: string[];
 }
 
-export async function submitProject(payload: SubmitProjectPayload): Promise<SubmitProjectResponse> {
-  const { data } = await api.post<{ success: boolean; data: SubmitProjectResponse }>(
-    "/api/projects",
-    payload,
-  );
+export async function submitProject(
+  payload: SubmitProjectPayload,
+): Promise<SubmitProjectResponse> {
+  const { data } = await api.post<{
+    success: boolean;
+    data: SubmitProjectResponse;
+  }>("/api/projects", payload);
   return data.data;
 }
 
@@ -777,20 +797,20 @@ export interface VerificationRequestResponse {
 export async function submitVerificationRequest(
   payload: VerificationRequestPayload,
 ): Promise<VerificationRequestResponse> {
-  const { data } = await api.post<{ success: boolean; data: VerificationRequestResponse }>(
-    "/api/verification-requests",
-    payload,
-  );
+  const { data } = await api.post<{
+    success: boolean;
+    data: VerificationRequestResponse;
+  }>("/api/verification-requests", payload);
   return data.data;
 }
 
 export async function fetchMyVerificationRequests(
   walletAddress: string,
 ): Promise<VerificationRequestResponse[]> {
-  const { data } = await api.get<{ success: boolean; data: VerificationRequestResponse[] }>(
-    "/api/verification-requests/me",
-    { params: { wallet: walletAddress } },
-  );
+  const { data } = await api.get<{
+    success: boolean;
+    data: VerificationRequestResponse[];
+  }>("/api/verification-requests/me", { params: { wallet: walletAddress } });
   return data.data;
 }
 
@@ -800,10 +820,10 @@ export async function fetchVerificationRequest(
 ): Promise<VerificationRequestResponse> {
   const params: Record<string, string> = {};
   if (walletAddress) params.wallet = walletAddress;
-  const { data } = await api.get<{ success: boolean; data: VerificationRequestResponse }>(
-    `/api/verification-requests/${id}`,
-    { params },
-  );
+  const { data } = await api.get<{
+    success: boolean;
+    data: VerificationRequestResponse;
+  }>(`/api/verification-requests/${id}`, { params });
   return data.data;
 }
 
@@ -821,7 +841,9 @@ export interface UploadedDocument {
  * STORAGE_BACKEND (local disk by default) and returns a URL that the
  * verification form stashes into `supportingDocuments[]` on submit.
  */
-export async function uploadSupportingDocument(file: File): Promise<UploadedDocument> {
+export async function uploadSupportingDocument(
+  file: File,
+): Promise<UploadedDocument> {
   // CSRF + multipart: axios automatically sets the right Content-Type when
   // given a FormData body; we still need the X-CSRF-Token header, which the
   // request interceptor already adds on POSTs.

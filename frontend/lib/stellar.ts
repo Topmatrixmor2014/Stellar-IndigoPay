@@ -7,19 +7,40 @@
  * @see https://developers.stellar.org/docs/data/horizon
  * @see https://soroban.stellar.org/docs
  */
-import { Horizon, Networks, Asset, Operation, TransactionBuilder, Transaction, Memo, rpc, Contract, scValToNative, Address, nativeToScVal, Account, xdr } from "@stellar/stellar-sdk";
+import {
+  Horizon,
+  Networks,
+  Asset,
+  Operation,
+  TransactionBuilder,
+  Transaction,
+  Memo,
+  rpc,
+  Contract,
+  scValToNative,
+  Address,
+  nativeToScVal,
+  Account,
+  xdr,
+} from "@stellar/stellar-sdk";
 
-export const NETWORK = (process.env.NEXT_PUBLIC_STELLAR_NETWORK || "testnet") as "testnet" | "mainnet";
-const HORIZON_URL = process.env.NEXT_PUBLIC_HORIZON_URL || "https://horizon-testnet.stellar.org";
-const RPC_URL     = process.env.NEXT_PUBLIC_SOROBAN_RPC_URL || "https://soroban-testnet.stellar.org";
+export const NETWORK = (process.env.NEXT_PUBLIC_STELLAR_NETWORK ||
+  "testnet") as "testnet" | "mainnet";
+const HORIZON_URL =
+  process.env.NEXT_PUBLIC_HORIZON_URL || "https://horizon-testnet.stellar.org";
+const RPC_URL =
+  process.env.NEXT_PUBLIC_SOROBAN_RPC_URL ||
+  "https://soroban-testnet.stellar.org";
 
-export const NETWORK_PASSPHRASE = NETWORK === "mainnet" ? Networks.PUBLIC : Networks.TESTNET;
+export const NETWORK_PASSPHRASE =
+  NETWORK === "mainnet" ? Networks.PUBLIC : Networks.TESTNET;
 export const server = new Horizon.Server(HORIZON_URL);
 export const rpcServer = new rpc.Server(RPC_URL);
 export const CONTRACT_ID = process.env.NEXT_PUBLIC_CONTRACT_ID || "";
 
 /** Soroban escrow contract (deploy `contracts/escrow-contract`). */
-export const ESCROW_CONTRACT_ID = process.env.NEXT_PUBLIC_ESCROW_CONTRACT_ID || "";
+export const ESCROW_CONTRACT_ID =
+  process.env.NEXT_PUBLIC_ESCROW_CONTRACT_ID || "";
 
 /**
  * Fetch an account's native XLM balance using Horizon.
@@ -80,10 +101,16 @@ export async function getFriendBotFunding(publicKey: string): Promise<string> {
  * @returns Balance string, or `null` when the trustline is missing.
  * @throws If the account does not exist, is not funded, or Horizon is unreachable.
  */
-export async function getAssetBalance(publicKey: string, assetCode: string, assetIssuer: string): Promise<string | null> {
+export async function getAssetBalance(
+  publicKey: string,
+  assetCode: string,
+  assetIssuer: string,
+): Promise<string | null> {
   try {
     const account = await server.loadAccount(publicKey);
-    const asset = account.balances.find((b: any) => b.asset_code === assetCode && b.asset_issuer === assetIssuer);
+    const asset = account.balances.find(
+      (b: any) => b.asset_code === assetCode && b.asset_issuer === assetIssuer,
+    );
     // If the asset is not present on the account, the user likely doesn't have the trustline.
     if (!asset) return null;
     return asset.balance;
@@ -116,13 +143,35 @@ export async function getAssetBalance(publicKey: string, assetCode: string, asse
  * @see https://developers.stellar.org/docs/data/horizon/api-reference/resources/accounts
  */
 export async function buildDonationTransaction({
-  fromPublicKey, toPublicKey, amount, memo, asset,
-}: { fromPublicKey: string; toPublicKey: string; amount: string; memo?: string; asset?: { code: string; issuer?: string } }) {
+  fromPublicKey,
+  toPublicKey,
+  amount,
+  memo,
+  asset,
+}: {
+  fromPublicKey: string;
+  toPublicKey: string;
+  amount: string;
+  memo?: string;
+  asset?: { code: string; issuer?: string };
+}) {
   const source = await server.loadAccount(fromPublicKey);
-  const paymentAsset = asset && asset.code && asset.issuer ? new Asset(asset.code, asset.issuer) : Asset.native();
+  const paymentAsset =
+    asset && asset.code && asset.issuer
+      ? new Asset(asset.code, asset.issuer)
+      : Asset.native();
 
-  const builder = new TransactionBuilder(source, { fee: "100", networkPassphrase: NETWORK_PASSPHRASE })
-    .addOperation(Operation.payment({ destination: toPublicKey, asset: paymentAsset, amount }))
+  const builder = new TransactionBuilder(source, {
+    fee: "100",
+    networkPassphrase: NETWORK_PASSPHRASE,
+  })
+    .addOperation(
+      Operation.payment({
+        destination: toPublicKey,
+        asset: paymentAsset,
+        amount,
+      }),
+    )
     .setTimeout(60);
   if (memo) builder.addMemo(Memo.text(memo.slice(0, 28)));
   return builder.build();
@@ -179,8 +228,8 @@ export async function buildContractDonationTransaction({
         donorAddress.toScVal(),
         nativeToScVal(projectId, { type: "string" }),
         nativeToScVal(amountInStroops, { type: "i128" }),
-        nativeToScVal(msgHash, { type: "u32" })
-      )
+        nativeToScVal(msgHash, { type: "u32" }),
+      ),
     )
     .setTimeout(60);
 
@@ -251,7 +300,11 @@ export async function buildMintImpactNftTransaction({
     networkPassphrase: NETWORK_PASSPHRASE,
   })
     .addOperation(
-      contract.call("mint_impact_nft", donorAddr.toScVal(), badgeTierToScVal(tier)),
+      contract.call(
+        "mint_impact_nft",
+        donorAddr.toScVal(),
+        badgeTierToScVal(tier),
+      ),
     )
     .setTimeout(60)
     .build();
@@ -270,10 +323,14 @@ export function formatMintSimulationFailure(simulated: unknown): Error {
     return new Error("You have already claimed the Impact NFT for this tier.");
   }
   if (raw.includes("No badge tier reached yet")) {
-    return new Error("No badge tier reached yet — donate more to unlock an Impact NFT.");
+    return new Error(
+      "No badge tier reached yet — donate more to unlock an Impact NFT.",
+    );
   }
   if (raw.includes("Tier does not match donor's current badge")) {
-    return new Error("This tier no longer matches your on-chain badge. Refresh and try again.");
+    return new Error(
+      "This tier no longer matches your on-chain badge. Refresh and try again.",
+    );
   }
   if (raw.includes("Cannot mint NFT for None tier")) {
     return new Error("There is no badge tier to claim yet.");
@@ -302,7 +359,10 @@ export function formatMintSimulationFailure(simulated: unknown): Error {
  */
 export async function submitSorobanTransaction(
   signedXDR: string,
-  { timeoutMs = 30000, intervalMs = 1500 }: { timeoutMs?: number; intervalMs?: number } = {},
+  {
+    timeoutMs = 30000,
+    intervalMs = 1500,
+  }: { timeoutMs?: number; intervalMs?: number } = {},
 ): Promise<{ hash: string; ledger: number }> {
   const tx = new Transaction(signedXDR, NETWORK_PASSPHRASE);
   const sent = await rpcServer.sendTransaction(tx);
@@ -323,7 +383,9 @@ export async function submitSorobanTransaction(
       return { hash, ledger: result.ledger };
     }
     if (result.status === rpc.Api.GetTransactionStatus.FAILED) {
-      throw new Error("Transaction failed on-chain. The mint was not completed.");
+      throw new Error(
+        "Transaction failed on-chain. The mint was not completed.",
+      );
     }
     // NOT_FOUND — still pending; wait and retry.
     await new Promise((resolve) => setTimeout(resolve, intervalMs));
@@ -355,7 +417,9 @@ export async function buildReleaseEscrowTransaction({
   clientAddress: string;
 }) {
   if (!contractId.trim()) {
-    throw new Error("Escrow contract is not configured (set NEXT_PUBLIC_ESCROW_CONTRACT_ID).");
+    throw new Error(
+      "Escrow contract is not configured (set NEXT_PUBLIC_ESCROW_CONTRACT_ID).",
+    );
   }
   const source = await server.loadAccount(clientAddress);
   const contract = new Contract(contractId);
@@ -431,7 +495,9 @@ export function formatSimulationFailure(simulated: unknown): Error {
     );
   }
   if (raw.includes("Only the client can release")) {
-    return new Error("Connect the client wallet — only the client can release escrow.");
+    return new Error(
+      "Connect the client wallet — only the client can release escrow.",
+    );
   }
   if (raw.includes("Already released")) {
     return new Error("This escrow was already released on-chain.");
@@ -458,7 +524,9 @@ export function formatTransactionError(err: unknown): string {
   const e = err as {
     response?: {
       data?: {
-        extras?: { result_codes?: { transaction?: string; operations?: string[] } };
+        extras?: {
+          result_codes?: { transaction?: string; operations?: string[] };
+        };
         detail?: string;
       };
     };
@@ -471,7 +539,10 @@ export function formatTransactionError(err: unknown): string {
   if (blob.includes("underfunded") || blob.includes("op_underfunded")) {
     return "Insufficient XLM balance for network fees or the payment.";
   }
-  if (blob.includes("insufficient_fee") || blob.includes("tx_insufficient_fee")) {
+  if (
+    blob.includes("insufficient_fee") ||
+    blob.includes("tx_insufficient_fee")
+  ) {
     return "Network fee too low. Wait and try again, or use a higher fee.";
   }
   if (blob.includes("bad_auth") || blob.includes("op_bad_auth")) {
@@ -546,17 +617,20 @@ export async function getGlobalImpactStats() {
   }
 
   const contract = new Contract(CONTRACT_ID);
-  
+
   try {
     const [totalRaised, totalCO2, donationCount] = await Promise.all([
       simulateCall(contract, "get_global_total"),
       simulateCall(contract, "get_global_co2"),
-      simulateCall(contract, "get_donation_count")
+      simulateCall(contract, "get_donation_count"),
     ]);
 
     // totalRaised is in stroops (i128), totalCO2 is in grams (i128)
     return {
-      totalRaisedXLM: (Number(totalRaised) / 10_000_000).toLocaleString(undefined, { minimumFractionDigits: 2 }),
+      totalRaisedXLM: (Number(totalRaised) / 10_000_000).toLocaleString(
+        undefined,
+        { minimumFractionDigits: 2 },
+      ),
       totalCO2OffsetGrams: totalCO2.toString(),
       donationCount: Number(donationCount),
     };
@@ -582,7 +656,9 @@ export async function getDonorStats(donorAddress: string) {
 
   try {
     const donor = new Address(donorAddress);
-    const stats = await simulateCall(contract, "get_donor_stats", [donor.toScVal()]);
+    const stats = await simulateCall(contract, "get_donor_stats", [
+      donor.toScVal(),
+    ]);
 
     return {
       totalDonated: Number(stats.total_donated) / 10_000_000,
@@ -607,7 +683,7 @@ export async function getDonorStats(donorAddress: string) {
 export function hashMessage(message: string): number {
   let hash = 5381;
   for (let i = 0; i < message.length; i++) {
-    hash = ((hash << 5) + hash) + message.charCodeAt(i);
+    hash = (hash << 5) + hash + message.charCodeAt(i);
     hash = hash >>> 0; // Convert to unsigned 32-bit integer
   }
   return hash;
@@ -687,7 +763,8 @@ export function streamGlobalProjectDonations(
     .cursor(cursor || "now")
     .stream({
       onmessage: (record: any) => {
-        if (record.type !== "payment" && record.type !== "create_account") return;
+        if (record.type !== "payment" && record.type !== "create_account")
+          return;
         const destination = String(
           record.to || record.account || record.destination || "",
         ).toUpperCase();
@@ -697,7 +774,9 @@ export function streamGlobalProjectDonations(
         if (!project) return;
 
         const isNativeXLM =
-          record.asset_type === "native" || !record.asset_type || record.asset_code === "XLM";
+          record.asset_type === "native" ||
+          !record.asset_type ||
+          record.asset_code === "XLM";
         if (!isNativeXLM) return;
 
         const amountRaw = record.amount || record.starting_balance || "0";
@@ -709,7 +788,8 @@ export function streamGlobalProjectDonations(
           projectId: project.id,
           projectName: project.name,
           amountXLM: amount.toFixed(7),
-          from: record.from || record.funder || record.source_account || "Unknown",
+          from:
+            record.from || record.funder || record.source_account || "Unknown",
           createdAt: record.created_at || new Date().toISOString(),
           transactionHash: record.transaction_hash || "",
         });
@@ -799,15 +879,27 @@ export async function fetchProjectDiscussion(
     .filter(Boolean) as ProjectDiscussionMessage[];
 
   // Chronological feed (oldest → newest)
-  messages.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  messages.sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+  );
 
   return messages;
 }
 
-async function simulateCall(contract: Contract, method: string, args: any[] = []) {
+async function simulateCall(
+  contract: Contract,
+  method: string,
+  args: any[] = [],
+) {
   // We use a dummy account for simulation
-  const dummyAccount = new Account("GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF", "-1");
-  const tx = new TransactionBuilder(dummyAccount, { fee: "100", networkPassphrase: NETWORK_PASSPHRASE })
+  const dummyAccount = new Account(
+    "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF",
+    "-1",
+  );
+  const tx = new TransactionBuilder(dummyAccount, {
+    fee: "100",
+    networkPassphrase: NETWORK_PASSPHRASE,
+  })
     .addOperation(contract.call(method, ...args))
     .setTimeout(30)
     .build();

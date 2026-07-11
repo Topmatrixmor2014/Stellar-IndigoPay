@@ -23,6 +23,7 @@ If a HIGH finding is reported by ZAP in CI but is determined to be a **false pos
 2. Open the main config file [zap-false-positives.json](../zap-false-positives.json).
 
 3. Append your rule override inside `ignored_alerts`:
+
    ```json
    {
      "pluginId": "10020",
@@ -31,6 +32,7 @@ If a HIGH finding is reported by ZAP in CI but is determined to be a **false pos
      "reason": "Explain clearly why this is safe and verified."
    }
    ```
-   *Note: If `url` is omitted, the override will apply to all instances matching that Plugin ID globally. Provide a `url` substring if the exclusion should be scoped strictly.*
+
+   _Note: If `url` is omitted, the override will apply to all instances matching that Plugin ID globally. Provide a `url` substring if the exclusion should be scoped strictly._
 
 4. Commit and push the changes. The next CI run will verify the triage list, skip the matching alert, and allow the pipeline to succeed.

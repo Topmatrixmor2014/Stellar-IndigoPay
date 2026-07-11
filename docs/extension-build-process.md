@@ -24,6 +24,7 @@ This document describes the build process for the Stellar-IndigoPay Companion br
 ### Installation
 
 1. Navigate to the extension directory:
+
    ```bash
    cd extension
    ```
@@ -64,6 +65,7 @@ npm run dev
 ```
 
 This command:
+
 - Runs webpack in watch mode
 - Automatically rebuilds when source files change
 - Outputs to `dist/` directory
@@ -80,6 +82,7 @@ npm run build
 ```
 
 This command:
+
 - Runs webpack in production mode
 - Minifies JavaScript output
 - Generates source maps
@@ -89,6 +92,7 @@ This command:
 ### Build Output
 
 The production build generates the following files in `dist/`:
+
 - `popup.js` - Minified popup logic
 - `settings.js` - Minified settings logic
 - `content-script.js` - Minified content script
@@ -101,11 +105,13 @@ The production build generates the following files in `dist/`:
 ### Chrome Build Process
 
 1. **Build the extension:**
+
    ```bash
    npm run build
    ```
 
 2. **Copy static files to dist:**
+
    ```bash
    cp manifest.json dist/
    cp popup.html dist/
@@ -123,6 +129,7 @@ The production build generates the following files in `dist/`:
 ### Chrome Manifest Differences
 
 The Chrome manifest (`manifest.json`) uses:
+
 - `manifest_version: 3`
 - `action` instead of `browser_action`
 - Host permissions restricted to IndigoPay domains only
@@ -143,6 +150,7 @@ The Chrome manifest (`manifest.json`) uses:
 Firefox requires a separate build due to manifest differences:
 
 1. **Modify webpack config for Firefox output:**
+
    ```bash
    # Temporarily update webpack.config.js to output to dist-firefox/
    # Change line 13 from: path: path.resolve(__dirname, 'dist')
@@ -150,11 +158,13 @@ Firefox requires a separate build due to manifest differences:
    ```
 
 2. **Build for Firefox:**
+
    ```bash
    npm run build
    ```
 
 3. **Copy Firefox-specific files:**
+
    ```bash
    cp manifest.firefox.json dist-firefox/manifest.json
    cp popup.html dist-firefox/
@@ -163,6 +173,7 @@ Firefox requires a separate build due to manifest differences:
    ```
 
 4. **Create distribution package:**
+
    ```bash
    cd dist-firefox
    zip -r ../indigopay-extension-firefox.zip .
@@ -177,6 +188,7 @@ Firefox requires a separate build due to manifest differences:
 ### Firefox Manifest Differences
 
 The Firefox manifest (`manifest.firefox.json`) uses:
+
 - `manifest_version: 3`
 - `browser_action` (Firefox compatibility)
 - `<all_urls>` host permissions (broader access)
@@ -199,6 +211,7 @@ The Firefox manifest (`manifest.firefox.json`) uses:
 See [PUBLISH.md](../extension/PUBLISH.md) for detailed Chrome Web Store submission instructions.
 
 **Quick summary:**
+
 1. Build the extension (see Chrome-Specific Build)
 2. Create developer account at Chrome Web Store ($5 fee)
 3. Upload `indigopay-extension.zip`
@@ -229,20 +242,23 @@ See [PUBLISH.md](../extension/PUBLISH.md) for detailed Chrome Web Store submissi
 ### Build Issues
 
 **Problem:** Build fails with TypeScript errors
+
 ```
 Solution: Ensure TypeScript is properly configured and all imports are valid.
 Check tsconfig.json for compiler options.
 ```
 
 **Problem:** Webpack cannot resolve modules
+
 ```
 Solution: Verify all dependencies are installed with `npm install`.
 Check webpack.config.js resolve configuration.
 ```
 
 **Problem:** Build succeeds but extension doesn't load
+
 ```
-Solution: 
+Solution:
 - Verify manifest.json is valid JSON
 - Check that all referenced files exist in dist/
 - Ensure manifest version matches browser requirements
@@ -251,12 +267,14 @@ Solution:
 ### Chrome-Specific Issues
 
 **Problem:** Extension rejected for permissions
+
 ```
 Solution: Review host_permissions in manifest.json.
 Ensure justification is provided for each permission.
 ```
 
 **Problem:** Content script not injecting
+
 ```
 Solution: Verify matches patterns in content_scripts section.
 Check that dist/content-script.js exists and is valid.
@@ -265,12 +283,14 @@ Check that dist/content-script.js exists and is valid.
 ### Firefox-Specific Issues
 
 **Problem:** Extension rejected for manifest version
+
 ```
 Solution: Ensure manifest_version is 3.
 Firefox requires manifest v3 for new submissions.
 ```
 
 **Problem:** browser_specific_settings validation error
+
 ```
 Solution: Verify the gecko ID is unique and follows format: name@domain
 Check strict_min_version is compatible with target Firefox versions.
@@ -279,6 +299,7 @@ Check strict_min_version is compatible with target Firefox versions.
 ### General Issues
 
 **Problem:** Zip file too large for store upload
+
 ```
 Solution: Ensure production build is minified.
 Exclude unnecessary files from the zip.
@@ -286,8 +307,9 @@ Check that source maps are not included in store submission.
 ```
 
 **Problem:** Extension works in testing but fails store review
+
 ```
-Solution: 
+Solution:
 - Test in clean browser profile
 - Verify all store assets meet specifications
 - Ensure privacy policy URL is accessible
@@ -308,12 +330,13 @@ When releasing a new version:
    - Follow Firefox build process
 
 3. **Create versioned packages:**
+
    ```bash
    # Chrome
    cd dist
    zip -r ../indigopay-extension-v1.0.1.zip .
    cd ..
-   
+
    # Firefox
    cd dist-firefox
    zip -r ../indigopay-extension-firefox-v1.0.1.zip .

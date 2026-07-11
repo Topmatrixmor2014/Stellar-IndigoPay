@@ -27,13 +27,16 @@ jest.mock("@stellar/freighter-api", () => {
     isConnected: jest.fn(() =>
       Promise.resolve({ isConnected: mockState.isConnected }),
     ),
-    isAllowed: jest.fn(() => Promise.resolve({ isAllowed: mockState.isAllowed })),
+    isAllowed: jest.fn(() =>
+      Promise.resolve({ isAllowed: mockState.isAllowed }),
+    ),
     requestAccess: jest.fn(() => Promise.resolve()),
     getPublicKey: jest.fn(() => Promise.resolve(mockState.publicKey ?? "")),
     signTransaction: jest.fn(() =>
       Promise.resolve({ signedTransaction: "SIGNED_XDR" }),
     ),
-    __setMockState: (next: Partial<MockState>) => Object.assign(mockState, next),
+    __setMockState: (next: Partial<MockState>) =>
+      Object.assign(mockState, next),
     // Exposes the closed-over `mockState` so beforeEach can re-attach a
     // `mockState`-aware impl after `mockReset` (otherwise the new impl
     // would be hardcoded to a literal value and break tests that rely on
@@ -56,9 +59,11 @@ type MockStatePatch = Partial<{
   isAllowed: boolean;
   publicKey: string | null;
 }>;
-const setMockState = (freighter as unknown as {
-  __setMockState: (next: MockStatePatch) => void;
-}).__setMockState;
+const setMockState = (
+  freighter as unknown as {
+    __setMockState: (next: MockStatePatch) => void;
+  }
+).__setMockState;
 
 const ADMIN = "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 const DONOR = "GBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB";
@@ -106,12 +111,14 @@ describe("WalletProvider", () => {
     (freighter.isConnected as jest.Mock).mockClear();
     (freighter.isAllowed as jest.Mock).mockClear();
     (freighter.requestAccess as jest.Mock).mockClear();
-    const liveMockState = (freighter as unknown as {
-      __getMockState: () => { publicKey: string | null };
-    }).__getMockState();
+    const liveMockState = (
+      freighter as unknown as {
+        __getMockState: () => { publicKey: string | null };
+      }
+    ).__getMockState();
     (freighter.getPublicKey as jest.Mock).mockReset();
-    (freighter.getPublicKey as jest.Mock).mockImplementation(
-      () => Promise.resolve(liveMockState.publicKey ?? ""),
+    (freighter.getPublicKey as jest.Mock).mockImplementation(() =>
+      Promise.resolve(liveMockState.publicKey ?? ""),
     );
     (freighter.signTransaction as jest.Mock).mockClear();
   });
@@ -184,7 +191,9 @@ describe("WalletProvider", () => {
     const pending = new Promise<void>((res) => {
       resolveRequest = res;
     });
-    (freighter.requestAccess as jest.Mock).mockImplementationOnce(() => pending);
+    (freighter.requestAccess as jest.Mock).mockImplementationOnce(
+      () => pending,
+    );
     (freighter.getPublicKey as jest.Mock).mockResolvedValueOnce(DONOR);
 
     render(
@@ -245,9 +254,7 @@ describe("WalletProvider", () => {
     // The wrapper prepends "Connection failed: " to the underlying
     // message; asserting on the substring instead of the literal keeps
     // this test resilient to wording tweaks in `lib/wallet.ts`.
-    expect(screen.getByTestId("error").textContent).toMatch(
-      /rejected access/i,
-    );
+    expect(screen.getByTestId("error").textContent).toMatch(/rejected access/i);
   });
 
   it("disconnect() clears the public key and returns state to idle", async () => {

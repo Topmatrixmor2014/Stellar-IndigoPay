@@ -2,7 +2,9 @@ import React, { useRef, useState } from "react";
 import type { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import DonationQRCode, { DonationQRCodeHandle } from "../../components/DonationQRCode";
+import DonationQRCode, {
+  DonationQRCodeHandle,
+} from "../../components/DonationQRCode";
 import type { DonateProject, DonatePageProps } from "../../utils/types";
 import { formatXLM } from "../../utils/format";
 
@@ -26,7 +28,10 @@ function categoryIcon(category: string): string {
 
 //  SEP-0007 URI builder //
 
-function buildStellarUri(project: DonateProject, presetAmount: number | null): string {
+function buildStellarUri(
+  project: DonateProject,
+  presetAmount: number | null,
+): string {
   // Base: web+stellar:pay?destination=<address>&memo=IndigoPay:<name>
   const params = new URLSearchParams();
   params.set("destination", project.walletAddress);
@@ -450,7 +455,9 @@ const DonatePage: NextPage<DonatePageProps> = ({ project, presetAmount }) => {
 
 //  Data fetching //
 
-export const getServerSideProps: GetServerSideProps<DonatePageProps> = async (ctx) => {
+export const getServerSideProps: GetServerSideProps<DonatePageProps> = async (
+  ctx,
+) => {
   const { id } = ctx.params as { id: string };
   const amountParam = ctx.query?.amount;
   const presetAmount =
@@ -459,8 +466,7 @@ export const getServerSideProps: GetServerSideProps<DonatePageProps> = async (ct
       : null;
 
   // Fetch project from the IndigoPay backend API
-  const apiBase =
-    process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+  const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
   try {
     const res = await fetch(`${apiBase}/api/v1/projects/${id}`);

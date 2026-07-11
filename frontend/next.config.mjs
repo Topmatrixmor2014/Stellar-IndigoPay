@@ -22,25 +22,27 @@ import { withSentryConfig } from "@sentry/nextjs";
 // ---------------------------------------------------------------------------
 
 const STELLAR_CONNECT = [
-  'https://horizon-testnet.stellar.org',
-  'https://horizon.stellar.org',
-  'https://soroban-testnet.stellar.org',
-  'https://soroban.stellar.org',
-  'https://friendbot.stellar.org',
-].join(' ')
+  "https://horizon-testnet.stellar.org",
+  "https://horizon.stellar.org",
+  "https://soroban-testnet.stellar.org",
+  "https://soroban.stellar.org",
+  "https://friendbot.stellar.org",
+].join(" ");
 
 // OpenStreetMap tile subdomains used by Leaflet's TileLayer
 const LEAFLET_TILE_SOURCES = [
-  'https://a.tile.openstreetmap.org',
-  'https://b.tile.openstreetmap.org',
-  'https://c.tile.openstreetmap.org',
-].join(' ')
+  "https://a.tile.openstreetmap.org",
+  "https://b.tile.openstreetmap.org",
+  "https://c.tile.openstreetmap.org",
+].join(" ");
 
 // unpkg serves the Leaflet CSS (dynamically injected by ProjectMap.tsx)
-const UNPKG = 'https://unpkg.com'
+const UNPKG = "https://unpkg.com";
 
 function buildStaticCsp(allowFraming = false) {
-  const frameAncestors = allowFraming ? "frame-ancestors *" : "frame-ancestors 'none'"
+  const frameAncestors = allowFraming
+    ? "frame-ancestors *"
+    : "frame-ancestors 'none'";
   return [
     "default-src 'self'",
     // Static fallback uses unsafe-inline; middleware.ts replaces this with a
@@ -57,44 +59,52 @@ function buildStaticCsp(allowFraming = false) {
     "form-action 'self'",
     frameAncestors,
     "upgrade-insecure-requests",
-  ].join('; ')
+  ].join("; ");
 }
 
 const nextConfig = {
   reactStrictMode: true,
   webpack: (config) => {
-    config.resolve.fallback = { ...config.resolve.fallback, fs: false, net: false, tls: false }
-    return config
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      net: false,
+      tls: false,
+    };
+    return config;
   },
   async headers() {
     return [
       {
         // Applied to every route.  middleware.ts overrides Content-Security-Policy
         // with the nonce-stamped version for all HTML responses.
-        source: '/(.*)',
+        source: "/(.*)",
         headers: [
-          { key: 'Content-Security-Policy', value: buildStaticCsp(false) },
+          { key: "Content-Security-Policy", value: buildStaticCsp(false) },
           // Security headers (Issue #472)
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'X-Frame-Options', value: 'DENY' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
         ],
       },
       {
         // Widget pages are intentionally embeddable by third-party sites.
         // Override frame-ancestors and X-Frame-Options for this route.
-        source: '/widget/:path*',
+        source: "/widget/:path*",
         headers: [
-          { key: 'Content-Security-Policy', value: buildStaticCsp(true) },
+          { key: "Content-Security-Policy", value: buildStaticCsp(true) },
           // X-Frame-Options has no "allow all" value; rely on CSP frame-ancestors
           // for modern browsers and omit the legacy header for widget routes.
-          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
         ],
       },
-    ]
+    ];
   },
-}
+};
 
 // Wrap with Sentry so source maps upload, instrumentation, and the
 // /monitoring tunnel route are auto-configured.

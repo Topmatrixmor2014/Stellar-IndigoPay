@@ -2,14 +2,20 @@
  * app/impact.tsx
  * My Impact screen - donor stats, history, and shareable certificate
  */
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
-import { captureRef } from 'react-native-view-shot';
-import * as Sharing from 'expo-sharing';
-import { useTheme } from './theme';
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import { useEffect, useRef, useState } from "react";
+import axios from "axios";
+import { captureRef } from "react-native-view-shot";
+import * as Sharing from "expo-sharing";
+import { useTheme } from "./theme";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4000';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:4000";
 
 interface Donation {
   id: string;
@@ -39,11 +45,11 @@ export default function ImpactScreen() {
   const [donations, setDonations] = useState<Donation[]>([]);
   const [impactStats, setImpactStats] = useState<ImpactStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [publicKey, setPublicKey] = useState('');
+  const [publicKey, setPublicKey] = useState("");
   const certificateRef = useRef<any>(null);
 
   useEffect(() => {
-    const demoKey = 'GABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+    const demoKey = "GABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
     setPublicKey(demoKey);
     loadImpactData(demoKey);
   }, []);
@@ -51,15 +57,21 @@ export default function ImpactScreen() {
   const loadImpactData = async (pk: string) => {
     try {
       const [profileRes, donationsRes, impactRes] = await Promise.all([
-        axios.get(`${API_URL}/api/profiles/${pk}`).catch(() => ({ data: { data: null } })),
-        axios.get(`${API_URL}/api/donations/donor/${pk}`).catch(() => ({ data: { data: [] } })),
-        axios.get(`${API_URL}/api/impact/donor/${pk}`).catch(() => ({ data: { data: null } })),
+        axios
+          .get(`${API_URL}/api/profiles/${pk}`)
+          .catch(() => ({ data: { data: null } })),
+        axios
+          .get(`${API_URL}/api/donations/donor/${pk}`)
+          .catch(() => ({ data: { data: [] } })),
+        axios
+          .get(`${API_URL}/api/impact/donor/${pk}`)
+          .catch(() => ({ data: { data: null } })),
       ]);
       setProfile(profileRes.data.data);
       setDonations(donationsRes.data.data);
       setImpactStats(impactRes.data.data);
     } catch (error) {
-      console.error('Error loading impact data:', error);
+      console.error("Error loading impact data:", error);
     } finally {
       setLoading(false);
     }
@@ -67,73 +79,147 @@ export default function ImpactScreen() {
 
   const handleShare = async () => {
     try {
-      const uri = await captureRef(certificateRef, { format: 'png', quality: 1.0 });
+      const uri = await captureRef(certificateRef, {
+        format: "png",
+        quality: 1.0,
+      });
       // Prefix with file:// for Android compatibility
-      const fileUri = uri.startsWith('file://') ? uri : `file://${uri}`;
+      const fileUri = uri.startsWith("file://") ? uri : `file://${uri}`;
       await Sharing.shareAsync(fileUri, {
-        mimeType: 'image/png',
-        dialogTitle: 'Share your impact certificate',
+        mimeType: "image/png",
+        dialogTitle: "Share your impact certificate",
       });
     } catch (err) {
-      console.error('Share failed:', err);
+      console.error("Share failed:", err);
     }
   };
 
   if (loading) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={[styles.loadingText, { color: colors.secondaryText }]}>Loading your impact...</Text>
+        <Text style={[styles.loadingText, { color: colors.secondaryText }]}>
+          Loading your impact...
+        </Text>
       </View>
     );
   }
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <View style={[styles.header, { backgroundColor: colors.primary }]}>
-        <Text style={[styles.title, { color: colors.headerText }]}>My Impact</Text>
-        <Text style={[styles.subtitle, { color: colors.headerText }]}>{publicKey.slice(0, 8)}...{publicKey.slice(-4)}</Text>
+        <Text style={[styles.title, { color: colors.headerText }]}>
+          My Impact
+        </Text>
+        <Text style={[styles.subtitle, { color: colors.headerText }]}>
+          {publicKey.slice(0, 8)}...{publicKey.slice(-4)}
+        </Text>
       </View>
 
       <View style={styles.statsGrid}>
-        <View style={[styles.statCard, { backgroundColor: colors.surface, shadowColor: colors.cardShadow, borderColor: colors.cardBorder }]}>
+        <View
+          style={[
+            styles.statCard,
+            {
+              backgroundColor: colors.surface,
+              shadowColor: colors.cardShadow,
+              borderColor: colors.cardBorder,
+            },
+          ]}
+        >
           <Text style={[styles.statIcon, { color: colors.accent }]}>💚</Text>
           <Text style={[styles.statValue, { color: colors.accent }]}>
-            {profile ? parseFloat(profile.totalDonatedXLM).toFixed(2) : '0'}
+            {profile ? parseFloat(profile.totalDonatedXLM).toFixed(2) : "0"}
           </Text>
-          <Text style={[styles.statLabel, { color: colors.muted }]}>XLM Donated</Text>
+          <Text style={[styles.statLabel, { color: colors.muted }]}>
+            XLM Donated
+          </Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: colors.surface, shadowColor: colors.cardShadow, borderColor: colors.cardBorder }]}>
+        <View
+          style={[
+            styles.statCard,
+            {
+              backgroundColor: colors.surface,
+              shadowColor: colors.cardShadow,
+              borderColor: colors.cardBorder,
+            },
+          ]}
+        >
           <Text style={[styles.statIcon, { color: colors.accent }]}>🌍</Text>
           <Text style={[styles.statValue, { color: colors.accent }]}>
             {profile ? profile.projectsSupported : 0}
           </Text>
-          <Text style={[styles.statLabel, { color: colors.muted }]}>Projects</Text>
+          <Text style={[styles.statLabel, { color: colors.muted }]}>
+            Projects
+          </Text>
         </View>
-        <View style={[styles.statCard, { backgroundColor: colors.surface, shadowColor: colors.cardShadow, borderColor: colors.cardBorder }]}>
+        <View
+          style={[
+            styles.statCard,
+            {
+              backgroundColor: colors.surface,
+              shadowColor: colors.cardShadow,
+              borderColor: colors.cardBorder,
+            },
+          ]}
+        >
           <Text style={[styles.statIcon, { color: colors.accent }]}>🏆</Text>
           <Text style={[styles.statValue, { color: colors.accent }]}>
             {profile ? profile.badges.length : 0}
           </Text>
-          <Text style={[styles.statLabel, { color: colors.muted }]}>Badges</Text>
+          <Text style={[styles.statLabel, { color: colors.muted }]}>
+            Badges
+          </Text>
         </View>
       </View>
 
-      <View style={[styles.historyCard, { backgroundColor: colors.surface, shadowColor: colors.cardShadow, borderColor: colors.cardBorder }]}>
-        <Text style={[styles.sectionTitle, { color: colors.primaryText }]}>Donation History</Text>
+      <View
+        style={[
+          styles.historyCard,
+          {
+            backgroundColor: colors.surface,
+            shadowColor: colors.cardShadow,
+            borderColor: colors.cardBorder,
+          },
+        ]}
+      >
+        <Text style={[styles.sectionTitle, { color: colors.primaryText }]}>
+          Donation History
+        </Text>
         {donations.length === 0 ? (
-          <Text style={[styles.emptyText, { color: colors.secondaryText }]}>No donations yet</Text>
+          <Text style={[styles.emptyText, { color: colors.secondaryText }]}>
+            No donations yet
+          </Text>
         ) : (
-          donations.map(donation => (
-            <View key={donation.id} style={[styles.donationRow, { borderBottomColor: colors.border }]}>
+          donations.map((donation) => (
+            <View
+              key={donation.id}
+              style={[styles.donationRow, { borderBottomColor: colors.border }]}
+            >
               <View style={styles.donationInfo}>
-                <Text style={[styles.donationProject, { color: colors.primaryText }]}>Project {donation.projectId.slice(0, 8)}</Text>
+                <Text
+                  style={[
+                    styles.donationProject,
+                    { color: colors.primaryText },
+                  ]}
+                >
+                  Project {donation.projectId.slice(0, 8)}
+                </Text>
                 {donation.message && (
-                  <Text style={[styles.donationMessage, { color: colors.secondaryText }]}>"{donation.message}"</Text>
+                  <Text
+                    style={[
+                      styles.donationMessage,
+                      { color: colors.secondaryText },
+                    ]}
+                  >
+                    "{donation.message}"
+                  </Text>
                 )}
               </View>
               <View style={styles.donationAmount}>
                 <Text style={[styles.amount, { color: colors.accent }]}>
-                  {donation.currency === 'USDC'
+                  {donation.currency === "USDC"
                     ? `$${parseFloat(donation.amount).toFixed(2)} USDC`
                     : `${parseFloat(donation.amount).toFixed(2)} XLM`}
                 </Text>
@@ -161,7 +247,8 @@ export default function ImpactScreen() {
           CO₂ Offset: {impactStats?.co2OffsetKg ?? 0} kg
         </Text>
         <Text style={styles.certRow}>
-          Total Donated: {profile ? parseFloat(profile.totalDonatedXLM).toFixed(2) : '0'} XLM
+          Total Donated:{" "}
+          {profile ? parseFloat(profile.totalDonatedXLM).toFixed(2) : "0"} XLM
         </Text>
       </View>
 
@@ -184,7 +271,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 40,
   },
   header: {
@@ -192,14 +279,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   subtitle: {
     fontSize: 14,
     marginTop: 4,
   },
   statsGrid: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 16,
     gap: 12,
   },
@@ -207,7 +294,7 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 12,
     padding: 16,
-    alignItems: 'center',
+    alignItems: "center",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -220,7 +307,7 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   statLabel: {
     fontSize: 12,
@@ -238,17 +325,17 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 16,
   },
   emptyText: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     paddingVertical: 20,
   },
   donationRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingVertical: 12,
     borderBottomWidth: 1,
   },
@@ -257,18 +344,18 @@ const styles = StyleSheet.create({
   },
   donationProject: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   donationMessage: {
     fontSize: 12,
     marginTop: 2,
   },
   donationAmount: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
   },
   amount: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   date: {
     fontSize: 10,
@@ -278,21 +365,21 @@ const styles = StyleSheet.create({
     margin: 16,
     padding: 24,
     borderRadius: 12,
-    backgroundColor: '#227239',
+    backgroundColor: "#227239",
   },
   certBrand: {
-    color: '#ffffff',
+    color: "#ffffff",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 4,
   },
   certTitle: {
-    color: '#d4edda',
+    color: "#d4edda",
     fontSize: 14,
     marginBottom: 16,
   },
   certRow: {
-    color: '#ffffff',
+    color: "#ffffff",
     fontSize: 16,
     marginBottom: 8,
   },
@@ -301,12 +388,12 @@ const styles = StyleSheet.create({
     marginTop: 0,
     padding: 14,
     borderRadius: 12,
-    backgroundColor: '#227239',
-    alignItems: 'center',
+    backgroundColor: "#227239",
+    alignItems: "center",
   },
   shareButtonText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
+    color: "#ffffff",
+    fontWeight: "bold",
     fontSize: 16,
   },
 });

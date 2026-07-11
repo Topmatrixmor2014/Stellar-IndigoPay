@@ -3,7 +3,14 @@
  */
 import Link from "next/link";
 import type { ClimateProject } from "@/utils/types";
-import { formatXLM, formatCO2, progressPercent, statusClass, statusLabel, CATEGORY_ICONS } from "@/utils/format";
+import {
+  formatXLM,
+  formatCO2,
+  progressPercent,
+  statusClass,
+  statusLabel,
+  CATEGORY_ICONS,
+} from "@/utils/format";
 import CircularProgress from "./CircularProgress";
 import { useXlmPrice } from "@/lib/priceContext";
 import { useWishlist } from "@/hooks/useWishlist";

@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
-import * as SecureStore from 'expo-secure-store';
-import { StrKey } from '@stellar/stellar-sdk';
+import { useState, useEffect, useCallback } from "react";
+import * as SecureStore from "expo-secure-store";
+import { StrKey } from "@stellar/stellar-sdk";
 
-const WALLET_KEY = 'indigopay_stellar_public_key';
+const WALLET_KEY = "indigopay_stellar_public_key";
 
 export function useWallet() {
   const [publicKey, setPublicKey] = useState<string | null>(null);
@@ -20,7 +20,9 @@ export function useWallet() {
     const trimmed = address.trim();
 
     if (!StrKey.isValidEd25519PublicKey(trimmed)) {
-      setError('Invalid Stellar address. Must start with G and be 56 characters.');
+      setError(
+        "Invalid Stellar address. Must start with G and be 56 characters.",
+      );
       return false;
     }
 

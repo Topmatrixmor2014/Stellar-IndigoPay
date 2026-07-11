@@ -3,9 +3,9 @@
  * AsyncStorage-backed utility for managing monthly recurring donations on mobile.
  * Mirrors the structure used by the web app's monthlyGiving.ts (localStorage).
  */
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const RECURRING_DONATIONS_KEY = 'indigopay_recurring_donations';
+export const RECURRING_DONATIONS_KEY = "indigopay_recurring_donations";
 
 export interface RecurringDonation {
   id: string;
@@ -16,7 +16,7 @@ export interface RecurringDonation {
   nextDueDate: string;
   durationMonths: number | null;
   remainingMonths: number | null;
-  status: 'active' | 'cancelled' | 'completed';
+  status: "active" | "cancelled" | "completed";
   createdAt: string;
 }
 
@@ -31,8 +31,13 @@ export async function loadRecurringDonations(): Promise<RecurringDonation[]> {
   }
 }
 
-export async function saveRecurringDonations(donations: RecurringDonation[]): Promise<void> {
-  await AsyncStorage.setItem(RECURRING_DONATIONS_KEY, JSON.stringify(donations));
+export async function saveRecurringDonations(
+  donations: RecurringDonation[],
+): Promise<void> {
+  await AsyncStorage.setItem(
+    RECURRING_DONATIONS_KEY,
+    JSON.stringify(donations),
+  );
 }
 
 export async function createRecurringDonation(input: {
@@ -51,7 +56,7 @@ export async function createRecurringDonation(input: {
     nextDueDate: now,
     durationMonths: input.durationMonths,
     remainingMonths: input.durationMonths,
-    status: 'active',
+    status: "active",
     createdAt: now,
   };
   const all = await loadRecurringDonations();
@@ -62,7 +67,7 @@ export async function createRecurringDonation(input: {
 export async function cancelRecurringDonation(id: string): Promise<void> {
   const all = await loadRecurringDonations();
   const updated = all.map((d) =>
-    d.id === id ? { ...d, status: 'cancelled' as const } : d,
+    d.id === id ? { ...d, status: "cancelled" as const } : d,
   );
   await saveRecurringDonations(updated);
 }

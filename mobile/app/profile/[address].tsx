@@ -3,15 +3,21 @@
  * Donor profile screen — shows stats, badge tier, and donation history
  * for any Stellar address.
  */
-import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
-import { useEffect, useState } from 'react';
-import { useLocalSearchParams } from 'expo-router';
-import axios from 'axios';
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
+import { useEffect, useState } from "react";
+import { useLocalSearchParams } from "expo-router";
+import axios from "axios";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4000';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:4000";
 
 interface Badge {
-  tier: 'seedling' | 'tree' | 'forest' | 'earth';
+  tier: "seedling" | "tree" | "forest" | "earth";
   earnedAt: string;
 }
 
@@ -32,14 +38,17 @@ interface Donation {
   message?: string;
 }
 
-const BADGE_CONFIG: Record<Badge['tier'], { icon: string; color: string; label: string }> = {
-  seedling:  { icon: '🌱', color: '#4CAF50', label: 'Seedling'       },
-  tree:      { icon: '🌳', color: '#2E7D32', label: 'Tree Planter'   },
-  forest:    { icon: '🌲', color: '#1B5E20', label: 'Forest Guardian' },
-  earth:     { icon: '🌍', color: '#0277BD', label: 'Earth Guardian'  },
+const BADGE_CONFIG: Record<
+  Badge["tier"],
+  { icon: string; color: string; label: string }
+> = {
+  seedling: { icon: "🌱", color: "#4CAF50", label: "Seedling" },
+  tree: { icon: "🌳", color: "#2E7D32", label: "Tree Planter" },
+  forest: { icon: "🌲", color: "#1B5E20", label: "Forest Guardian" },
+  earth: { icon: "🌍", color: "#0277BD", label: "Earth Guardian" },
 };
 
-function BadgePill({ tier }: { tier: Badge['tier'] }) {
+function BadgePill({ tier }: { tier: Badge["tier"] }) {
   const cfg = BADGE_CONFIG[tier] ?? BADGE_CONFIG.seedling;
   return (
     <View style={[styles.badgePill, { backgroundColor: cfg.color }]}>
@@ -64,13 +73,17 @@ export default function ProfileScreen() {
   const loadProfile = async (pk: string) => {
     try {
       const [profileRes, donationsRes] = await Promise.all([
-        axios.get(`${API_URL}/api/profiles/${pk}`).catch(() => ({ data: { data: null } })),
-        axios.get(`${API_URL}/api/donations/donor/${pk}`).catch(() => ({ data: { data: [] } })),
+        axios
+          .get(`${API_URL}/api/profiles/${pk}`)
+          .catch(() => ({ data: { data: null } })),
+        axios
+          .get(`${API_URL}/api/donations/donor/${pk}`)
+          .catch(() => ({ data: { data: [] } })),
       ]);
       setProfile(profileRes.data.data);
       setDonations(donationsRes.data.data ?? []);
     } catch {
-      setError('Failed to load profile');
+      setError("Failed to load profile");
     } finally {
       setLoading(false);
     }
@@ -99,21 +112,21 @@ export default function ProfileScreen() {
       <View style={styles.header}>
         {topBadge && (
           <Text style={styles.headerBadgeIcon}>
-            {BADGE_CONFIG[topBadge.tier]?.icon ?? '🌱'}
+            {BADGE_CONFIG[topBadge.tier]?.icon ?? "🌱"}
           </Text>
         )}
         <Text style={styles.displayName}>
-          {profile?.displayName ?? 'Anonymous Donor'}
+          {profile?.displayName ?? "Anonymous Donor"}
         </Text>
         <Text style={styles.address}>
-          {address ? `${address.slice(0, 8)}...${address.slice(-4)}` : ''}
+          {address ? `${address.slice(0, 8)}...${address.slice(-4)}` : ""}
         </Text>
       </View>
 
       <View style={styles.statsRow}>
         <View style={styles.statCard}>
           <Text style={styles.statValue}>
-            {profile ? parseFloat(profile.totalDonatedXLM).toFixed(2) : '0'}
+            {profile ? parseFloat(profile.totalDonatedXLM).toFixed(2) : "0"}
           </Text>
           <Text style={styles.statLabel}>XLM Donated</Text>
         </View>
@@ -124,9 +137,7 @@ export default function ProfileScreen() {
           <Text style={styles.statLabel}>Projects</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>
-            {profile?.badges?.length ?? 0}
-          </Text>
+          <Text style={styles.statValue}>{profile?.badges?.length ?? 0}</Text>
           <Text style={styles.statLabel}>Badges</Text>
         </View>
       </View>
@@ -154,14 +165,16 @@ export default function ProfileScreen() {
                   Project {donation.projectId.slice(0, 8)}
                 </Text>
                 {donation.message ? (
-                  <Text style={styles.donationMessage}>"{donation.message}"</Text>
+                  <Text style={styles.donationMessage}>
+                    "{donation.message}"
+                  </Text>
                 ) : null}
                 <Text style={styles.donationDate}>
                   {new Date(donation.createdAt).toLocaleDateString()}
                 </Text>
               </View>
               <Text style={styles.donationAmount}>
-                {donation.currency === 'USDC'
+                {donation.currency === "USDC"
                   ? `$${parseFloat(donation.amount).toFixed(2)} USDC`
                   : `${parseFloat(donation.amount).toFixed(2)} XLM`}
               </Text>
@@ -176,25 +189,25 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f7f0',
+    backgroundColor: "#f0f7f0",
   },
   content: {
     paddingBottom: 32,
   },
   centered: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f7f0',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f0f7f0",
   },
   errorText: {
     fontSize: 16,
-    color: '#c62828',
+    color: "#c62828",
   },
   header: {
-    backgroundColor: '#227239',
+    backgroundColor: "#227239",
     padding: 24,
-    alignItems: 'center',
+    alignItems: "center",
   },
   headerBadgeIcon: {
     fontSize: 48,
@@ -202,68 +215,68 @@ const styles = StyleSheet.create({
   },
   displayName: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
   },
   address: {
     fontSize: 13,
-    color: '#c8e6c9',
+    color: "#c8e6c9",
     marginTop: 4,
   },
   statsRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 16,
     gap: 12,
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 14,
-    alignItems: 'center',
+    alignItems: "center",
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 3,
   },
   statValue: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#227239',
+    fontWeight: "bold",
+    color: "#227239",
   },
   statLabel: {
     fontSize: 11,
-    color: '#5a7a5a',
+    color: "#5a7a5a",
     marginTop: 3,
   },
   section: {
     marginHorizontal: 16,
     marginTop: 4,
     marginBottom: 12,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 16,
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 3,
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1a2e1a',
+    fontWeight: "bold",
+    color: "#1a2e1a",
     marginBottom: 12,
   },
   badgesRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
   badgePill: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -274,16 +287,16 @@ const styles = StyleSheet.create({
   },
   badgeLabel: {
     fontSize: 13,
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "600",
   },
   donationRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#e8f3e8',
+    borderBottomColor: "#e8f3e8",
   },
   donationInfo: {
     flex: 1,
@@ -291,23 +304,23 @@ const styles = StyleSheet.create({
   },
   donationProject: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#1a2e1a',
+    fontWeight: "600",
+    color: "#1a2e1a",
   },
   donationMessage: {
     fontSize: 12,
-    color: '#5a7a5a',
+    color: "#5a7a5a",
     marginTop: 2,
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
   donationDate: {
     fontSize: 11,
-    color: '#8aaa8a',
+    color: "#8aaa8a",
     marginTop: 2,
   },
   donationAmount: {
     fontSize: 14,
-    fontWeight: 'bold',
-    color: '#227239',
+    fontWeight: "bold",
+    color: "#227239",
   },
 });

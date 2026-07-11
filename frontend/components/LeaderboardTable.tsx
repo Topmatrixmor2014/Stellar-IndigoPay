@@ -3,7 +3,12 @@
  */
 import { useState, useEffect } from "react";
 import { fetchLeaderboard } from "@/lib/api";
-import { formatXLM, formatUSDEquivalent, shortenAddress, badgeEmoji } from "@/utils/format";
+import {
+  formatXLM,
+  formatUSDEquivalent,
+  shortenAddress,
+  badgeEmoji,
+} from "@/utils/format";
 import { accountUrl } from "@/lib/stellar";
 import { useXlmPrice } from "@/lib/priceContext";
 import type { LeaderboardEntry } from "@/utils/types";
@@ -34,7 +39,13 @@ function avatarInitials(displayName: string | undefined, publicKey: string) {
   return `${first}${second}`.toUpperCase();
 }
 
-function Avatar({ publicKey, displayName }: { publicKey: string; displayName?: string }) {
+function Avatar({
+  publicKey,
+  displayName,
+}: {
+  publicKey: string;
+  displayName?: string;
+}) {
   const bg = AVATAR_COLORS[hashToIndex(publicKey, AVATAR_COLORS.length)];
   return (
     <div
@@ -48,10 +59,16 @@ function Avatar({ publicKey, displayName }: { publicKey: string; displayName?: s
   );
 }
 
-export default function LeaderboardTable({ limit = 20, period = "all" }: { limit?: number; period?: "all" | "month" | "year" }) {
+export default function LeaderboardTable({
+  limit = 20,
+  period = "all",
+}: {
+  limit?: number;
+  period?: "all" | "month" | "year";
+}) {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const xlmUsd = useXlmPrice();
 
   useEffect(() => {
@@ -63,44 +80,58 @@ export default function LeaderboardTable({ limit = 20, period = "all" }: { limit
       .finally(() => setLoading(false));
   }, [limit, period]);
 
-  if (loading) return (
-    <div className="space-y-2">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} className="animate-pulse flex items-center gap-4 p-4 rounded-xl bg-[rgba(99,102,241,0.04)] dark:bg-[rgba(129,140,248,0.06)] border border-[rgba(99,102,241,0.08)] dark:border-[rgba(129,140,248,0.10)]">
-          <div className="w-8 h-8 rounded-full bg-[rgba(99,102,241,0.10)] dark:bg-[rgba(129,140,248,0.12)]" />
-          <div className="flex-1 space-y-2">
-            <div className="h-3 bg-[rgba(99,102,241,0.10)] dark:bg-[rgba(129,140,248,0.12)] rounded w-1/3" />
-            <div className="h-2 bg-[rgba(99,102,241,0.06)] dark:bg-[rgba(129,140,248,0.08)] rounded w-1/4" />
+  if (loading)
+    return (
+      <div className="space-y-2">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div
+            key={i}
+            className="animate-pulse flex items-center gap-4 p-4 rounded-xl bg-[rgba(99,102,241,0.04)] dark:bg-[rgba(129,140,248,0.06)] border border-[rgba(99,102,241,0.08)] dark:border-[rgba(129,140,248,0.10)]"
+          >
+            <div className="w-8 h-8 rounded-full bg-[rgba(99,102,241,0.10)] dark:bg-[rgba(129,140,248,0.12)]" />
+            <div className="flex-1 space-y-2">
+              <div className="h-3 bg-[rgba(99,102,241,0.10)] dark:bg-[rgba(129,140,248,0.12)] rounded w-1/3" />
+              <div className="h-2 bg-[rgba(99,102,241,0.06)] dark:bg-[rgba(129,140,248,0.08)] rounded w-1/4" />
+            </div>
+            <div className="h-4 bg-[rgba(99,102,241,0.10)] dark:bg-[rgba(129,140,248,0.12)] rounded w-20" />
           </div>
-          <div className="h-4 bg-[rgba(99,102,241,0.10)] dark:bg-[rgba(129,140,248,0.12)] rounded w-20" />
-        </div>
-      ))}
-    </div>
-  );
+        ))}
+      </div>
+    );
 
-  if (error) return <p className="text-red-500 text-sm text-center py-6 font-body">{error}</p>;
+  if (error)
+    return (
+      <p className="text-red-500 text-sm text-center py-6 font-body">{error}</p>
+    );
 
-  if (entries.length === 0) return (
-    <div className="text-center py-12">
-      <p className="text-3xl mb-3">🌱</p>
-      <p className="text-[#475569] dark:text-[#94A3B8] font-body">No donors yet — be the first!</p>
-    </div>
-  );
+  if (entries.length === 0)
+    return (
+      <div className="text-center py-12">
+        <p className="text-3xl mb-3">🌱</p>
+        <p className="text-[#475569] dark:text-[#94A3B8] font-body">
+          No donors yet — be the first!
+        </p>
+      </div>
+    );
 
   const medals = ["🥇", "🥈", "🥉"];
 
   return (
     <div className="space-y-2">
       {entries.map((entry) => (
-        <div key={entry.publicKey}
-          className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-[#14142D] border border-[rgba(99,102,241,0.10)] dark:border-[rgba(129,140,248,0.12)] hover:border-[rgba(99,102,241,0.25)] dark:hover:border-[rgba(129,140,248,0.30)] transition-all">
-
+        <div
+          key={entry.publicKey}
+          className="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-[#14142D] border border-[rgba(99,102,241,0.10)] dark:border-[rgba(129,140,248,0.12)] hover:border-[rgba(99,102,241,0.25)] dark:hover:border-[rgba(129,140,248,0.30)] transition-all"
+        >
           {/* Rank */}
           <div className="w-8 text-center flex-shrink-0">
-            {entry.rank <= 3
-              ? <span className="text-lg">{medals[entry.rank - 1]}</span>
-              : <span className="text-sm font-semibold text-[#64748B] dark:text-[#94A3B8] font-body">#{entry.rank}</span>
-            }
+            {entry.rank <= 3 ? (
+              <span className="text-lg">{medals[entry.rank - 1]}</span>
+            ) : (
+              <span className="text-sm font-semibold text-[#64748B] dark:text-[#94A3B8] font-body">
+                #{entry.rank}
+              </span>
+            )}
           </div>
 
           {/* Badge */}
@@ -112,7 +143,10 @@ export default function LeaderboardTable({ limit = 20, period = "all" }: { limit
 
           {/* Name / address */}
           <div className="flex-1 min-w-0 flex items-center gap-3">
-            <Avatar publicKey={entry.publicKey} displayName={entry.displayName} />
+            <Avatar
+              publicKey={entry.publicKey}
+              displayName={entry.displayName}
+            />
             <div className="min-w-0">
               <a
                 href={accountUrl(entry.publicKey)}
@@ -123,7 +157,8 @@ export default function LeaderboardTable({ limit = 20, period = "all" }: { limit
                 {entry.displayName || shortenAddress(entry.publicKey)}
               </a>
               <p className="text-xs text-[#64748B] dark:text-[#94A3B8] font-body mt-0.5">
-                {entry.projectsSupported} project{entry.projectsSupported !== 1 ? "s" : ""} supported
+                {entry.projectsSupported} project
+                {entry.projectsSupported !== 1 ? "s" : ""} supported
               </p>
             </div>
           </div>
@@ -138,7 +173,9 @@ export default function LeaderboardTable({ limit = 20, period = "all" }: { limit
                 {formatUSDEquivalent(entry.totalDonatedXLM, xlmUsd)}
               </p>
             )}
-            <p className="text-xs text-[#64748B] dark:text-[#94A3B8] font-body">donated</p>
+            <p className="text-xs text-[#64748B] dark:text-[#94A3B8] font-body">
+              donated
+            </p>
           </div>
         </div>
       ))}

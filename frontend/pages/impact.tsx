@@ -15,7 +15,11 @@ import type { ImpactGlobalStats } from "@/lib/api";
 
 export default function ImpactPage() {
   const [stats, setStats] = useState<ImpactGlobalStats | null>(null);
-  const [sorobanStats, setSorobanStats] = useState<{ totalRaisedXLM: string; totalCO2OffsetGrams: string; donationCount: number } | null>(null);
+  const [sorobanStats, setSorobanStats] = useState<{
+    totalRaisedXLM: string;
+    totalCO2OffsetGrams: string;
+    donationCount: number;
+  } | null>(null);
   const [projectCount, setProjectCount] = useState(0);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -23,12 +27,13 @@ export default function ImpactPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [impactStats, topDonors, sorobanData, allProjects] = await Promise.all([
-          fetchImpactGlobal(),
-          fetchLeaderboard(3),
-          getGlobalImpactStats(),
-          fetchProjects(),
-        ]);
+        const [impactStats, topDonors, sorobanData, allProjects] =
+          await Promise.all([
+            fetchImpactGlobal(),
+            fetchLeaderboard(3),
+            getGlobalImpactStats(),
+            fetchProjects(),
+          ]);
         setStats(impactStats);
         setLeaderboard(topDonors);
         setSorobanStats(sorobanData);
@@ -46,10 +51,11 @@ export default function ImpactPage() {
     <div className="min-h-screen bg-[#FAFAFE] dark:bg-[#0A0A1A] font-body text-[#0F172A] dark:text-[#E2E8F0] pb-20">
       <Head>
         <title>Global Impact | Stellar IndigoPay</title>
-        <meta name="description" content="Witness the real-time community impact of Stellar IndigoPay donors." />
+        <meta
+          name="description"
+          content="Witness the real-time community impact of Stellar IndigoPay donors."
+        />
       </Head>
-
-
 
       <main className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
         {/* Header Section */}
@@ -58,7 +64,8 @@ export default function ImpactPage() {
             Our <span className="text-gradient">Global Impact</span>
           </h1>
           <p className="mt-4 text-lg text-[#4F46E5] dark:text-[#818CF8] max-w-2xl mx-auto">
-            Transparency on-chain. Witness what the community has achieved together for our planet.
+            Transparency on-chain. Witness what the community has achieved
+            together for our planet.
           </p>
         </div>
 
@@ -74,7 +81,9 @@ export default function ImpactPage() {
           <StatCard
             label="CO₂ Offset"
             icon="🌿"
-            value={sorobanStats ? Number(sorobanStats.totalCO2OffsetGrams) / 1000 : 0}
+            value={
+              sorobanStats ? Number(sorobanStats.totalCO2OffsetGrams) / 1000 : 0
+            }
             unit="Kg"
             isLoading={isLoading}
             formatter={(val) => formatCO2(Math.floor(val))}
@@ -120,20 +129,27 @@ export default function ImpactPage() {
                   className="flex items-center justify-between rounded-2xl border border-[rgba(99,102,241,0.08)] dark:border-[rgba(129,140,248,0.10)] bg-[rgba(99,102,241,0.04)] dark:bg-[rgba(129,140,248,0.06)] p-5"
                 >
                   <div className="min-w-0">
-                    <p className="font-semibold text-[#0F172A] dark:text-[#E2E8F0] truncate">{row.category}</p>
+                    <p className="font-semibold text-[#0F172A] dark:text-[#E2E8F0] truncate">
+                      {row.category}
+                    </p>
                     <p className="text-xs text-[#4F46E5] dark:text-[#818CF8] mt-1">
-                      {row.donorCount} donor{row.donorCount !== 1 ? "s" : ""} • {formatCO2(row.co2OffsetKg)}
+                      {row.donorCount} donor{row.donorCount !== 1 ? "s" : ""} •{" "}
+                      {formatCO2(row.co2OffsetKg)}
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="font-mono font-semibold text-[#4F46E5] dark:text-[#818CF8]">{formatXLM(row.totalDonationsXLM)}</p>
+                    <p className="font-mono font-semibold text-[#4F46E5] dark:text-[#818CF8]">
+                      {formatXLM(row.totalDonationsXLM)}
+                    </p>
                     <p className="text-[11px] text-[#64748B]">donated</p>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-forest-500 text-sm">No category breakdown available yet.</p>
+            <p className="text-forest-500 text-sm">
+              No category breakdown available yet.
+            </p>
           )}
         </div>
 
@@ -146,31 +162,43 @@ export default function ImpactPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
             {leaderboard.length > 0 ? (
               leaderboard.map((entry, idx) => (
-                <div key={entry.publicKey} className="flex flex-col items-center text-center p-6 bg-[rgba(99,102,241,0.04)] dark:bg-[rgba(129,140,248,0.06)] rounded-2xl hover:bg-[rgba(99,102,241,0.08)] dark:hover:bg-[rgba(129,140,248,0.10)] transition-colors border border-transparent hover:border-[rgba(99,102,241,0.15)] dark:hover:border-[rgba(129,140,248,0.20)]">
+                <div
+                  key={entry.publicKey}
+                  className="flex flex-col items-center text-center p-6 bg-[rgba(99,102,241,0.04)] dark:bg-[rgba(129,140,248,0.06)] rounded-2xl hover:bg-[rgba(99,102,241,0.08)] dark:hover:bg-[rgba(129,140,248,0.10)] transition-colors border border-transparent hover:border-[rgba(99,102,241,0.15)] dark:hover:border-[rgba(129,140,248,0.20)]"
+                >
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] text-white flex items-center justify-center font-bold mb-4 shadow-lg">
                     #{idx + 1}
                   </div>
                   <span className="font-bold text-lg text-[#0F172A] dark:text-[#E2E8F0] break-all">
                     {entry.displayName || shortenAddress(entry.publicKey)}
                   </span>
-                  <p className="text-[#4F46E5] dark:text-[#818CF8] text-sm mt-1">{entry.totalDonatedXLM} XLM Total</p>
+                  <p className="text-[#4F46E5] dark:text-[#818CF8] text-sm mt-1">
+                    {entry.totalDonatedXLM} XLM Total
+                  </p>
                   <div className="mt-4 px-3 py-1 rounded-full bg-[rgba(99,102,241,0.10)] dark:bg-[rgba(129,140,248,0.12)] text-[#4F46E5] dark:text-[#818CF8] text-xs font-bold uppercase tracking-wider">
                     {entry.topBadge || "Seedling"}
                   </div>
                 </div>
               ))
             ) : (
-              <p className="col-span-3 text-center text-[#64748B] dark:text-[#94A3B8] py-10">No leaderboard data available yet.</p>
+              <p className="col-span-3 text-center text-[#64748B] dark:text-[#94A3B8] py-10">
+                No leaderboard data available yet.
+              </p>
             )}
           </div>
         </div>
 
         {/* Community Call-to-Action */}
         <div className="text-center py-10">
-            <h3 className="text-2xl font-bold text-[#0F172A] dark:text-[#E2E8F0] mb-4">Ready to make an impact?</h3>
-            <button className="btn-primary px-8 py-3 text-lg" onClick={() => window.location.href = '/projects'}>
-                View Climate Projects
-            </button>
+          <h3 className="text-2xl font-bold text-[#0F172A] dark:text-[#E2E8F0] mb-4">
+            Ready to make an impact?
+          </h3>
+          <button
+            className="btn-primary px-8 py-3 text-lg"
+            onClick={() => (window.location.href = "/projects")}
+          >
+            View Climate Projects
+          </button>
         </div>
       </main>
 
@@ -199,14 +227,18 @@ function StatCard({
       <div className="w-12 h-12 rounded-2xl bg-[rgba(99,102,241,0.08)] dark:bg-[rgba(129,140,248,0.10)] flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
         {icon}
       </div>
-      <p className="text-[#4F46E5] dark:text-[#818CF8] font-medium text-sm uppercase tracking-wider mb-2">{label}</p>
+      <p className="text-[#4F46E5] dark:text-[#818CF8] font-medium text-sm uppercase tracking-wider mb-2">
+        {label}
+      </p>
       <div className="text-4xl font-display font-bold text-[#0F172A] dark:text-[#E2E8F0] flex items-baseline gap-1.5">
         {!isLoading ? (
           <AnimatedNumber value={value} formatter={formatter} />
         ) : (
           <span className="w-24 h-8 bg-forest-50 animate-pulse rounded" />
         )}
-        {unit && <span className="text-xl text-forest-400 font-normal">{unit}</span>}
+        {unit && (
+          <span className="text-xl text-forest-400 font-normal">{unit}</span>
+        )}
       </div>
     </div>
   );

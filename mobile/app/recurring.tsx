@@ -12,20 +12,20 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
-} from 'react-native';
-import { useEffect, useState, useCallback } from 'react';
-import { useFocusEffect } from 'expo-router';
+} from "react-native";
+import { useEffect, useState, useCallback } from "react";
+import { useFocusEffect } from "expo-router";
 import {
   loadRecurringDonations,
   cancelRecurringDonation,
   type RecurringDonation,
-} from '../utils/recurringDonations';
+} from "../utils/recurringDonations";
 
 function formatNextDate(isoDate: string): string {
   return new Date(isoDate).toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 }
 
@@ -38,13 +38,13 @@ function DonationCard({
 }) {
   const handleCancel = () => {
     Alert.alert(
-      'Cancel Recurring Donation',
+      "Cancel Recurring Donation",
       `Stop the monthly ${donation.amountXLM} XLM donation to ${donation.projectName}?`,
       [
-        { text: 'Keep it', style: 'cancel' },
+        { text: "Keep it", style: "cancel" },
         {
-          text: 'Cancel donation',
-          style: 'destructive',
+          text: "Cancel donation",
+          style: "destructive",
           onPress: () => onCancel(donation.id),
         },
       ],
@@ -53,8 +53,8 @@ function DonationCard({
 
   const durationText =
     donation.remainingMonths !== null
-      ? `${donation.remainingMonths} month${donation.remainingMonths !== 1 ? 's' : ''} remaining`
-      : 'Ongoing';
+      ? `${donation.remainingMonths} month${donation.remainingMonths !== 1 ? "s" : ""} remaining`
+      : "Ongoing";
 
   return (
     <View style={styles.card}>
@@ -68,7 +68,9 @@ function DonationCard({
       <View style={styles.cardBody}>
         <View style={styles.metaRow}>
           <Text style={styles.metaLabel}>Next payment</Text>
-          <Text style={styles.metaValue}>{formatNextDate(donation.nextDueDate)}</Text>
+          <Text style={styles.metaValue}>
+            {formatNextDate(donation.nextDueDate)}
+          </Text>
         </View>
         <View style={styles.metaRow}>
           <Text style={styles.metaLabel}>Duration</Text>
@@ -76,7 +78,13 @@ function DonationCard({
         </View>
       </View>
 
-      <TouchableOpacity style={styles.cancelBtn} onPress={handleCancel} activeOpacity={0.7} accessibilityLabel={`Cancel recurring donation to ${donation.projectName}`} accessibilityRole="button">
+      <TouchableOpacity
+        style={styles.cancelBtn}
+        onPress={handleCancel}
+        activeOpacity={0.7}
+        accessibilityLabel={`Cancel recurring donation to ${donation.projectName}`}
+        accessibilityRole="button"
+      >
         <Text style={styles.cancelBtnText}>Cancel</Text>
       </TouchableOpacity>
     </View>
@@ -90,7 +98,7 @@ export default function RecurringScreen() {
   const refresh = useCallback(async () => {
     setLoading(true);
     const all = await loadRecurringDonations();
-    setDonations(all.filter((d) => d.status === 'active'));
+    setDonations(all.filter((d) => d.status === "active"));
     setLoading(false);
   }, []);
 
@@ -121,12 +129,17 @@ export default function RecurringScreen() {
           <Text style={styles.emptyIcon}>🌱</Text>
           <Text style={styles.emptyTitle}>No active recurring donations</Text>
           <Text style={styles.emptyText}>
-            Set up a monthly donation from any project page to support ongoing impact.
+            Set up a monthly donation from any project page to support ongoing
+            impact.
           </Text>
         </View>
       ) : (
         donations.map((donation) => (
-          <DonationCard key={donation.id} donation={donation} onCancel={handleCancel} />
+          <DonationCard
+            key={donation.id}
+            donation={donation}
+            onCancel={handleCancel}
+          />
         ))
       )}
     </ScrollView>
@@ -136,33 +149,33 @@ export default function RecurringScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f7f0',
+    backgroundColor: "#f0f7f0",
   },
   content: {
     paddingBottom: 32,
   },
   centered: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
-    backgroundColor: '#227239',
+    backgroundColor: "#227239",
     padding: 24,
-    alignItems: 'center',
+    alignItems: "center",
   },
   headerTitle: {
     fontSize: 26,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
   },
   headerSub: {
     fontSize: 13,
-    color: '#c8e6c9',
+    color: "#c8e6c9",
     marginTop: 4,
   },
   emptyState: {
-    alignItems: 'center',
+    alignItems: "center",
     padding: 40,
   },
   emptyIcon: {
@@ -171,73 +184,73 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#1a2e1a',
+    fontWeight: "600",
+    color: "#1a2e1a",
     marginBottom: 8,
   },
   emptyText: {
     fontSize: 14,
-    color: '#5a7a5a',
-    textAlign: 'center',
+    color: "#5a7a5a",
+    textAlign: "center",
     lineHeight: 20,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     marginHorizontal: 16,
     marginTop: 12,
     borderRadius: 12,
     padding: 16,
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.08,
     shadowRadius: 3,
   },
   cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 12,
   },
   projectName: {
     flex: 1,
     fontSize: 16,
-    fontWeight: '700',
-    color: '#1a2e1a',
+    fontWeight: "700",
+    color: "#1a2e1a",
     marginRight: 8,
   },
   amount: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#227239',
+    fontWeight: "bold",
+    color: "#227239",
   },
   cardBody: {
     gap: 6,
     marginBottom: 14,
   },
   metaRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   metaLabel: {
     fontSize: 13,
-    color: '#5a7a5a',
+    color: "#5a7a5a",
   },
   metaValue: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#1a2e1a',
+    fontWeight: "600",
+    color: "#1a2e1a",
   },
   cancelBtn: {
     borderWidth: 1.5,
-    borderColor: '#c62828',
+    borderColor: "#c62828",
     borderRadius: 8,
     paddingVertical: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   cancelBtnText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#c62828',
+    fontWeight: "600",
+    color: "#c62828",
   },
 });

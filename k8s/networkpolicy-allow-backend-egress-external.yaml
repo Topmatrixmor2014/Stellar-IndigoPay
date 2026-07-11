@@ -29,7 +29,7 @@ spec:
     # Stellar Horizon testnet
     - to:
         - ipBlock:
-            cidr: 34.82.117.0/24  # SDF testnet approx; pin exactly when stable
+            cidr: 34.82.117.0/24 # SDF testnet approx; pin exactly when stable
       ports:
         - protocol: TCP
           port: 443

@@ -19,9 +19,9 @@
  * - Outside production, preserves the developer-facing message and
  *   prepends the stack so devs can triage from the device log.
  */
-import React, { type ErrorInfo, type ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { captureException } from '../lib/errorReporter';
+import React, { type ErrorInfo, type ReactNode } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { captureException } from "../lib/errorReporter";
 
 export interface ErrorBoundaryProps {
   children: ReactNode;
@@ -44,7 +44,7 @@ function isProduction(): boolean {
   // typical `__DEV__` global control; we check both.
   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
   const explicit =
-    typeof process !== 'undefined' && process?.env?.NODE_ENV === 'production';
+    typeof process !== "undefined" && process?.env?.NODE_ENV === "production";
   return explicit || __DEV__ === false;
 }
 
@@ -85,13 +85,13 @@ export class ErrorBoundary extends React.Component<
         accessibilityLiveRegion="assertive"
       >
         <Text style={styles.icon} accessibilityElementsHidden>
-          {'\ud83d\ude14'}
+          {"\ud83d\ude14"}
         </Text>
         <Text style={styles.title}>Something went wrong</Text>
         <Text style={styles.body}>
           {showDetails && error.message
             ? error.message
-            : 'An unexpected error occurred while rendering this screen.'}
+            : "An unexpected error occurred while rendering this screen."}
         </Text>
         {showDetails && error.stack ? (
           <Text style={styles.stack} selectable>
@@ -121,8 +121,8 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
     paddingTop: 56,
-    alignItems: 'center',
-    backgroundColor: '#0a1410',
+    alignItems: "center",
+    backgroundColor: "#0a1410",
   },
   icon: {
     fontSize: 48,
@@ -130,29 +130,29 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontWeight: '700',
-    color: '#e8f1ea',
+    fontWeight: "700",
+    color: "#e8f1ea",
     marginBottom: 8,
-    textAlign: 'center',
+    textAlign: "center",
   },
   body: {
     fontSize: 15,
-    color: '#a8b8ac',
-    textAlign: 'center',
+    color: "#a8b8ac",
+    textAlign: "center",
     marginBottom: 16,
     lineHeight: 22,
   },
   stack: {
     fontSize: 11,
-    color: '#8aa899',
-    backgroundColor: '#122019',
+    color: "#8aa899",
+    backgroundColor: "#122019",
     padding: 12,
     borderRadius: 6,
     marginBottom: 16,
     maxHeight: 220,
   },
   button: {
-    backgroundColor: '#227239',
+    backgroundColor: "#227239",
     paddingHorizontal: 28,
     paddingVertical: 12,
     borderRadius: 8,
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#ffffff',
+    fontWeight: "600",
+    color: "#ffffff",
   },
 });

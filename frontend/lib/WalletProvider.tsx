@@ -171,9 +171,7 @@ export function WalletProvider({ children }: WalletProviderProps) {
   const isAdmin = useCallback(
     (candidateAddress: string | null | undefined) => {
       if (!candidateAddress || !publicKey) return false;
-      return (
-        publicKey.toUpperCase() === candidateAddress.toUpperCase()
-      );
+      return publicKey.toUpperCase() === candidateAddress.toUpperCase();
     },
     [publicKey],
   );

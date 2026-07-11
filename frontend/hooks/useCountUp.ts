@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 
 export function useCountUp(target: number, duration: number = 2000) {
   const [count, setCount] = useState(0);
@@ -13,7 +13,7 @@ export function useCountUp(target: number, duration: number = 2000) {
           observer.disconnect();
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     if (elementRef.current) {
@@ -32,13 +32,13 @@ export function useCountUp(target: number, duration: number = 2000) {
     const animate = (currentTime: number) => {
       if (!startTime) startTime = currentTime;
       const progress = Math.min((currentTime - startTime) / duration, 1);
-      
+
       // Easing function: easeOutQuart
       const ease = 1 - Math.pow(1 - progress, 4);
       const nextCount = Math.floor(ease * target);
-      
+
       setCount(nextCount);
-      
+
       if (progress < 1) {
         animationFrame = requestAnimationFrame(animate);
       }

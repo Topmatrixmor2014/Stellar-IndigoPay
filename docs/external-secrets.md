@@ -24,6 +24,7 @@ secrets from a central store gives us:
 ## Setup
 
 1. Install the operator:
+
    ```bash
    helm repo add external-secrets https://charts.external-secrets.io
    helm install external-secrets external-secrets/external-secrets \
@@ -33,6 +34,7 @@ secrets from a central store gives us:
 2. Create the secrets in your manager of choice. The expected layout
    is one secret per environment (e.g. `stellar-indigopay/prod`) with JSON
    keys for each value:
+
    ```json
    {
      "postgres_user": "indigopay",
@@ -56,6 +58,7 @@ secrets from a central store gives us:
    - **Vault**: configure an AppRole or Kubernetes auth method.
 
 4. Apply the manifest:
+
    ```bash
    kubectl apply -f k8s/external-secret.yaml
    ```

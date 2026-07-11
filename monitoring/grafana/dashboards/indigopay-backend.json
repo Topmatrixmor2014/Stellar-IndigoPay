@@ -62,7 +62,10 @@
       "gridPos": { "h": 6, "w": 6, "x": 0, "y": 9 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
-        { "expr": "sum(http_requests_in_flight{service=\"stellar-indigopay-api\"})", "refId": "A" }
+        {
+          "expr": "sum(http_requests_in_flight{service=\"stellar-indigopay-api\"})",
+          "refId": "A"
+        }
       ]
     },
     {
@@ -94,9 +97,21 @@
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
-        { "expr": "db_pool_total_count{service=\"stellar-indigopay-api\"}", "legendFormat": "total", "refId": "A" },
-        { "expr": "db_pool_idle_count{service=\"stellar-indigopay-api\"}", "legendFormat": "idle", "refId": "B" },
-        { "expr": "db_pool_waiting_count{service=\"stellar-indigopay-api\"}", "legendFormat": "waiting", "refId": "C" }
+        {
+          "expr": "db_pool_total_count{service=\"stellar-indigopay-api\"}",
+          "legendFormat": "total",
+          "refId": "A"
+        },
+        {
+          "expr": "db_pool_idle_count{service=\"stellar-indigopay-api\"}",
+          "legendFormat": "idle",
+          "refId": "B"
+        },
+        {
+          "expr": "db_pool_waiting_count{service=\"stellar-indigopay-api\"}",
+          "legendFormat": "waiting",
+          "refId": "C"
+        }
       ]
     },
     {

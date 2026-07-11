@@ -1,7 +1,13 @@
 /**
  * lib/i18n.tsx — Lightweight i18n context with JSON locale files.
  */
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  type ReactNode,
+} from "react";
 import en from "@/locales/en.json";
 import es from "@/locales/es.json";
 import fr from "@/locales/fr.json";
@@ -41,10 +47,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const t = useCallback(
-    (key: string) => get(locales[locale], key),
-    [locale],
-  );
+  const t = useCallback((key: string) => get(locales[locale], key), [locale]);
 
   return (
     <I18nContext.Provider value={{ locale, setLocale: handleSetLocale, t }}>

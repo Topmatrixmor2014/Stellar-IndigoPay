@@ -2,7 +2,7 @@
  * utils/cache.ts
  * AsyncStorage caching utility for offline support
  */
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 
@@ -11,7 +11,9 @@ interface CacheEntry<T> {
   timestamp: number;
 }
 
-export async function getCachedData<T>(key: string): Promise<{ data: T; isStale: boolean } | null> {
+export async function getCachedData<T>(
+  key: string,
+): Promise<{ data: T; isStale: boolean } | null> {
   try {
     const cached = await AsyncStorage.getItem(key);
     if (!cached) return null;
@@ -29,6 +31,6 @@ export async function setCachedData<T>(key: string, data: T): Promise<void> {
     const entry: CacheEntry<T> = { data, timestamp: Date.now() };
     await AsyncStorage.setItem(key, JSON.stringify(entry));
   } catch (error) {
-    console.warn('Cache write failed:', error);
+    console.warn("Cache write failed:", error);
   }
 }

@@ -31,13 +31,13 @@ Stellar-IndigoPay is an **open-source climate donation platform** built on the S
 
 The same platform ships as:
 
-| Surface | What it is | Built with |
-|---------|-----------|------------|
-| 🌐 **Web app** | Full-featured donor dashboard, project browse, leaderboard, AI impact summaries | Next.js 14 · React · TypeScript · Tailwind |
-| 📱 **Mobile app** | On-the-go donations, QR-scan-to-give, biometric auth, push receipts | React Native · Expo · expo-router |
-| 🧩 **Browser extension** | Detect Stellar addresses on any page, donate in one click | Manifest V3 · Webpack |
-| ⛓️ **Soroban contracts** | On-chain donation ledger, badges, governance, upgrades, NFT minting | Rust · WASM |
-| 🛠 **Backend API** | Metadata, leaderboard, webhooks, AI summaries, admin | Node.js 20 · Express · Postgres · pg-boss |
+| Surface                  | What it is                                                                      | Built with                                 |
+| ------------------------ | ------------------------------------------------------------------------------- | ------------------------------------------ |
+| 🌐 **Web app**           | Full-featured donor dashboard, project browse, leaderboard, AI impact summaries | Next.js 14 · React · TypeScript · Tailwind |
+| 📱 **Mobile app**        | On-the-go donations, QR-scan-to-give, biometric auth, push receipts             | React Native · Expo · expo-router          |
+| 🧩 **Browser extension** | Detect Stellar addresses on any page, donate in one click                       | Manifest V3 · Webpack                      |
+| ⛓️ **Soroban contracts** | On-chain donation ledger, badges, governance, upgrades, NFT minting             | Rust · WASM                                |
+| 🛠 **Backend API**        | Metadata, leaderboard, webhooks, AI summaries, admin                            | Node.js 20 · Express · Postgres · pg-boss  |
 
 ---
 
@@ -59,13 +59,13 @@ You can be donating on testnet in **under five minutes**.
 
 ### 1. Prerequisites
 
-| Tool | Version | Why |
-|------|---------|-----|
-| Node.js | **20 LTS** | Backend + frontend + mobile scripts |
-| npm | 10+ | Package manager |
-| Docker + Docker Compose | Latest | One-command dev environment |
-| Freighter Wallet | Latest | Stellar browser wallet (or [Freighter Mobile](https://freighter.app) on phones) |
-| *(optional)* Rust + `wasm32-unknown-unknown` | 1.74+ | Only if you want to build the contracts |
+| Tool                                         | Version    | Why                                                                             |
+| -------------------------------------------- | ---------- | ------------------------------------------------------------------------------- |
+| Node.js                                      | **20 LTS** | Backend + frontend + mobile scripts                                             |
+| npm                                          | 10+        | Package manager                                                                 |
+| Docker + Docker Compose                      | Latest     | One-command dev environment                                                     |
+| Freighter Wallet                             | Latest     | Stellar browser wallet (or [Freighter Mobile](https://freighter.app) on phones) |
+| _(optional)_ Rust + `wasm32-unknown-unknown` | 1.74+      | Only if you want to build the contracts                                         |
 
 ### 2. Clone & bootstrap
 
@@ -84,14 +84,14 @@ The setup script installs Node deps for the backend, frontend, mobile, and exten
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
-| Service | URL |
-|---------|-----|
-| 🖥 Frontend | <http://localhost:3000> |
-| 🛠 Backend API | <http://localhost:4000> |
-| 📜 Swagger UI | <http://localhost:4000/api/docs> |
-| ❤️ Health | <http://localhost:4000/api/health> |
-| 🗄 Postgres | `localhost:5432` (`indigopay` / `indigopay`) |
-| 📦 Redis (optional) | `localhost:6379` |
+| Service             | URL                                          |
+| ------------------- | -------------------------------------------- |
+| 🖥 Frontend          | <http://localhost:3000>                      |
+| 🛠 Backend API       | <http://localhost:4000>                      |
+| 📜 Swagger UI       | <http://localhost:4000/api/docs>             |
+| ❤️ Health           | <http://localhost:4000/api/health>           |
+| 🗄 Postgres          | `localhost:5432` (`indigopay` / `indigopay`) |
+| 📦 Redis (optional) | `localhost:6379`                             |
 
 The `docker-compose.dev.yml` override mounts source code into the containers and enables hot-reload for both Next.js and Express. Source edits refresh in seconds.
 
@@ -196,15 +196,15 @@ That's it. No account creation, no email verification, no KYC.
 
 ### ⛓️ Soroban contracts (`contracts/indigopay-contract/`)
 
-| Capability | Entry points |
-|------------|--------------|
-| **Project registry** | `register_project`, `batch_register_projects`, `update_project_co2_rate`, `pause_project`, `resume_project`, `deactivate_project`, `deactivate_all_projects` |
-| **Donations** | `donate(token, donor, project_id, amount, msg_hash)`, `donate_usdc(…)` with oracle |
-| **Reputation** | `get_donor_stats`, `get_badge`, tier calculation (`None` / `Seedling` / `Tree` / `Forest` / `EarthGuardian`) |
-| **NFTs** | `mint_impact_nft(donor, tier)`, `mint_project_nft(donor, project_id)` |
-| **Governance** | `create_proposal`, `vote_verify_project`, `resolve_proposal`, `veto_proposal` (gated by `≥ Seedling`) |
-| **Trust model (Phase A)** | `transfer_admin` → `accept_admin` (two-step), `pause_contract` / `unpause_contract`, `propose_upgrade` → 48h timelock → `execute_upgrade` |
-| **Read** | `get_project`, `get_global_total`, `get_global_co2`, `get_global_stats`, `get_donation_count`, `get_project_count`, `get_donation_record`, `get_pending_admin`, `is_contract_paused`, `get_pending_upgrade`, `get_last_executed_upgrade` |
+| Capability                | Entry points                                                                                                                                                                                                                             |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Project registry**      | `register_project`, `batch_register_projects`, `update_project_co2_rate`, `pause_project`, `resume_project`, `deactivate_project`, `deactivate_all_projects`                                                                             |
+| **Donations**             | `donate(token, donor, project_id, amount, msg_hash)`, `donate_usdc(…)` with oracle                                                                                                                                                       |
+| **Reputation**            | `get_donor_stats`, `get_badge`, tier calculation (`None` / `Seedling` / `Tree` / `Forest` / `EarthGuardian`)                                                                                                                             |
+| **NFTs**                  | `mint_impact_nft(donor, tier)`, `mint_project_nft(donor, project_id)`                                                                                                                                                                    |
+| **Governance**            | `create_proposal`, `vote_verify_project`, `resolve_proposal`, `veto_proposal` (gated by `≥ Seedling`)                                                                                                                                    |
+| **Trust model (Phase A)** | `transfer_admin` → `accept_admin` (two-step), `pause_contract` / `unpause_contract`, `propose_upgrade` → 48h timelock → `execute_upgrade`                                                                                                |
+| **Read**                  | `get_project`, `get_global_total`, `get_global_co2`, `get_global_stats`, `get_donation_count`, `get_project_count`, `get_donation_record`, `get_pending_admin`, `is_contract_paused`, `get_pending_upgrade`, `get_last_executed_upgrade` |
 
 Full list with auth requirements: [`contracts/indigopay-contract/README.md`](contracts/indigopay-contract/README.md).
 Threat model: [`contracts/indigopay-contract/SECURITY.md`](contracts/indigopay-contract/SECURITY.md).
@@ -253,29 +253,29 @@ Upgrade mechanics: [`contracts/indigopay-contract/UPGRADE.md`](contracts/indigop
 
 ## 🧪 Testing
 
-| Layer | Command | Notes |
-|-------|---------|-------|
-| Backend unit | `cd backend && npm test` | Jest + supertest, in-memory Postgres via testcontainers |
-| Frontend unit | `cd frontend && npm test` | Jest + Testing Library |
-| Frontend e2e | `cd frontend && npm run test:e2e` | Playwright; accessibility checks via `@axe-core/playwright` |
-| Contracts | `cargo test --features testutils` | Rust unit + fuzz |
-| Contracts build | `cargo build --target wasm32-unknown-unknown --release` | WASM artefact in `target/` |
-| DAST | `.github/workflows/ci.yml` | OWASP ZAP baseline against the running frontend |
-| Load | `k6 run scripts/load-test.js` | See SLOs in [`docs/performance.md`](docs/performance.md) |
-| Restore drill | `.github/workflows/restore-drill.yml` | Monthly in CI |
+| Layer           | Command                                                 | Notes                                                       |
+| --------------- | ------------------------------------------------------- | ----------------------------------------------------------- |
+| Backend unit    | `cd backend && npm test`                                | Jest + supertest, in-memory Postgres via testcontainers     |
+| Frontend unit   | `cd frontend && npm test`                               | Jest + Testing Library                                      |
+| Frontend e2e    | `cd frontend && npm run test:e2e`                       | Playwright; accessibility checks via `@axe-core/playwright` |
+| Contracts       | `cargo test --features testutils`                       | Rust unit + fuzz                                            |
+| Contracts build | `cargo build --target wasm32-unknown-unknown --release` | WASM artefact in `target/`                                  |
+| DAST            | `.github/workflows/ci.yml`                              | OWASP ZAP baseline against the running frontend             |
+| Load            | `k6 run scripts/load-test.js`                           | See SLOs in [`docs/performance.md`](docs/performance.md)    |
+| Restore drill   | `.github/workflows/restore-drill.yml`                   | Monthly in CI                                               |
 
 ---
 
 ## 🚢 Deployment
 
-| Environment | Path |
-|-------------|------|
-| Kubernetes (raw YAML) | [`k8s/`](k8s/) — namespace, configmap, secret, postgres, backend, frontend, ingress, HPA, PDB, NetworkPolicies, ExternalSecret |
-| Helm chart | [`helm/indigopay/`](helm/indigopay/) — chart-driven reconciliation, tested in CI with `helm lint` + `helm template --dry-run` |
-| GitOps | [`gitops/argocd-application.yaml`](gitops/argocd-application.yaml) + [`gitops/argo-rollouts-canary.yaml`](gitops/argo-rollouts-canary.yaml) for progressive delivery with Prometheus success-rate analysis |
-| Local dev | `docker compose -f docker-compose.yml -f docker-compose.dev.yml up` |
-| CI test | `docker compose -f docker-compose.test.yml up` |
-| Mainnet launch | [`docs/deployment-mainnet.md`](docs/deployment-mainnet.md) |
+| Environment           | Path                                                                                                                                                                                                       |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Kubernetes (raw YAML) | [`k8s/`](k8s/) — namespace, configmap, secret, postgres, backend, frontend, ingress, HPA, PDB, NetworkPolicies, ExternalSecret                                                                             |
+| Helm chart            | [`helm/indigopay/`](helm/indigopay/) — chart-driven reconciliation, tested in CI with `helm lint` + `helm template --dry-run`                                                                              |
+| GitOps                | [`gitops/argocd-application.yaml`](gitops/argocd-application.yaml) + [`gitops/argo-rollouts-canary.yaml`](gitops/argo-rollouts-canary.yaml) for progressive delivery with Prometheus success-rate analysis |
+| Local dev             | `docker compose -f docker-compose.yml -f docker-compose.dev.yml up`                                                                                                                                        |
+| CI test               | `docker compose -f docker-compose.test.yml up`                                                                                                                                                             |
+| Mainnet launch        | [`docs/deployment-mainnet.md`](docs/deployment-mainnet.md)                                                                                                                                                 |
 
 Container images are multi-stage (`builder` + `runner`), pinned to `node:20.18.1-alpine` LTS, built with `npm ci --omit=dev`, and signed with cosign on release tags.
 

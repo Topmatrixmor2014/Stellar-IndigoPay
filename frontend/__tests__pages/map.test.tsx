@@ -17,8 +17,10 @@ import type { ClimateProject } from "@/utils/types";
 // pass-through that renders the component synchronously.
 jest.mock("next/dynamic", () => {
   return function mockDynamic(
-    importFn: () => Promise<{ default: React.ComponentType<{ projects: ClimateProject[] }> }>,
-    options?: { loading?: () => JSX.Element }
+    importFn: () => Promise<{
+      default: React.ComponentType<{ projects: ClimateProject[] }>;
+    }>,
+    options?: { loading?: () => JSX.Element },
   ) {
     // Return a component that renders the loading placeholder so the test
     // can verify the page skeleton without needing a real Leaflet canvas.
@@ -37,13 +39,14 @@ jest.mock("@/lib/i18n", () => ({
   useI18n: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        "map.title":          "Project World Map",
-        "map.subtitle":       "{count} active projects around the globe",
+        "map.title": "Project World Map",
+        "map.subtitle": "{count} active projects around the globe",
         "map.activeProjects": "active projects",
-        "map.browseAll":      "Browse all projects",
-        "map.noProjects":     "No active projects yet",
-        "map.noProjectsDesc": "Check back soon — new projects are verified regularly.",
-        "map.dataUpdated":    "Data as of {time}",
+        "map.browseAll": "Browse all projects",
+        "map.noProjects": "No active projects yet",
+        "map.noProjectsDesc":
+          "Check back soon — new projects are verified regularly.",
+        "map.dataUpdated": "Data as of {time}",
       };
       return translations[key] ?? key;
     },
@@ -54,22 +57,22 @@ jest.mock("@/lib/i18n", () => ({
 
 function makeProject(overrides: Partial<ClimateProject> = {}): ClimateProject {
   return {
-    id:           "proj-1",
-    name:         "Amazon Reforestation",
-    description:  "Restoring rainforest cover.",
-    category:     "Reforestation",
-    location:     "Brazil",
-    walletAddress:"GABCDEFGHIJKLMNOPQRSTUVWXYZ234567ABCDEFGHIJKLMNOPQRST",
-    goalXLM:      "10000",
-    raisedXLM:    "2500",
-    donorCount:   42,
-    co2OffsetKg:  1200,
-    status:       "active",
-    verified:     true,
+    id: "proj-1",
+    name: "Amazon Reforestation",
+    description: "Restoring rainforest cover.",
+    category: "Reforestation",
+    location: "Brazil",
+    walletAddress: "GABCDEFGHIJKLMNOPQRSTUVWXYZ234567ABCDEFGHIJKLMNOPQRST",
+    goalXLM: "10000",
+    raisedXLM: "2500",
+    donorCount: 42,
+    co2OffsetKg: 1200,
+    status: "active",
+    verified: true,
     onChainVerified: false,
-    tags:         ["trees"],
-    createdAt:    "2025-01-01T00:00:00.000Z",
-    updatedAt:    "2025-01-02T00:00:00.000Z",
+    tags: ["trees"],
+    createdAt: "2025-01-01T00:00:00.000Z",
+    updatedAt: "2025-01-02T00:00:00.000Z",
     ...overrides,
   };
 }
@@ -125,7 +128,9 @@ describe("MapPage", () => {
 
     it("does not render the empty-state message", () => {
       render(<MapPage projects={projects} fetchedAt={FETCHED_AT} />);
-      expect(screen.queryByText(/no active projects yet/i)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(/no active projects yet/i),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -137,9 +142,7 @@ describe("MapPage", () => {
 
     it("renders the empty-state description", () => {
       render(<MapPage projects={[]} fetchedAt={FETCHED_AT} />);
-      expect(
-        screen.getByText(/check back soon/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/check back soon/i)).toBeInTheDocument();
     });
 
     it("renders a Browse link in the empty state", () => {

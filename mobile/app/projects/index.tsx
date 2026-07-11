@@ -2,15 +2,22 @@
  * app/projects/index.tsx
  * Projects browse screen — with offline cache support (#482)
  */
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useTheme } from '../theme';
-import { getCachedData, setCachedData } from '../../utils/cache';
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useTheme } from "../theme";
+import { getCachedData, setCachedData } from "../../utils/cache";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4000';
-const CACHE_KEY_PROJECTS = 'projects:list';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:4000";
+const CACHE_KEY_PROJECTS = "projects:list";
 
 interface ClimateProject {
   id: string;
@@ -28,8 +35,10 @@ export default function ProjectsScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const [projects, setProjects] = useState<ClimateProject[]>([]);
-  const [filteredProjects, setFilteredProjects] = useState<ClimateProject[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredProjects, setFilteredProjects] = useState<ClimateProject[]>(
+    [],
+  );
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [isOffline, setIsOffline] = useState(false);
 
@@ -40,10 +49,11 @@ export default function ProjectsScreen() {
   useEffect(() => {
     if (searchQuery) {
       setFilteredProjects(
-        projects.filter(p =>
-          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.category.toLowerCase().includes(searchQuery.toLowerCase())
-        )
+        projects.filter(
+          (p) =>
+            p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            p.category.toLowerCase().includes(searchQuery.toLowerCase()),
+        ),
       );
     } else {
       setFilteredProjects(projects);
@@ -65,7 +75,7 @@ export default function ProjectsScreen() {
         setFilteredProjects(cached.data);
         setIsOffline(true);
       } else {
-        console.error('Error loading projects:', error);
+        console.error("Error loading projects:", error);
       }
     } finally {
       setLoading(false);
@@ -81,21 +91,36 @@ export default function ProjectsScreen() {
 
   if (loading) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}> 
-        <Text style={[styles.loadingText, { color: colors.secondaryText }]}>Loading projects...</Text>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <Text style={[styles.loadingText, { color: colors.secondaryText }]}>
+          Loading projects...
+        </Text>
       </View>
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}> 
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {isOffline && (
-        <View style={styles.offlineBanner} accessibilityRole="alert" accessibilityLabel="Offline — showing cached data">
-          <Text style={styles.offlineBannerText}>Offline — showing cached data</Text>
+        <View
+          style={styles.offlineBanner}
+          accessibilityRole="alert"
+          accessibilityLabel="Offline — showing cached data"
+        >
+          <Text style={styles.offlineBannerText}>
+            Offline — showing cached data
+          </Text>
         </View>
       )}
       <TextInput
-        style={[styles.searchInput, { backgroundColor: colors.inputBackground, borderColor: colors.inputBorder, color: colors.primaryText }]}
+        style={[
+          styles.searchInput,
+          {
+            backgroundColor: colors.inputBackground,
+            borderColor: colors.inputBorder,
+            color: colors.primaryText,
+          },
+        ]}
         placeholder="Search projects..."
         placeholderTextColor={colors.placeholder}
         value={searchQuery}
@@ -104,36 +129,62 @@ export default function ProjectsScreen() {
         accessibilityRole="search"
       />
       <ScrollView style={[styles.scroll, { borderColor: colors.background }]}>
-        {filteredProjects.map(project => (
+        {filteredProjects.map((project) => (
           <TouchableOpacity
             key={project.id}
-            style={[styles.card, { backgroundColor: colors.surface, shadowColor: colors.cardShadow, borderColor: colors.cardBorder }]}
+            style={[
+              styles.card,
+              {
+                backgroundColor: colors.surface,
+                shadowColor: colors.cardShadow,
+                borderColor: colors.cardBorder,
+              },
+            ]}
             onPress={() => router.push(`/projects/${project.id}`)}
             accessibilityLabel={`View ${project.name} project`}
             accessibilityRole="button"
           >
             <View style={styles.cardHeader}>
-              <Text style={[styles.category, { color: colors.primary }]}>{project.category}</Text>
-              <Text style={[styles.status, { color: colors.secondaryText }]}>{project.status}</Text>
+              <Text style={[styles.category, { color: colors.primary }]}>
+                {project.category}
+              </Text>
+              <Text style={[styles.status, { color: colors.secondaryText }]}>
+                {project.status}
+              </Text>
             </View>
-            <Text style={[styles.name, { color: colors.primaryText }]}>{project.name}</Text>
-            <Text style={[styles.description, { color: colors.secondaryText }]} numberOfLines={2}>
+            <Text style={[styles.name, { color: colors.primaryText }]}>
+              {project.name}
+            </Text>
+            <Text
+              style={[styles.description, { color: colors.secondaryText }]}
+              numberOfLines={2}
+            >
               {project.description}
             </Text>
             <View style={styles.progressContainer}>
-              <View style={[styles.progressBar, { backgroundColor: colors.border }]}> 
+              <View
+                style={[styles.progressBar, { backgroundColor: colors.border }]}
+              >
                 <View
                   style={[
                     styles.progressFill,
-                    { width: `${progressPercent(project.raisedXLM, project.goalXLM)}%`, backgroundColor: colors.primary }
+                    {
+                      width: `${progressPercent(project.raisedXLM, project.goalXLM)}%`,
+                      backgroundColor: colors.primary,
+                    },
                   ]}
                 />
               </View>
-              <Text style={[styles.progressText, { color: colors.secondaryText }]}> 
-                {parseFloat(project.raisedXLM).toFixed(2)} / {parseFloat(project.goalXLM).toFixed(2)} XLM
+              <Text
+                style={[styles.progressText, { color: colors.secondaryText }]}
+              >
+                {parseFloat(project.raisedXLM).toFixed(2)} /{" "}
+                {parseFloat(project.goalXLM).toFixed(2)} XLM
               </Text>
             </View>
-            <Text style={[styles.donorCount, { color: colors.muted }]}>{project.donorCount} donors</Text>
+            <Text style={[styles.donorCount, { color: colors.muted }]}>
+              {project.donorCount} donors
+            </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -158,7 +209,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 40,
   },
   card: {
@@ -172,21 +223,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 8,
   },
   category: {
     fontSize: 12,
-    fontWeight: '600',
-    textTransform: 'uppercase',
+    fontWeight: "600",
+    textTransform: "uppercase",
   },
   status: {
     fontSize: 12,
   },
   name: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 4,
   },
   description: {
@@ -199,10 +250,10 @@ const styles = StyleSheet.create({
   progressBar: {
     height: 8,
     borderRadius: 4,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progressFill: {
-    height: '100%',
+    height: "100%",
   },
   progressText: {
     fontSize: 12,
@@ -213,13 +264,13 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   offlineBanner: {
-    backgroundColor: '#f5a623',
+    backgroundColor: "#f5a623",
     padding: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   offlineBannerText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

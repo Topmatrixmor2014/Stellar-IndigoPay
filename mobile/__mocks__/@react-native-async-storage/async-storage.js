@@ -2,7 +2,9 @@
 const store = {};
 
 const AsyncStorage = {
-  getItem: jest.fn().mockImplementation((key) => Promise.resolve(store[key] ?? null)),
+  getItem: jest
+    .fn()
+    .mockImplementation((key) => Promise.resolve(store[key] ?? null)),
   setItem: jest.fn().mockImplementation((key, value) => {
     store[key] = value;
     return Promise.resolve();

@@ -6,13 +6,13 @@ explicit and rehearsed, not improvised.
 
 ## Recovery Targets
 
-| Tier | Service | RTO (down) | RPO (data loss) | Strategy |
-|------|---------|-----------|----------------|----------|
-| 1 | API + web | 5 min | 0 | Multi-replica deployment + HPA, no in-flight request loss on rolling restart |
-| 1 | Stellar indexer | 5 min | 0 (at-rest), 5 min (in-stream) | Restart from `cursor=now` (in-memory; gap-fill job runs after restart) |
-| 2 | Postgres | 30 min | 5 min | WAL archiving to S3 every 5 min; base backup nightly; restore drill monthly |
-| 2 | Redis cache | 1 min | 0 (cache rebuild on first read) | No persistence; treated as ephemeral |
-| 3 | Push notification queue | 1 hour | All un-pushed notifications | pg-boss backed; rows persist in `webhook_deliveries` until ack |
+| Tier | Service                 | RTO (down) | RPO (data loss)                 | Strategy                                                                     |
+| ---- | ----------------------- | ---------- | ------------------------------- | ---------------------------------------------------------------------------- |
+| 1    | API + web               | 5 min      | 0                               | Multi-replica deployment + HPA, no in-flight request loss on rolling restart |
+| 1    | Stellar indexer         | 5 min      | 0 (at-rest), 5 min (in-stream)  | Restart from `cursor=now` (in-memory; gap-fill job runs after restart)       |
+| 2    | Postgres                | 30 min     | 5 min                           | WAL archiving to S3 every 5 min; base backup nightly; restore drill monthly  |
+| 2    | Redis cache             | 1 min      | 0 (cache rebuild on first read) | No persistence; treated as ephemeral                                         |
+| 3    | Push notification queue | 1 hour     | All un-pushed notifications     | pg-boss backed; rows persist in `webhook_deliveries` until ack               |
 
 RTO/RPO are reviewed quarterly. They are not free — RPO 0 for tier 1
 requires synchronous multi-region replication, which we don't run
@@ -23,6 +23,7 @@ roadmap.
 ## Failure Modes
 
 ### Pod crash
+
 - **Detection**: readiness probe fails, kube-proxy removes the pod
   from the service endpoints.
 - **Recovery**: kubelet restarts the pod; HPA replaces it if it
@@ -30,6 +31,7 @@ roadmap.
 - **RTO**: < 30s.
 
 ### Node failure
+
 - **Detection**: kube-controller-manager marks the node `NotReady`
   after the node-monitor-grace-period (default 50s).
 - **Recovery**: pods are evicted, scheduled on healthy nodes, HPA
@@ -37,6 +39,7 @@ roadmap.
 - **RTO**: < 2 min.
 
 ### Database corruption (single-writer pod)
+
 - **Detection**: readiness probe returns 503 (`db_pool_waiting > 0`
   alert).
 - **Recovery**: restore from latest S3 backup; see `restore runbook`.
@@ -44,6 +47,7 @@ roadmap.
 - **RPO**: up to 5 min (last WAL archive).
 
 ### Database region failure
+
 - **Detection**: cluster API unreachable from primary region.
 - **Recovery**: fail over DNS / Load Balancer to a warm standby in a
   second region. **Not automated yet** — see roadmap.
@@ -51,6 +55,7 @@ roadmap.
 - **RPO**: 1 min (replication lag).
 
 ### Secret compromise
+
 - **Detection**: gitleaks CI alert, anomalous access in CloudTrail, or
   partner notification.
 - **Recovery**: rotate the affected secret in AWS Secrets Manager;
@@ -61,6 +66,7 @@ roadmap.
   to refresh.
 
 ### Webhook receiver compromise
+
 - **Detection**: partner notification or anomalous delivery pattern.
 - **Recovery**: rotate `webhook_secret` per project; receivers must
   re-fetch the new value and update their verifier.
@@ -84,6 +90,7 @@ the documented posture and the runbook above applies.
 ## Monitoring the DR Plan
 
 The on-call alert pipeline must include:
+
 - Backup success (last 24h) — `database_backup_success` alert.
 - Restore drill success (last 30 days) — checked manually in the
   on-call review.

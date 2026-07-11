@@ -186,7 +186,10 @@ export default function Home({ publicKey, onConnect }: HomeProps) {
     <div className="relative overflow-hidden">
       <Head>
         <title>Stellar IndigoPay — Fund the planet. One XLM at a time.</title>
-        <meta name="description" content="Stellar IndigoPay connects donors with verified climate projects worldwide. Donations go directly on-chain — no banks, no delays, no fees swallowed by middlemen." />
+        <meta
+          name="description"
+          content="Stellar IndigoPay connects donors with verified climate projects worldwide. Donations go directly on-chain — no banks, no delays, no fees swallowed by middlemen."
+        />
       </Head>
       {/* Background gradient */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -206,9 +209,7 @@ export default function Home({ publicKey, onConnect }: HomeProps) {
           <h1 className="font-display text-5xl sm:text-6xl md:text-7xl font-bold text-[#0F172A] dark:text-[#E2E8F0] leading-tight mb-6 tracking-tight">
             Fund the planet.
             <br />
-            <span className="text-gradient italic">
-              One XLM at a time.
-            </span>
+            <span className="text-gradient italic">One XLM at a time.</span>
           </h1>
 
           <p className="text-[#475569] dark:text-[#94A3B8] text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-body">
@@ -224,8 +225,18 @@ export default function Home({ publicKey, onConnect }: HomeProps) {
                   href="/projects"
                   className="btn-primary text-base px-8 py-3.5 gap-2"
                 >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                    />
                   </svg>
                   Browse Projects
                 </Link>
@@ -242,8 +253,18 @@ export default function Home({ publicKey, onConnect }: HomeProps) {
                   onClick={() => setShowConnect(true)}
                   className="btn-primary text-base px-8 py-3.5 gap-2"
                 >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                    />
                   </svg>
                   Start Donating
                 </button>
@@ -327,7 +348,9 @@ export default function Home({ publicKey, onConnect }: HomeProps) {
                 href={`/projects?category=${encodeURIComponent(cat.label)}`}
                 className="card text-center hover:shadow-indigo hover:border-[rgba(99,102,241,0.25)] dark:hover:border-[rgba(129,140,248,0.30)] transition-all group py-5"
               >
-                <div className="text-3xl mb-2 transition-transform group-hover:scale-110">{cat.icon}</div>
+                <div className="text-3xl mb-2 transition-transform group-hover:scale-110">
+                  {cat.icon}
+                </div>
                 <p className="text-xs font-semibold text-[#475569] dark:text-[#94A3B8] group-hover:text-[#4F46E5] dark:group-hover:text-[#818CF8] transition-colors font-body">
                   {cat.label}
                 </p>
@@ -352,7 +375,10 @@ export default function Home({ publicKey, onConnect }: HomeProps) {
               { emoji: "🌲", name: "Forest", threshold: "500+ XLM" },
               { emoji: "🌍", name: "Earth Guardian", threshold: "2,000+ XLM" },
             ].map((b) => (
-              <div key={b.name} className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/20 text-center min-w-[130px]">
+              <div
+                key={b.name}
+                className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/20 text-center min-w-[130px]"
+              >
                 <div className="text-4xl mb-2">{b.emoji}</div>
                 <p className="font-display font-semibold text-white text-sm">
                   {b.name}
@@ -455,7 +481,9 @@ function CategoryStatsChart({ stats }: { stats: CategoryStats[] }) {
               className="block group"
             >
               <div className="flex items-center gap-3 mb-1">
-                <span className="text-xl">{getCategoryIcon(stat.category)}</span>
+                <span className="text-xl">
+                  {getCategoryIcon(stat.category)}
+                </span>
                 <span className="font-body text-sm font-medium text-[#0F172A] dark:text-[#E2E8F0] group-hover:text-[#4F46E5] dark:group-hover:text-[#818CF8] transition-colors flex-1">
                   {stat.category}
                 </span>
@@ -562,10 +590,7 @@ function FeaturedProjectCard({ project }: { project: ClimateProject }) {
 function CO2OffsetTicker({ stats }: { stats: GlobalStats }) {
   const { count, elementRef } = useCountUp(stats.totalCO2OffsetKg, 2500);
   return (
-    <div
-      ref={elementRef}
-      className="card-gradient text-center py-10 mb-20"
-    >
+    <div ref={elementRef} className="card-gradient text-center py-10 mb-20">
       <p className="text-3xl mb-2">🍃</p>
       <div className="font-display text-5xl sm:text-6xl font-bold text-white mb-2">
         {formatCO2(count)}
@@ -574,7 +599,8 @@ function CO2OffsetTicker({ stats }: { stats: GlobalStats }) {
         Total CO₂ Offset Across All Donations
       </p>
       <p className="text-[#C7D2FE] text-xs font-body mt-2">
-        {stats.totalDonations.toLocaleString()} donations · {stats.totalDonors.toLocaleString()} donors ·{" "}
+        {stats.totalDonations.toLocaleString()} donations ·{" "}
+        {stats.totalDonors.toLocaleString()} donors ·{" "}
         {parseFloat(stats.totalXLMRaised).toLocaleString()} XLM raised
       </p>
     </div>
@@ -584,7 +610,10 @@ function CO2OffsetTicker({ stats }: { stats: GlobalStats }) {
 function StatItem({ stat }: { stat: any }) {
   const { count, elementRef } = useCountUp(stat.value, stat.duration);
   return (
-    <div ref={elementRef} className="bg-white dark:bg-[#14142D] text-center py-10 px-4">
+    <div
+      ref={elementRef}
+      className="bg-white dark:bg-[#14142D] text-center py-10 px-4"
+    >
       <div className="font-display text-4xl font-bold text-gradient mb-1">
         {stat.prefix}
         {count.toLocaleString()}

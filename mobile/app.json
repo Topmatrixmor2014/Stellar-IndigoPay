@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#227239"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.stellarindigopay.app",
@@ -31,7 +29,11 @@
           "autoVerify": true,
           "data": [
             { "scheme": "indigopay" },
-            { "scheme": "https", "host": "indigopay.example.com", "pathPrefix": "/project/" }
+            {
+              "scheme": "https",
+              "host": "indigopay.example.com",
+              "pathPrefix": "/project/"
+            }
           ],
           "category": ["BROWSABLE", "DEFAULT"]
         }

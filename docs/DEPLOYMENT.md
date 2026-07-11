@@ -6,10 +6,10 @@ This document covers the full production deployment process for Stellar-IndigoPa
 
 Before deploying to production, ensure you have the following installed and configured:
 
-*   **`kubectl`**: The Kubernetes command-line tool.
-*   **`helm`**: The Helm package manager (v3+).
-*   **A Kubernetes Cluster**: Running on a cloud provider like GCP (GKE), AWS (EKS), or a managed cluster.
-*   **Cloud Provider CLI**: (e.g., `gcloud` for GCP, `aws` for AWS) configured with appropriate access rights.
+- **`kubectl`**: The Kubernetes command-line tool.
+- **`helm`**: The Helm package manager (v3+).
+- **A Kubernetes Cluster**: Running on a cloud provider like GCP (GKE), AWS (EKS), or a managed cluster.
+- **Cloud Provider CLI**: (e.g., `gcloud` for GCP, `aws` for AWS) configured with appropriate access rights.
 
 ## Creating secrets from .env
 
@@ -21,7 +21,7 @@ Create a Kubernetes Secret from your `.env` file:
 kubectl create secret generic stellar-indigopay-secrets --from-env-file=.env
 ```
 
-*Note: Ensure your `.env` file is properly configured for the production environment and NEVER committed to version control.*
+_Note: Ensure your `.env` file is properly configured for the production environment and NEVER committed to version control._
 
 ## Deploying with Helm
 
@@ -44,6 +44,7 @@ To expose the application securely over HTTPS, configure an Ingress resource wit
 3.  **Update `values.yaml`**: Update the `helm/indigopay/values.yaml` (or pass a custom `values-prod.yaml`) to enable the Ingress and configure TLS hosts.
 
 Example configuration snippet:
+
 ```yaml
 ingress:
   enabled: true
@@ -62,6 +63,7 @@ ingress:
 ```
 
 Apply the updated configuration:
+
 ```bash
 helm upgrade stellar-indigopay helm/indigopay/ -f values-prod.yaml
 ```
@@ -75,7 +77,8 @@ Connect to a running backend pod or execute a one-off job to run the migration s
 ```bash
 kubectl exec -it deployment/stellar-indigopay-backend -- npm run migrate
 ```
-*(Adjust the command if you use a dedicated migration job or a different package manager command.)*
+
+_(Adjust the command if you use a dedicated migration job or a different package manager command.)_
 
 ## Registering the Soroban contract on mainnet
 

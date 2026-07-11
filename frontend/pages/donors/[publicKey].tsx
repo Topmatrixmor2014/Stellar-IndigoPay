@@ -15,7 +15,11 @@ import {
   submitSorobanTransaction,
   explorerUrl,
 } from "@/lib/stellar";
-import { getConnectedPublicKey, connectWallet, signTransactionWithWallet } from "@/lib/wallet";
+import {
+  getConnectedPublicKey,
+  connectWallet,
+  signTransactionWithWallet,
+} from "@/lib/wallet";
 import type { DonorProfile, Donation, BadgeTier } from "@/utils/types";
 import { formatXLM } from "@/utils/format";
 
@@ -77,7 +81,11 @@ function BadgePill({ tier, earnedAt }: { tier: BadgeTier; earnedAt: string }) {
       title={`${meta.label} — earned ${formatDate(earnedAt)}`}
       className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${meta.bg} ${meta.color} ${meta.border}`}
     >
-      <span role="img" aria-label={meta.label} className="text-base leading-none">
+      <span
+        role="img"
+        aria-label={meta.label}
+        className="text-base leading-none"
+      >
         {meta.emoji}
       </span>
       {meta.label}
@@ -100,14 +108,17 @@ function StatCard({
       <p className="font-display text-2xl font-semibold text-[#227239]">
         {value}
       </p>
-      {sub && <p className="text-xs text-[#5a7a5a] dark:text-[#8aaa8a] font-body">{sub}</p>}
+      {sub && (
+        <p className="text-xs text-[#5a7a5a] dark:text-[#8aaa8a] font-body">
+          {sub}
+        </p>
+      )}
     </div>
   );
 }
 
 function DonationRow({ donation }: { donation: Donation }) {
-  const amount =
-    donation.amount ?? donation.amountXLM ?? "0";
+  const amount = donation.amount ?? donation.amountXLM ?? "0";
   const currency = donation.currency ?? "XLM";
 
   return (
@@ -124,7 +135,9 @@ function DonationRow({ donation }: { donation: Donation }) {
       </div>
       <div className="flex flex-col items-end gap-0.5 shrink-0">
         <span className="font-semibold text-[#227239] font-body text-sm">
-          {currency === "XLM" ? formatXLM(amount) : `${parseFloat(amount).toFixed(2)} ${currency}`}
+          {currency === "XLM"
+            ? formatXLM(amount)
+            : `${parseFloat(amount).toFixed(2)} ${currency}`}
         </span>
         <span className="text-[10px] text-[#5a7a5a] dark:text-[#8aaa8a]">
           {formatDate(donation.createdAt)}
@@ -146,8 +159,8 @@ function ProfileNotFound({ publicKey }: { publicKey: string }) {
         </h1>
         <p className="text-[#5a7a5a] dark:text-[#8aaa8a] font-body max-w-sm mx-auto text-sm leading-relaxed">
           The donor at{" "}
-          <span className="address-tag">{shortenKey(publicKey)}</span> hasn&apos;t
-          created a public profile yet.
+          <span className="address-tag">{shortenKey(publicKey)}</span>{" "}
+          hasn&apos;t created a public profile yet.
         </p>
       </div>
       <Link href="/projects" className="btn-primary text-sm">
@@ -307,7 +320,9 @@ function ClaimNftCard({ profile }: { profile: DonorProfile }) {
     setMinted(null);
 
     if (!CONTRACT_ID) {
-      setError("Impact NFT contract is not configured (set NEXT_PUBLIC_CONTRACT_ID).");
+      setError(
+        "Impact NFT contract is not configured (set NEXT_PUBLIC_CONTRACT_ID).",
+      );
       setStep("error");
       return;
     }
@@ -323,7 +338,9 @@ function ClaimNftCard({ profile }: { profile: DonorProfile }) {
       const fresh = await fetchProfile(profile.publicKey);
       const currentTier = highestTier(fresh.badges);
       if (!currentTier) {
-        throw new Error("No badge tier reached yet — donate more to unlock an Impact NFT.");
+        throw new Error(
+          "No badge tier reached yet — donate more to unlock an Impact NFT.",
+        );
       }
 
       // 2. Build the Soroban mint_impact_nft(donor, tier) transaction.
@@ -340,7 +357,9 @@ function ClaimNftCard({ profile }: { profile: DonorProfile }) {
         tx.toXDR(),
       );
       if (signErr || !signedXDR) {
-        throw new Error(signErr || "Wallet did not return a signed transaction.");
+        throw new Error(
+          signErr || "Wallet did not return a signed transaction.",
+        );
       }
 
       // 4. Submit via Soroban RPC and wait for the mint ledger.
@@ -351,7 +370,9 @@ function ClaimNftCard({ profile }: { profile: DonorProfile }) {
       setStep("success");
     } catch (err: unknown) {
       const msg =
-        err instanceof Error ? err.message : "Something went wrong. Please try again.";
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.";
       setError(msg);
       setStep("error");
     }
@@ -426,8 +447,8 @@ function ClaimNftCard({ profile }: { profile: DonorProfile }) {
         </button>
       ) : !isOwner ? (
         <p className="text-xs text-[#8aaa8a] font-body">
-          Connect the wallet that owns this profile ({shortenKey(profile.publicKey)})
-          to claim its Impact NFT.
+          Connect the wallet that owns this profile (
+          {shortenKey(profile.publicKey)}) to claim its Impact NFT.
         </p>
       ) : (
         <button
@@ -479,8 +500,8 @@ export default function DonorProfilePage() {
       } catch (err: unknown) {
         if (!cancelled) {
           // Treat 404 or any error fetching the profile as "not found"
-          const status =
-            (err as { response?: { status?: number } })?.response?.status;
+          const status = (err as { response?: { status?: number } })?.response
+            ?.status;
           if (!status || status === 404) {
             setNotFound(true);
           } else {
@@ -502,8 +523,7 @@ export default function DonorProfilePage() {
   const displayName =
     profile?.displayName || (publicKey ? shortenKey(publicKey) : "Donor");
 
-  const profileUrl =
-    typeof window !== "undefined" ? window.location.href : "";
+  const profileUrl = typeof window !== "undefined" ? window.location.href : "";
 
   const ogTitle = `${displayName} — Stellar IndigoPay Donor`;
   const ogDescription = profile
@@ -534,7 +554,6 @@ export default function DonorProfilePage() {
 
       <div className="min-h-screen bg-leaf">
         <div className="max-w-2xl mx-auto px-4 py-10 space-y-6">
-
           {/* ── Header card ─────────────────────────────────────────────── */}
           <div className="card shadow-green">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -615,7 +634,6 @@ export default function DonorProfilePage() {
               ← Browse all projects
             </Link>
           </div>
-
         </div>
       </div>
     </>

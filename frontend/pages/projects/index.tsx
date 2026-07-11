@@ -17,9 +17,9 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedProjectIds, setSelectedProjectIds] = useState<string[]>([]);
   const [showComparison, setShowComparison] = useState(false);
-  
+
   const searchRef = useRef<HTMLDivElement>(null);
-  
+
   const {
     query: search,
     setQuery: setSearch,
@@ -27,7 +27,7 @@ export default function ProjectsPage() {
     isOpen: isAutocompleteOpen,
     setIsOpen: setIsAutocompleteOpen,
     activeIndex,
-    handleKeyDown
+    handleKeyDown,
   } = useAutocomplete<string>(fetchTagSuggestions);
 
   const category = (router.query.category as string) || "";
@@ -106,7 +106,7 @@ export default function ProjectsPage() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
       setSearch(value);
-      
+
       // Update URL with search query (debounced would be better but keeping simple for now)
       const timer = setTimeout(() => {
         router.push(
@@ -172,7 +172,7 @@ export default function ProjectsPage() {
             "px-3 py-1.5 rounded-full text-sm font-medium border transition-all font-body",
             !category
               ? "bg-forest-500 text-white border-forest-500"
-              : "bg-white text-forest-700 border-forest-200 hover:border-forest-400"
+              : "bg-white text-forest-700 border-forest-200 hover:border-forest-400",
           )}
         >
           All
@@ -185,7 +185,7 @@ export default function ProjectsPage() {
               "px-3 py-1.5 rounded-full text-sm font-medium border transition-all font-body flex items-center gap-1.5",
               category === cat
                 ? "bg-forest-500 text-white border-forest-500"
-                : "bg-white text-forest-700 border-forest-200 hover:border-forest-400"
+                : "bg-white text-forest-700 border-forest-200 hover:border-forest-400",
             )}
           >
             <span>{CATEGORY_ICONS[cat]}</span>
@@ -197,29 +197,54 @@ export default function ProjectsPage() {
       {/* Active filter summary */}
       {(category || status !== "active" || verified || search) && (
         <div className="flex flex-wrap items-center gap-2 mb-4">
-          <span className="text-xs text-[#8aaa8a] dark:text-forest-300 font-body">Active filters:</span>
+          <span className="text-xs text-[#8aaa8a] dark:text-forest-300 font-body">
+            Active filters:
+          </span>
           {category && (
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-forest-100 text-forest-700 text-xs font-body">
               {CATEGORY_ICONS[category]} {category}
-              <button onClick={() => setFilter("category", "")} className="ml-1 hover:text-forest-900">✕</button>
+              <button
+                onClick={() => setFilter("category", "")}
+                className="ml-1 hover:text-forest-900"
+              >
+                ✕
+              </button>
             </span>
           )}
           {status !== "active" && (
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-forest-100 text-forest-700 text-xs font-body">
               {status || "All"} status
-              <button onClick={() => setFilter("status", "active")} className="ml-1 hover:text-forest-900">✕</button>
+              <button
+                onClick={() => setFilter("status", "active")}
+                className="ml-1 hover:text-forest-900"
+              >
+                ✕
+              </button>
             </span>
           )}
           {verified && (
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-forest-100 text-forest-700 text-xs font-body">
               ✓ Verified
-              <button onClick={() => setFilter("verified", "")} className="ml-1 hover:text-forest-900">✕</button>
+              <button
+                onClick={() => setFilter("verified", "")}
+                className="ml-1 hover:text-forest-900"
+              >
+                ✕
+              </button>
             </span>
           )}
           {search && (
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-forest-100 text-forest-700 text-xs font-body">
               🔍 {search}
-              <button onClick={() => { setSearch(""); setFilter("search", ""); }} className="ml-1 hover:text-forest-900">✕</button>
+              <button
+                onClick={() => {
+                  setSearch("");
+                  setFilter("search", "");
+                }}
+                className="ml-1 hover:text-forest-900"
+              >
+                ✕
+              </button>
             </span>
           )}
         </div>
@@ -270,7 +295,9 @@ export default function ProjectsPage() {
                 <div className="w-8 h-8 rounded-lg bg-forest-100 flex items-center justify-center text-sm font-semibold text-forest-700 flex-shrink-0">
                   #
                 </div>
-                <p className="text-sm font-semibold text-forest-900 truncate">{tag}</p>
+                <p className="text-sm font-semibold text-forest-900 truncate">
+                  {tag}
+                </p>
               </li>
             ))}
           </ul>
@@ -425,7 +452,10 @@ export default function ProjectsPage() {
                       type="checkbox"
                       checked={selectedProjectIds.includes(p.id)}
                       onChange={() => toggleSelection(p.id)}
-                      disabled={selectedProjectIds.length >= 3 && !selectedProjectIds.includes(p.id)}
+                      disabled={
+                        selectedProjectIds.length >= 3 &&
+                        !selectedProjectIds.includes(p.id)
+                      }
                     />
                     Compare
                   </label>

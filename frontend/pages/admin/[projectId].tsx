@@ -3,7 +3,16 @@ import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import WalletConnect from "@/components/WalletConnect";
-import { createProjectUpdate, fetchProject, fetchProjectDonations, updateProjectStatus, registerProjectOnChain, confirmProjectRegistration, fetchProjectMatches, csrfFetch } from "@/lib/api";
+import {
+  createProjectUpdate,
+  fetchProject,
+  fetchProjectDonations,
+  updateProjectStatus,
+  registerProjectOnChain,
+  confirmProjectRegistration,
+  fetchProjectMatches,
+  csrfFetch,
+} from "@/lib/api";
 import { buildMilestoneTransaction, submitTransaction } from "@/lib/stellar";
 import { formatCO2, formatXLM, shortenAddress, timeAgo } from "@/utils/format";
 import type { ClimateProject, Donation } from "@/utils/types";
@@ -22,11 +31,15 @@ function weekKey(dateStr: string): string {
   const d = new Date(dateStr);
   if (Number.isNaN(d.getTime())) return dateStr;
   // ISO week-like key (YYYY-WW) using UTC week start (Mon)
-  const utc = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const utc = new Date(
+    Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()),
+  );
   const day = utc.getUTCDay() || 7;
   utc.setUTCDate(utc.getUTCDate() + 4 - day);
   const yearStart = new Date(Date.UTC(utc.getUTCFullYear(), 0, 1));
-  const weekNo = Math.ceil((((utc.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+  const weekNo = Math.ceil(
+    ((utc.getTime() - yearStart.getTime()) / 86400000 + 1) / 7,
+  );
   return `${utc.getUTCFullYear()}-W${String(weekNo).padStart(2, "0")}`;
 }
 
@@ -41,30 +54,44 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
 
   const [updateTitle, setUpdateTitle] = useState("");
   const [updateBody, setUpdateBody] = useState("");
-  const [postingState, setPostingState] = useState<"idle" | "posting" | "success" | "error">("idle");
+  const [postingState, setPostingState] = useState<
+    "idle" | "posting" | "success" | "error"
+  >("idle");
   const [postingError, setPostingError] = useState<string | null>(null);
 
   const [milestones, setMilestones] = useState<any[]>([]);
   const [newMilestoneTitle, setNewMilestoneTitle] = useState("");
-  const [newMilestonePercentage, setNewMilestonePercentage] = useState<number>(25);
-  const [milestoneActionState, setMilestoneActionState] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [newMilestonePercentage, setNewMilestonePercentage] =
+    useState<number>(25);
+  const [milestoneActionState, setMilestoneActionState] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
 
-  const [approvalState, setApprovalState] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [approvalState, setApprovalState] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const [approvalMessage, setApprovalMessage] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
 
-  const [onChainState, setOnChainState] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [onChainState, setOnChainState] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const [onChainMessage, setOnChainMessage] = useState<string | null>(null);
 
   const [matches, setMatches] = useState<any[]>([]);
 
   const [widgetAccent, setWidgetAccent] = useState("#059669");
-  const [widgetButtonText, setWidgetButtonText] = useState("Donate on IndigoPay");
+  const [widgetButtonText, setWidgetButtonText] = useState(
+    "Donate on IndigoPay",
+  );
   const [widgetCurrency, setWidgetCurrency] = useState<"XLM" | "USDC">("XLM");
   const [copied, setCopied] = useState(false);
 
   const widgetEmbedCode = useMemo(() => {
-    const baseUrl = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+    const baseUrl =
+      typeof window !== "undefined"
+        ? window.location.origin
+        : "http://localhost:3000";
     const params = new URLSearchParams({
       accent: widgetAccent,
       buttonText: widgetButtonText,
@@ -74,9 +101,18 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
   }, [widgetAccent, widgetButtonText, widgetCurrency, projectId]);
 
   const PRESET_COLORS = [
-    "#059669", "#10b981", "#34d399", "#6ee7b7",
-    "#2563eb", "#7c3aed", "#db2777", "#dc2626",
-    "#ea580c", "#d97706", "#65a30d", "#0891b2",
+    "#059669",
+    "#10b981",
+    "#34d399",
+    "#6ee7b7",
+    "#2563eb",
+    "#7c3aed",
+    "#db2777",
+    "#dc2626",
+    "#ea580c",
+    "#d97706",
+    "#65a30d",
+    "#0891b2",
   ];
 
   const copyEmbed = async () => {
@@ -104,7 +140,9 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
     Promise.all([
       fetchProject(projectId),
       fetchProjectDonations(projectId, 200).then((r) => r.donations),
-      fetch(`${process.env.NEXT_PUBLIC_API_URL || ""}/api/v1/projects/${projectId}/milestones`).then(r => r.json()),
+      fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || ""}/api/v1/projects/${projectId}/milestones`,
+      ).then((r) => r.json()),
       fetchProjectMatches(projectId).catch(() => []),
     ])
       .then(([p, d, m, mt]) => {
@@ -113,18 +151,28 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
         setMilestones(m.data || []);
         setMatches(mt);
       })
-      .catch((e: unknown) => setError((e as Error).message || "Failed to load project"))
+      .catch((e: unknown) =>
+        setError((e as Error).message || "Failed to load project"),
+      )
       .finally(() => setLoading(false));
   }, [projectId]);
 
-  const isOwner = !!publicKey && !!project && publicKey === project.walletAddress;
+  const isOwner =
+    !!publicKey && !!project && publicKey === project.walletAddress;
 
   const donorBreakdown = useMemo(() => {
-    const byDonor = new Map<string, { donorAddress: string; total: number; count: number }>();
+    const byDonor = new Map<
+      string,
+      { donorAddress: string; total: number; count: number }
+    >();
     for (const d of donations) {
       const donorAddress = d.donorAddress;
       const amount = parseFloat(d.amountXLM || d.amount || "0");
-      const curr = byDonor.get(donorAddress) || { donorAddress, total: 0, count: 0 };
+      const curr = byDonor.get(donorAddress) || {
+        donorAddress,
+        total: 0,
+        count: 0,
+      };
       curr.total += Number.isFinite(amount) ? amount : 0;
       curr.count += 1;
       byDonor.set(donorAddress, curr);
@@ -137,18 +185,30 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
     for (const d of donations) {
       const key = weekKey(d.createdAt);
       const amount = parseFloat(d.amountXLM || d.amount || "0");
-      byWeek.set(key, (byWeek.get(key) || 0) + (Number.isFinite(amount) ? amount : 0));
+      byWeek.set(
+        key,
+        (byWeek.get(key) || 0) + (Number.isFinite(amount) ? amount : 0),
+      );
     }
     return Array.from(byWeek.entries())
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([week, totalXLM]) => ({ week, totalXLM: Number(totalXLM.toFixed(2)) }));
+      .map(([week, totalXLM]) => ({
+        week,
+        totalXLM: Number(totalXLM.toFixed(2)),
+      }));
   }, [donations]);
 
   const downloadCsv = () => {
     const header = ["donorAddress", "totalXLM", "donationCount"];
-    const lines = donorBreakdown.map((d) => [d.donorAddress, d.total.toFixed(7), String(d.count)]);
+    const lines = donorBreakdown.map((d) => [
+      d.donorAddress,
+      d.total.toFixed(7),
+      String(d.count),
+    ]);
     const csv = [header, ...lines]
-      .map((row) => row.map((v) => `"${String(v).replace(/\"/g, '""')}"`).join(","))
+      .map((row) =>
+        row.map((v) => `"${String(v).replace(/\"/g, '""')}"`).join(","),
+      )
       .join("\n");
 
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
@@ -189,13 +249,21 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
     if (!project || !newMilestoneTitle.trim()) return;
     setMilestoneActionState("loading");
     try {
-      const res = await csrfFetch(`${process.env.NEXT_PUBLIC_API_URL || ""}/api/v1/projects/${project.id}/milestones`, {
-        method: "POST",
-        body: JSON.stringify({ title: newMilestoneTitle.trim(), percentage: newMilestonePercentage }),
-      });
+      const res = await csrfFetch(
+        `${process.env.NEXT_PUBLIC_API_URL || ""}/api/v1/projects/${project.id}/milestones`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            title: newMilestoneTitle.trim(),
+            percentage: newMilestonePercentage,
+          }),
+        },
+      );
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to add milestone");
-      setMilestones([...milestones, data.data].sort((a, b) => a.percentage - b.percentage));
+      setMilestones(
+        [...milestones, data.data].sort((a, b) => a.percentage - b.percentage),
+      );
       setNewMilestoneTitle("");
       setMilestoneActionState("success");
       setTimeout(() => setMilestoneActionState("idle"), 2000);
@@ -214,23 +282,31 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
         publicKey,
         milestoneTitle: milestone.title,
       });
-      
+
       // Since we are in a browser, we'd normally use Freighter to sign.
       // For this demo, we'll assume the user signs via their wallet extension.
-      const { signedXDR } = await (window as any).stellarWallets.signTransaction(tx.toXDR());
-      
+      const { signedXDR } = await (
+        window as any
+      ).stellarWallets.signTransaction(tx.toXDR());
+
       // 2. Submit to Stellar
       const result = await submitTransaction(signedXDR);
-      
+
       // 3. Update backend
-      const res = await csrfFetch(`${process.env.NEXT_PUBLIC_API_URL || ""}/api/v1/projects/${project?.id}/milestones/${milestone.id}/reach`, {
-        method: "POST",
-        body: JSON.stringify({ transactionHash: result.hash }),
-      });
+      const res = await csrfFetch(
+        `${process.env.NEXT_PUBLIC_API_URL || ""}/api/v1/projects/${project?.id}/milestones/${milestone.id}/reach`,
+        {
+          method: "POST",
+          body: JSON.stringify({ transactionHash: result.hash }),
+        },
+      );
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to update milestone status");
-      
-      setMilestones(milestones.map(m => m.id === milestone.id ? data.data : m));
+      if (!res.ok)
+        throw new Error(data.error || "Failed to update milestone status");
+
+      setMilestones(
+        milestones.map((m) => (m.id === milestone.id ? data.data : m)),
+      );
       setMilestoneActionState("success");
       setTimeout(() => setMilestoneActionState("idle"), 2000);
     } catch (e: any) {
@@ -260,7 +336,11 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
     setApprovalState("loading");
     setApprovalMessage(null);
     try {
-      const updated = await updateProjectStatus(project.id, "rejected", rejectionReason.trim());
+      const updated = await updateProjectStatus(
+        project.id,
+        "rejected",
+        rejectionReason.trim(),
+      );
       setProject(updated);
       setApprovalMessage("Project rejected");
       setApprovalState("success");
@@ -285,8 +365,12 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
         adminAddress: publicKey,
       });
       // Sign the XDR with wallet
-      const { signedXDR } = await (window as any).stellarWallets.signTransaction(result.xdr);
-      const txResult = await (await import("@/lib/stellar")).submitTransaction(signedXDR);
+      const { signedXDR } = await (
+        window as any
+      ).stellarWallets.signTransaction(result.xdr);
+      const txResult = await (
+        await import("@/lib/stellar")
+      ).submitTransaction(signedXDR);
       // Confirm registration on backend
       await confirmProjectRegistration({
         projectId: project.id,
@@ -307,8 +391,12 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
         <div className="text-center mb-10">
-          <h1 className="font-display text-3xl font-bold text-forest-900 mb-3">Project Admin</h1>
-          <p className="text-[#5a7a5a] dark:text-[#8aaa8a] font-body">Connect the project wallet to access analytics and post updates.</p>
+          <h1 className="font-display text-3xl font-bold text-forest-900 mb-3">
+            Project Admin
+          </h1>
+          <p className="text-[#5a7a5a] dark:text-[#8aaa8a] font-body">
+            Connect the project wallet to access analytics and post updates.
+          </p>
         </div>
         <WalletConnect onConnect={onConnect} />
       </div>
@@ -327,9 +415,14 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
         <div className="card">
-          <p className="text-red-600 font-body">{error || "Project not found"}</p>
+          <p className="text-red-600 font-body">
+            {error || "Project not found"}
+          </p>
           <div className="mt-4">
-            <Link className="text-forest-700 font-semibold hover:underline" href="/projects">
+            <Link
+              className="text-forest-700 font-semibold hover:underline"
+              href="/projects"
+            >
               ← Back to projects
             </Link>
           </div>
@@ -342,15 +435,22 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
         <div className="card">
-          <h1 className="font-display text-xl font-bold text-forest-900 mb-2">Access denied</h1>
+          <h1 className="font-display text-xl font-bold text-forest-900 mb-2">
+            Access denied
+          </h1>
           <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body">
-            This admin dashboard is only accessible to the connected wallet that matches the project wallet address.
+            This admin dashboard is only accessible to the connected wallet that
+            matches the project wallet address.
           </p>
           <div className="mt-4 text-xs text-[#8aaa8a] dark:text-forest-300 font-body">
-            Connected: {shortenAddress(publicKey)} • Project wallet: {shortenAddress(project.walletAddress)}
+            Connected: {shortenAddress(publicKey)} • Project wallet:{" "}
+            {shortenAddress(project.walletAddress)}
           </div>
           <div className="mt-5">
-            <Link className="text-forest-700 font-semibold hover:underline" href={`/projects/${project.id}`}>
+            <Link
+              className="text-forest-700 font-semibold hover:underline"
+              href={`/projects/${project.id}`}
+            >
               View project page →
             </Link>
           </div>
@@ -363,33 +463,63 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <p className="text-xs tracking-[0.22em] uppercase text-[#8aaa8a] dark:text-forest-300 font-body">Project Admin</p>
-          <h1 className="font-display text-3xl font-bold text-forest-900 mb-1">{project.name}</h1>
-          <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body">Wallet: {shortenAddress(project.walletAddress, 10)}</p>
+          <p className="text-xs tracking-[0.22em] uppercase text-[#8aaa8a] dark:text-forest-300 font-body">
+            Project Admin
+          </p>
+          <h1 className="font-display text-3xl font-bold text-forest-900 mb-1">
+            {project.name}
+          </h1>
+          <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body">
+            Wallet: {shortenAddress(project.walletAddress, 10)}
+          </p>
         </div>
-        <Link href={`/projects/${project.id}`} className="btn-primary text-sm py-2.5 px-5 flex-shrink-0">
+        <Link
+          href={`/projects/${project.id}`}
+          className="btn-primary text-sm py-2.5 px-5 flex-shrink-0"
+        >
           View Project
         </Link>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
-          { icon: "💚", label: "Total Raised", value: formatXLM(project.raisedXLM) },
+          {
+            icon: "💚",
+            label: "Total Raised",
+            value: formatXLM(project.raisedXLM),
+          },
           { icon: "👥", label: "Donors", value: String(project.donorCount) },
-          { icon: "♻️", label: "CO₂ Offset", value: formatCO2(project.co2OffsetKg) },
-          { icon: "🧾", label: "Recent Donations", value: String(donations.length) },
+          {
+            icon: "♻️",
+            label: "CO₂ Offset",
+            value: formatCO2(project.co2OffsetKg),
+          },
+          {
+            icon: "🧾",
+            label: "Recent Donations",
+            value: String(donations.length),
+          },
         ].map((stat) => (
-          <div key={stat.label} className="card text-center shadow-sm border border-forest-100/50">
+          <div
+            key={stat.label}
+            className="card text-center shadow-sm border border-forest-100/50"
+          >
             <p className="text-2xl mb-2">{stat.icon}</p>
-            <p className="font-display font-bold text-forest-900 text-lg leading-tight">{stat.value}</p>
-            <p className="text-xs text-[#8aaa8a] dark:text-forest-300 mt-1 font-body uppercase tracking-wider font-bold opacity-60">{stat.label}</p>
+            <p className="font-display font-bold text-forest-900 text-lg leading-tight">
+              {stat.value}
+            </p>
+            <p className="text-xs text-[#8aaa8a] dark:text-forest-300 mt-1 font-body uppercase tracking-wider font-bold opacity-60">
+              {stat.label}
+            </p>
           </div>
         ))}
       </div>
 
       <div className="card mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-          <h2 className="font-display text-xl font-bold text-forest-900">Donation Growth</h2>
+          <h2 className="font-display text-xl font-bold text-forest-900">
+            Donation Growth
+          </h2>
           <button
             onClick={downloadCsv}
             className="px-5 py-2.5 rounded-xl text-sm font-semibold border border-forest-200 bg-forest-50 hover:bg-forest-100 transition-all"
@@ -401,29 +531,47 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
           <DonationGrowthChartNoSSR data={weeklyGrowth} />
         </div>
         <p className="text-xs text-[#8aaa8a] dark:text-forest-300 mt-3 font-body">
-          Weekly totals based on recent donation history (up to 200 donations loaded).
+          Weekly totals based on recent donation history (up to 200 donations
+          loaded).
         </p>
       </div>
 
       <div className="card mb-8">
-        <h2 className="font-display text-xl font-bold text-forest-900 mb-4">Project Milestones</h2>
+        <h2 className="font-display text-xl font-bold text-forest-900 mb-4">
+          Project Milestones
+        </h2>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-4">
             {milestones.length === 0 ? (
-              <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body">No milestones defined yet.</p>
+              <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body">
+                No milestones defined yet.
+              </p>
             ) : (
               milestones.map((m) => {
-                const reached = parseFloat(project.raisedXLM) >= (parseFloat(project.goalXLM) * m.percentage / 100);
+                const reached =
+                  parseFloat(project.raisedXLM) >=
+                  (parseFloat(project.goalXLM) * m.percentage) / 100;
                 return (
-                  <div key={m.id} className={`p-4 rounded-xl border ${m.reachedAt ? 'bg-emerald-50 border-emerald-100' : 'bg-white border-forest-100'}`}>
+                  <div
+                    key={m.id}
+                    className={`p-4 rounded-xl border ${m.reachedAt ? "bg-emerald-50 border-emerald-100" : "bg-white border-forest-100"}`}
+                  >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${m.reachedAt ? 'bg-emerald-500 text-white' : 'bg-forest-100 text-forest-700'}`}>
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${m.reachedAt ? "bg-emerald-500 text-white" : "bg-forest-100 text-forest-700"}`}
+                        >
                           {m.percentage}%
                         </div>
                         <div>
-                          <p className="font-semibold text-forest-900 font-body">{m.title}</p>
-                          {m.reachedAt && <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest">Reached {timeAgo(m.reachedAt)}</p>}
+                          <p className="font-semibold text-forest-900 font-body">
+                            {m.title}
+                          </p>
+                          {m.reachedAt && (
+                            <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest">
+                              Reached {timeAgo(m.reachedAt)}
+                            </p>
+                          )}
                         </div>
                       </div>
                       {reached && !m.reachedAt && (
@@ -447,9 +595,11 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
                       )}
                     </div>
                     <div className="w-full bg-forest-100 h-1.5 rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full transition-all duration-1000 ${m.reachedAt ? 'bg-emerald-500' : reached ? 'bg-amber-400' : 'bg-forest-300'}`}
-                        style={{ width: `${Math.min(100, (parseFloat(project.raisedXLM) / (parseFloat(project.goalXLM) * m.percentage / 100)) * 100)}%` }}
+                      <div
+                        className={`h-full transition-all duration-1000 ${m.reachedAt ? "bg-emerald-500" : reached ? "bg-amber-400" : "bg-forest-300"}`}
+                        style={{
+                          width: `${Math.min(100, (parseFloat(project.raisedXLM) / ((parseFloat(project.goalXLM) * m.percentage) / 100)) * 100)}%`,
+                        }}
                       />
                     </div>
                   </div>
@@ -458,7 +608,9 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
             )}
           </div>
           <div className="bg-forest-50 p-5 rounded-2xl border border-forest-100">
-            <h3 className="text-sm font-bold text-forest-900 mb-3 uppercase tracking-wider opacity-60">Add Milestone</h3>
+            <h3 className="text-sm font-bold text-forest-900 mb-3 uppercase tracking-wider opacity-60">
+              Add Milestone
+            </h3>
             <div className="space-y-3">
               <input
                 value={newMilestoneTitle}
@@ -467,25 +619,36 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
                 className="input-field bg-white"
               />
               <div>
-                <label className="block text-[10px] font-bold text-forest-800 uppercase tracking-widest mb-1 ml-1 opacity-50">Percentage of goal</label>
+                <label className="block text-[10px] font-bold text-forest-800 uppercase tracking-widest mb-1 ml-1 opacity-50">
+                  Percentage of goal
+                </label>
                 <div className="flex items-center gap-3">
                   <input
                     type="range"
                     min="1"
                     max="100"
                     value={newMilestonePercentage}
-                    onChange={(e) => setNewMilestonePercentage(parseInt(e.target.value))}
+                    onChange={(e) =>
+                      setNewMilestonePercentage(parseInt(e.target.value))
+                    }
                     className="flex-1 accent-forest-600"
                   />
-                  <span className="text-sm font-bold text-forest-900 w-8">{newMilestonePercentage}%</span>
+                  <span className="text-sm font-bold text-forest-900 w-8">
+                    {newMilestonePercentage}%
+                  </span>
                 </div>
               </div>
               <button
                 onClick={addMilestone}
-                disabled={milestoneActionState === "loading" || !newMilestoneTitle.trim()}
+                disabled={
+                  milestoneActionState === "loading" ||
+                  !newMilestoneTitle.trim()
+                }
                 className="btn-primary w-full text-sm py-2 disabled:opacity-50"
               >
-                {milestoneActionState === "loading" ? "Adding..." : "Add Milestone"}
+                {milestoneActionState === "loading"
+                  ? "Adding..."
+                  : "Add Milestone"}
               </button>
             </div>
           </div>
@@ -494,22 +657,33 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="card">
-          <h2 className="font-display text-xl font-bold text-forest-900 mb-4">Recent Donations</h2>
+          <h2 className="font-display text-xl font-bold text-forest-900 mb-4">
+            Recent Donations
+          </h2>
           {donations.length === 0 ? (
-            <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body">No donations yet.</p>
+            <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body">
+              No donations yet.
+            </p>
           ) : (
             <div className="space-y-3">
               {donations.slice(0, 10).map((d) => (
-                <div key={d.id} className="flex items-center justify-between gap-3 p-3 rounded-xl border border-forest-100">
+                <div
+                  key={d.id}
+                  className="flex items-center justify-between gap-3 p-3 rounded-xl border border-forest-100"
+                >
                   <div>
                     <p className="text-sm font-semibold text-forest-900 font-body">
-                      {shortenAddress(d.donorAddress)} • {formatXLM(d.amountXLM || d.amount || "0", 2)}
+                      {shortenAddress(d.donorAddress)} •{" "}
+                      {formatXLM(d.amountXLM || d.amount || "0", 2)}
                     </p>
-                    <p className="text-xs text-[#8aaa8a] dark:text-forest-300 font-body">{timeAgo(d.createdAt)}</p>
+                    <p className="text-xs text-[#8aaa8a] dark:text-forest-300 font-body">
+                      {timeAgo(d.createdAt)}
+                    </p>
                   </div>
                   {d.message && (
                     <p className="text-xs text-[#5a7a5a] dark:text-[#8aaa8a] font-body max-w-[220px] text-right">
-                      “{d.message.slice(0, 60)}{d.message.length > 60 ? "…" : ""}”
+                      “{d.message.slice(0, 60)}
+                      {d.message.length > 60 ? "…" : ""}”
                     </p>
                   )}
                 </div>
@@ -519,7 +693,9 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
         </div>
 
         <div className="card">
-          <h2 className="font-display text-xl font-bold text-forest-900 mb-2">Post Update</h2>
+          <h2 className="font-display text-xl font-bold text-forest-900 mb-2">
+            Post Update
+          </h2>
           <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body mb-4">
             Publish a project update to notify subscribers.
           </p>
@@ -561,10 +737,14 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
 
       {/* Approval Workflow */}
       <div className="card mt-6">
-        <h2 className="font-display text-xl font-bold text-forest-900 mb-2">Approval Workflow</h2>
+        <h2 className="font-display text-xl font-bold text-forest-900 mb-2">
+          Approval Workflow
+        </h2>
         <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body mb-4">
           Manage project status. Current status:{" "}
-          <span className={`font-semibold ${project.status === "active" ? "text-emerald-600" : project.status === "rejected" ? "text-red-600" : "text-amber-600"}`}>
+          <span
+            className={`font-semibold ${project.status === "active" ? "text-emerald-600" : project.status === "rejected" ? "text-red-600" : "text-amber-600"}`}
+          >
             {project.status}
           </span>
         </p>
@@ -576,7 +756,9 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
         )}
 
         {approvalMessage && (
-          <div className={`p-3 rounded-xl text-sm font-body mb-4 ${approvalState === "success" ? "bg-green-50 border border-green-200 text-green-700" : "bg-red-50 border border-red-200 text-red-600"}`}>
+          <div
+            className={`p-3 rounded-xl text-sm font-body mb-4 ${approvalState === "success" ? "bg-green-50 border border-green-200 text-green-700" : "bg-red-50 border border-red-200 text-red-600"}`}
+          >
             {approvalMessage}
           </div>
         )}
@@ -597,14 +779,20 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
           <div className="flex gap-3">
             <button
               onClick={handleApprove}
-              disabled={approvalState === "loading" || project.status === "active"}
+              disabled={
+                approvalState === "loading" || project.status === "active"
+              }
               className="btn-primary flex-1 disabled:opacity-50"
             >
               {approvalState === "loading" ? "Processing…" : "Approve"}
             </button>
             <button
               onClick={handleReject}
-              disabled={approvalState === "loading" || !rejectionReason.trim() || project.status === "rejected"}
+              disabled={
+                approvalState === "loading" ||
+                !rejectionReason.trim() ||
+                project.status === "rejected"
+              }
               className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {approvalState === "loading" ? "Processing…" : "Reject"}
@@ -615,13 +803,18 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
 
       {/* On-Chain Registration */}
       <div className="card mt-6">
-        <h2 className="font-display text-xl font-bold text-forest-900 mb-2">On-Chain Registration</h2>
+        <h2 className="font-display text-xl font-bold text-forest-900 mb-2">
+          On-Chain Registration
+        </h2>
         <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body mb-4">
-          Register this project on the Stellar blockchain via Soroban smart contract.
+          Register this project on the Stellar blockchain via Soroban smart
+          contract.
         </p>
 
         {onChainMessage && (
-          <div className={`p-3 rounded-xl text-sm font-body mb-4 ${onChainState === "success" ? "bg-green-50 border border-green-200 text-green-700" : "bg-red-50 border border-red-200 text-red-600"}`}>
+          <div
+            className={`p-3 rounded-xl text-sm font-body mb-4 ${onChainState === "success" ? "bg-green-50 border border-green-200 text-green-700" : "bg-red-50 border border-red-200 text-red-600"}`}
+          >
             {onChainMessage}
           </div>
         )}
@@ -643,17 +836,24 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
 
       {/* Donation Match Funds */}
       <div className="card mt-6">
-        <h2 className="font-display text-xl font-bold text-forest-900 mb-2">Donation Match Funds</h2>
+        <h2 className="font-display text-xl font-bold text-forest-900 mb-2">
+          Donation Match Funds
+        </h2>
         <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body mb-4">
           View and manage donation matching for this project.
         </p>
 
         {matches.length === 0 ? (
-          <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body">No active donation matches.</p>
+          <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body">
+            No active donation matches.
+          </p>
         ) : (
           <div className="space-y-3">
             {matches.map((m: any) => (
-              <div key={m.id} className="p-4 rounded-xl border border-forest-100 bg-forest-50">
+              <div
+                key={m.id}
+                className="p-4 rounded-xl border border-forest-100 bg-forest-50"
+              >
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <p className="text-sm font-semibold text-forest-900 font-body">
@@ -669,16 +869,28 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
                 </div>
                 <div className="grid grid-cols-3 gap-3 mt-3">
                   <div>
-                    <p className="text-[10px] uppercase tracking-widest font-bold text-forest-800 opacity-50">Cap (XLM)</p>
-                    <p className="text-sm font-semibold text-forest-900 font-body">{formatXLM(m.capXLM)}</p>
+                    <p className="text-[10px] uppercase tracking-widest font-bold text-forest-800 opacity-50">
+                      Cap (XLM)
+                    </p>
+                    <p className="text-sm font-semibold text-forest-900 font-body">
+                      {formatXLM(m.capXLM)}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-widest font-bold text-forest-800 opacity-50">Matched</p>
-                    <p className="text-sm font-semibold text-forest-900 font-body">{formatXLM(m.matchedXLM)}</p>
+                    <p className="text-[10px] uppercase tracking-widest font-bold text-forest-800 opacity-50">
+                      Matched
+                    </p>
+                    <p className="text-sm font-semibold text-forest-900 font-body">
+                      {formatXLM(m.matchedXLM)}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-widest font-bold text-forest-800 opacity-50">Remaining</p>
-                    <p className="text-sm font-semibold text-forest-900 font-body">{formatXLM(m.remainingXLM)}</p>
+                    <p className="text-[10px] uppercase tracking-widest font-bold text-forest-800 opacity-50">
+                      Remaining
+                    </p>
+                    <p className="text-sm font-semibold text-forest-900 font-body">
+                      {formatXLM(m.remainingXLM)}
+                    </p>
                   </div>
                 </div>
                 <p className="text-xs text-[#8aaa8a] dark:text-forest-300 font-body mt-2">
@@ -692,9 +904,12 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
 
       {/* Widget Builder */}
       <div className="card mt-6">
-        <h2 className="font-display text-xl font-bold text-forest-900 mb-2">Widget Builder</h2>
+        <h2 className="font-display text-xl font-bold text-forest-900 mb-2">
+          Widget Builder
+        </h2>
         <p className="text-sm text-[#5a7a5a] font-body mb-4">
-          Customise the embeddable widget for this project and copy the embed code to paste on external sites.
+          Customise the embeddable widget for this project and copy the embed
+          code to paste on external sites.
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -723,7 +938,9 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
                   onChange={(e) => setWidgetAccent(e.target.value)}
                   className="w-10 h-10 rounded cursor-pointer border border-forest-200 p-0.5"
                 />
-                <span className="text-xs font-mono text-[#5a7a5a]">{widgetAccent}</span>
+                <span className="text-xs font-mono text-[#5a7a5a]">
+                  {widgetAccent}
+                </span>
               </div>
             </div>
 
@@ -766,7 +983,9 @@ export default function ProjectAdmin({ publicKey, onConnect }: AdminProps) {
             {/* Live preview hint */}
             <div className="p-3 rounded-xl bg-forest-50 border border-forest-100">
               <p className="text-xs text-[#5a7a5a] font-body">
-                <span className="font-semibold">Tip:</span> The widget will display {widgetCurrency} amounts with the accent colour shown above.
+                <span className="font-semibold">Tip:</span> The widget will
+                display {widgetCurrency} amounts with the accent colour shown
+                above.
               </p>
             </div>
           </div>

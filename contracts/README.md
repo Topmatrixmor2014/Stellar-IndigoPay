@@ -57,17 +57,21 @@ The compiled WASM file will be located at `target/wasm32-unknown-unknown/release
 ## Troubleshooting Common Errors
 
 ### Error: `target wasm32-unknown-unknown not found`
-*   **Cause**: The WebAssembly target is not installed for your active Rust toolchain.
-*   **Fix**: Run `rustup target add wasm32-unknown-unknown`.
+
+- **Cause**: The WebAssembly target is not installed for your active Rust toolchain.
+- **Fix**: Run `rustup target add wasm32-unknown-unknown`.
 
 ### Error: `unresolved import` or `cannot find value` during tests
-*   **Cause**: You might be running tests without the `testutils` feature enabled, which provides mock data and utilities.
-*   **Fix**: Ensure you append `--features testutils` when running `cargo test`.
+
+- **Cause**: You might be running tests without the `testutils` feature enabled, which provides mock data and utilities.
+- **Fix**: Ensure you append `--features testutils` when running `cargo test`.
 
 ### Error: `linker 'rust-lld' not found`
-*   **Cause**: The required linker is missing from your environment.
-*   **Fix**: Install the `lld` package for your operating system (e.g., `apt install lld` on Ubuntu, `brew install lld` on macOS).
+
+- **Cause**: The required linker is missing from your environment.
+- **Fix**: Install the `lld` package for your operating system (e.g., `apt install lld` on Ubuntu, `brew install lld` on macOS).
 
 ### Warning: `unused import` or `dead code`
-*   **Cause**: The codebase contains unused variables or imports, which Rust flags aggressively by default.
-*   **Fix**: While not blocking the build, you can prefix unused variables with an underscore (e.g., `_my_var`) or clean up the code.
+
+- **Cause**: The codebase contains unused variables or imports, which Rust flags aggressively by default.
+- **Fix**: While not blocking the build, you can prefix unused variables with an underscore (e.g., `_my_var`) or clean up the code.

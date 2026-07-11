@@ -21,9 +21,9 @@ interface MonthSnapshot {
 
 const BADGE_ICONS: Record<string, string> = {
   seedling: "🌱",
-  tree:     "🌳",
-  forest:   "🌲",
-  earth:    "🌍",
+  tree: "🌳",
+  forest: "🌲",
+  earth: "🌍",
 };
 
 const RANK_MEDALS: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
@@ -58,9 +58,13 @@ export default function LeaderboardHistoryPage() {
           Donor of the Month — History
         </h1>
         <p className="text-[#5a7a5a] max-w-xl mx-auto font-body leading-relaxed">
-          Each month&apos;s top climate donors, permanently recorded on the Stellar blockchain.
+          Each month&apos;s top climate donors, permanently recorded on the
+          Stellar blockchain.
         </p>
-        <Link href="/leaderboard" className="text-forest-600 text-sm underline mt-2 inline-block">
+        <Link
+          href="/leaderboard"
+          className="text-forest-600 text-sm underline mt-2 inline-block"
+        >
           ← Back to all-time leaderboard
         </Link>
       </div>
@@ -69,13 +73,12 @@ export default function LeaderboardHistoryPage() {
         <div className="text-center text-[#5a7a5a] py-16">Loading…</div>
       )}
 
-      {error && (
-        <div className="text-center text-red-600 py-16">{error}</div>
-      )}
+      {error && <div className="text-center text-red-600 py-16">{error}</div>}
 
       {!loading && !error && history.length === 0 && (
         <div className="text-center text-[#5a7a5a] py-16">
-          No monthly snapshots yet. Check back after the first snapshot is taken.
+          No monthly snapshots yet. Check back after the first snapshot is
+          taken.
         </div>
       )}
 
@@ -86,14 +89,18 @@ export default function LeaderboardHistoryPage() {
           </h2>
 
           {snapshot.entries.length === 0 ? (
-            <p className="text-[#5a7a5a] text-sm">No donations recorded this month.</p>
+            <p className="text-[#5a7a5a] text-sm">
+              No donations recorded this month.
+            </p>
           ) : (
             <div className="space-y-3">
               {snapshot.entries.slice(0, 10).map((entry) => (
                 <div
                   key={entry.donorAddress}
                   className={`flex items-center bg-white border rounded-xl px-4 py-3 shadow-sm ${
-                    entry.rank === 1 ? "border-yellow-400 bg-yellow-50" : "border-forest-100"
+                    entry.rank === 1
+                      ? "border-yellow-400 bg-yellow-50"
+                      : "border-forest-100"
                   }`}
                 >
                   <span className="text-2xl w-10 text-center">

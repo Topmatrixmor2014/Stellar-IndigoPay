@@ -29,27 +29,28 @@ existing clients.
 ---
 
 ## Health
+
 `GET /health` — Server status check.
 
 ---
 
 ## Projects
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/projects` | List projects with cursor pagination |
-| GET | `/api/projects/:id` | Get single project |
+| Method | Endpoint            | Description                          |
+| ------ | ------------------- | ------------------------------------ |
+| GET    | `/api/projects`     | List projects with cursor pagination |
+| GET    | `/api/projects/:id` | Get single project                   |
 
 ### GET /api/projects — query parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `limit` | integer | `20` | Page size (max 100) |
-| `cursor` | string | — | Opaque cursor from `next_cursor` in a previous response |
-| `category` | string | — | Filter by category (e.g. `Reforestation`) |
-| `status` | string | — | Filter by status (`active`, `completed`, `paused`) |
-| `verified` | `true` | — | Return only verified projects |
-| `search` | string | — | Full-text search across name, description, location, tags |
+| Parameter  | Type    | Default | Description                                               |
+| ---------- | ------- | ------- | --------------------------------------------------------- |
+| `limit`    | integer | `20`    | Page size (max 100)                                       |
+| `cursor`   | string  | —       | Opaque cursor from `next_cursor` in a previous response   |
+| `category` | string  | —       | Filter by category (e.g. `Reforestation`)                 |
+| `status`   | string  | —       | Filter by status (`active`, `completed`, `paused`)        |
+| `verified` | `true`  | —       | Return only verified projects                             |
+| `search`   | string  | —       | Full-text search across name, description, location, tags |
 
 ### Pagination
 
@@ -58,9 +59,11 @@ The first request is made without a `cursor`. Subsequent pages pass the `next_cu
 value from the previous response.
 
 **First page**
+
 ```
 GET /api/projects?limit=20&status=active
 ```
+
 ```json
 {
   "success": true,
@@ -71,6 +74,7 @@ GET /api/projects?limit=20&status=active
 ```
 
 **Next page**
+
 ```
 GET /api/projects?limit=20&status=active&cursor=eyJjcmVhdGVkX2F0Ij...
 ```
@@ -79,6 +83,7 @@ When `has_more` is `false` (or `next_cursor` is `null`), you have reached the la
 Cursors are stable: inserting new projects does not shift pages already in flight.
 
 ### Project object
+
 ```json
 {
   "id": "uuid",
@@ -102,13 +107,14 @@ Cursors are stable: inserting new projects does not shift pages already in fligh
 
 ## Donations
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/donations` | Record a donation after on-chain tx |
-| GET | `/api/v1/donations/project/:id` | Donations for a project (`?limit=20`) |
-| GET | `/api/v1/donations/donor/:publicKey` | A donor's full history |
+| Method | Endpoint                             | Description                           |
+| ------ | ------------------------------------ | ------------------------------------- |
+| POST   | `/api/v1/donations`                  | Record a donation after on-chain tx   |
+| GET    | `/api/v1/donations/project/:id`      | Donations for a project (`?limit=20`) |
+| GET    | `/api/v1/donations/donor/:publicKey` | A donor's full history                |
 
 ### POST /api/v1/donations
+
 ```json
 {
   "projectId": "uuid",
@@ -125,20 +131,21 @@ Donations are **deduplicated by transactionHash** — safe to retry.
 
 ## Profiles
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/profiles/:publicKey` | Get donor profile + badges |
-| POST | `/api/v1/profiles` | Create or update profile |
+| Method | Endpoint                      | Description                |
+| ------ | ----------------------------- | -------------------------- |
+| GET    | `/api/v1/profiles/:publicKey` | Get donor profile + badges |
+| POST   | `/api/v1/profiles`            | Create or update profile   |
 
 ---
 
 ## Leaderboard
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/leaderboard` | Top donors by total XLM (`?limit=20`) |
+| Method | Endpoint              | Description                           |
+| ------ | --------------------- | ------------------------------------- |
+| GET    | `/api/v1/leaderboard` | Top donors by total XLM (`?limit=20`) |
 
 ### Leaderboard entry
+
 ```json
 {
   "rank": 1,
@@ -154,17 +161,17 @@ Donations are **deduplicated by transactionHash** — safe to retry.
 
 ## Project Updates
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/updates/:projectId` | Updates posted by a project |
+| Method | Endpoint                     | Description                 |
+| ------ | ---------------------------- | --------------------------- |
+| GET    | `/api/v1/updates/:projectId` | Updates posted by a project |
 
 ---
 
 ## Badge Tiers
 
-| Tier | Threshold | Emoji |
-|------|-----------|-------|
-| `seedling` | ≥ 10 XLM | 🌱 |
-| `tree` | ≥ 100 XLM | 🌳 |
-| `forest` | ≥ 500 XLM | 🌲 |
-| `earth` | ≥ 2,000 XLM | 🌍 |
+| Tier       | Threshold   | Emoji |
+| ---------- | ----------- | ----- |
+| `seedling` | ≥ 10 XLM    | 🌱    |
+| `tree`     | ≥ 100 XLM   | 🌳    |
+| `forest`   | ≥ 500 XLM   | 🌲    |
+| `earth`    | ≥ 2,000 XLM | 🌍    |

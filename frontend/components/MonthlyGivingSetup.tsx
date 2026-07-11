@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { createMonthlySubscription, loadMonthlySubscriptions } from "@/lib/monthlyGiving";
+import {
+  createMonthlySubscription,
+  loadMonthlySubscriptions,
+} from "@/lib/monthlyGiving";
 import { formatXLM, timeAgo } from "@/utils/format";
 import type { MonthlySubscription } from "@/utils/types";
 
@@ -24,7 +27,9 @@ export default function MonthlyGivingSetup({
   onCreated,
 }: MonthlyGivingSetupProps) {
   const [amountXLM, setAmountXLM] = useState("25");
-  const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
+  const [startDate, setStartDate] = useState(
+    new Date().toISOString().slice(0, 10),
+  );
   const [duration, setDuration] = useState("3");
   const [subscriptions, setSubscriptions] = useState<MonthlySubscription[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +52,8 @@ export default function MonthlyGivingSetup({
       return;
     }
     setError(null);
-    const durationMonths = duration === "indefinite" ? null : Number.parseInt(duration, 10);
+    const durationMonths =
+      duration === "indefinite" ? null : Number.parseInt(duration, 10);
     const created = createMonthlySubscription({
       projectId,
       projectName,
@@ -63,12 +69,20 @@ export default function MonthlyGivingSetup({
     <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="w-full max-w-xl card bg-white max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-display text-xl font-semibold text-[#0F172A] dark:text-[#E2E8F0]">Monthly Giving Setup</h3>
-          <button onClick={onClose} className="btn-secondary text-xs py-1.5 px-3">Close</button>
+          <h3 className="font-display text-xl font-semibold text-[#0F172A] dark:text-[#E2E8F0]">
+            Monthly Giving Setup
+          </h3>
+          <button
+            onClick={onClose}
+            className="btn-secondary text-xs py-1.5 px-3"
+          >
+            Close
+          </button>
         </div>
 
         <p className="text-sm text-[#475569] dark:text-[#94A3B8] font-body mb-5">
-          Schedule recurring monthly donations for <strong>{projectName}</strong>.
+          Schedule recurring monthly donations for{" "}
+          <strong>{projectName}</strong>.
         </p>
 
         <div className="grid sm:grid-cols-2 gap-4">
@@ -102,8 +116,8 @@ export default function MonthlyGivingSetup({
                   onClick={() => setDuration(option.value)}
                   className={`px-3 py-2 rounded-lg text-sm border font-body ${
                     duration === option.value
-                  ? "btn-primary text-white border-0"
-                  : "bg-[rgba(99,102,241,0.06)] dark:bg-[rgba(129,140,248,0.08)] text-[#4F46E5] dark:text-[#818CF8] border-[rgba(99,102,241,0.15)] dark:border-[rgba(129,140,248,0.20)]"
+                      ? "btn-primary text-white border-0"
+                      : "bg-[rgba(99,102,241,0.06)] dark:bg-[rgba(129,140,248,0.08)] text-[#4F46E5] dark:text-[#818CF8] border-[rgba(99,102,241,0.15)] dark:border-[rgba(129,140,248,0.20)]"
                   }`}
                 >
                   {option.label}
@@ -113,7 +127,9 @@ export default function MonthlyGivingSetup({
           </div>
         </div>
 
-        {error && <p className="mt-3 text-sm text-red-600 font-body">{error}</p>}
+        {error && (
+          <p className="mt-3 text-sm text-red-600 font-body">{error}</p>
+        )}
 
         <button
           type="button"
@@ -125,13 +141,20 @@ export default function MonthlyGivingSetup({
         </button>
 
         <div className="mt-8 border-t border-[rgba(99,102,241,0.08)] dark:border-[rgba(129,140,248,0.10)] pt-5">
-          <h4 className="font-display text-lg font-semibold text-[#0F172A] dark:text-[#E2E8F0] mb-3">Subscription History</h4>
+          <h4 className="font-display text-lg font-semibold text-[#0F172A] dark:text-[#E2E8F0] mb-3">
+            Subscription History
+          </h4>
           {subscriptions.length === 0 ? (
-            <p className="text-sm text-[#475569] dark:text-[#94A3B8] font-body">No subscriptions created for this project yet.</p>
+            <p className="text-sm text-[#475569] dark:text-[#94A3B8] font-body">
+              No subscriptions created for this project yet.
+            </p>
           ) : (
             <div className="space-y-3">
               {subscriptions.map((sub) => (
-                <div key={sub.id} className="p-3 rounded-lg border border-[rgba(99,102,241,0.10)] dark:border-[rgba(129,140,248,0.12)] bg-[rgba(99,102,241,0.04)] dark:bg-[rgba(129,140,248,0.06)]">
+                <div
+                  key={sub.id}
+                  className="p-3 rounded-lg border border-[rgba(99,102,241,0.10)] dark:border-[rgba(129,140,248,0.12)] bg-[rgba(99,102,241,0.04)] dark:bg-[rgba(129,140,248,0.06)]"
+                >
                   <p className="text-sm font-semibold text-[#0F172A] dark:text-[#E2E8F0] font-body">
                     {formatXLM(sub.amountXLM)} monthly · {sub.status}
                   </p>
@@ -141,13 +164,19 @@ export default function MonthlyGivingSetup({
                   {sub.history.length > 0 ? (
                     <div className="mt-2 space-y-1">
                       {sub.history.slice(0, 5).map((entry) => (
-                        <p key={entry.paidAt} className="text-xs text-[#475569] dark:text-[#94A3B8] font-body">
-                          Paid {formatXLM(entry.amountXLM)} · {timeAgo(entry.paidAt)}
+                        <p
+                          key={entry.paidAt}
+                          className="text-xs text-[#475569] dark:text-[#94A3B8] font-body"
+                        >
+                          Paid {formatXLM(entry.amountXLM)} ·{" "}
+                          {timeAgo(entry.paidAt)}
                         </p>
                       ))}
                     </div>
                   ) : (
-                    <p className="mt-2 text-xs text-[#475569] dark:text-[#94A3B8] font-body">No paid months yet.</p>
+                    <p className="mt-2 text-xs text-[#475569] dark:text-[#94A3B8] font-body">
+                      No paid months yet.
+                    </p>
                   )}
                 </div>
               ))}

@@ -23,11 +23,11 @@
  *   EncryptedSharedPreferences has its own quota; the right tool for
  *   those is `utils/cache.ts` (AsyncStorage).
  */
-import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
-import { authenticate } from '../hooks/useBiometricAuth';
+import * as SecureStore from "expo-secure-store";
+import { Platform } from "react-native";
+import { authenticate } from "../hooks/useBiometricAuth";
 
-const KEY_PREFIX = '@StellarIndigo:';
+const KEY_PREFIX = "@StellarIndigo:";
 
 export interface SecureStoreOptions {
   /**
@@ -64,12 +64,12 @@ export interface SecureValue<T> {
  */
 export async function get<T = unknown>(
   key: string,
-  options: SecureStoreOptions = {}
+  options: SecureStoreOptions = {},
 ): Promise<T | null> {
   const fullKey = KEY_PREFIX + key;
 
   if (options.requireAuth) {
-    const success = await authenticate('Confirm identity to reveal secret');
+    const success = await authenticate("Confirm identity to reveal secret");
     if (!success) return null;
   }
 
@@ -90,7 +90,7 @@ export async function get<T = unknown>(
     // SecureStore returns a Rejection with code -1 on Keychain ACL
     // failure on iOS. JSON.parse throws SyntaxError on corrupted
     // entries. Both are surfaced as null so callers can recover.
-    if (__DEV__) console.warn('[secureStore.get] failed', key, err);
+    if (__DEV__) console.warn("[secureStore.get] failed", key, err);
     return null;
   }
 }
@@ -98,12 +98,12 @@ export async function get<T = unknown>(
 export async function set<T = unknown>(
   key: string,
   value: T,
-  options: SecureStoreOptions = {}
+  options: SecureStoreOptions = {},
 ): Promise<boolean> {
   const fullKey = KEY_PREFIX + key;
 
   if (options.requireAuth) {
-    const success = await authenticate('Confirm identity to store secret');
+    const success = await authenticate("Confirm identity to store secret");
     if (!success) return false;
   }
 
@@ -115,7 +115,7 @@ export async function set<T = unknown>(
     // iOS Keychain throws if the value exceeds 2048 bytes; Android
     // throws if EncryptedSharedPreferences is in a bad state. Surface
     // as false so callers can decide whether to bail out.
-    if (__DEV__) console.warn('[secureStore.set] failed', key, err);
+    if (__DEV__) console.warn("[secureStore.set] failed", key, err);
     return false;
   }
 }
@@ -127,12 +127,12 @@ export async function set<T = unknown>(
  */
 export async function remove(
   key: string,
-  options: SecureStoreOptions = {}
+  options: SecureStoreOptions = {},
 ): Promise<boolean> {
   const fullKey = KEY_PREFIX + key;
 
   if (options.requireAuth) {
-    const success = await authenticate('Confirm identity to delete secret');
+    const success = await authenticate("Confirm identity to delete secret");
     if (!success) return false;
   }
 
@@ -140,7 +140,7 @@ export async function remove(
     await SecureStore.deleteItemAsync(fullKey);
     return true;
   } catch (err) {
-    if (__DEV__) console.warn('[secureStore.remove] failed', key, err);
+    if (__DEV__) console.warn("[secureStore.remove] failed", key, err);
     return false;
   }
 }
@@ -173,7 +173,7 @@ export async function wipeAll(): Promise<void> {
   // implementation.
   if (__DEV__) {
     console.warn(
-      '[secureStore.wipeAll] is a no-op by design; AuthProvider.clear() handles the real teardown'
+      "[secureStore.wipeAll] is a no-op by design; AuthProvider.clear() handles the real teardown",
     );
   }
 }
@@ -184,5 +184,5 @@ export async function wipeAll(): Promise<void> {
  */
 export const __internal = {
   KEY_PREFIX,
-  isNative: Platform.OS !== 'web',
+  isNative: Platform.OS !== "web",
 };

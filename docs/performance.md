@@ -2,12 +2,12 @@
 
 ## POST /api/donations
 
-| Metric | Target |
-|--------|--------|
-| p50 latency | < 150 ms |
-| p95 latency | < 500 ms |
-| p99 latency | < 1 000 ms |
-| Error rate | < 1 % |
+| Metric                 | Target      |
+| ---------------------- | ----------- |
+| p50 latency            | < 150 ms    |
+| p95 latency            | < 500 ms    |
+| p99 latency            | < 1 000 ms  |
+| Error rate             | < 1 %       |
 | Throughput (sustained) | ≥ 100 req/s |
 
 These targets are validated by the k6 load test at `scripts/load-test.js`
@@ -45,11 +45,11 @@ SCENARIO=ramp-up npm run load-test
 
 ## Understanding the thresholds
 
-| Threshold | k6 expression | Meaning |
-|-----------|--------------|---------|
-| `donation_latency p(95)<500` | Hard | 95 % of requests must complete in < 500 ms |
-| `donation_success_rate rate>0.99` | Hard | ≥ 99 % of checks must pass |
-| `http_req_failed rate<0.01` | Hard | HTTP error rate must stay below 1 % |
+| Threshold                         | k6 expression | Meaning                                    |
+| --------------------------------- | ------------- | ------------------------------------------ |
+| `donation_latency p(95)<500`      | Hard          | 95 % of requests must complete in < 500 ms |
+| `donation_success_rate rate>0.99` | Hard          | ≥ 99 % of checks must pass                 |
+| `http_req_failed rate<0.01`       | Hard          | HTTP error rate must stay below 1 %        |
 
 A failed threshold causes k6 to exit with a non-zero status, which will fail the CI job.
 
@@ -73,13 +73,13 @@ Key columns to watch:
 _Run after initial backend deployment. Update this table after each significant
 infrastructure change or after merging changes to the donations route._
 
-| Metric | Result |
-|--------|--------|
-| p50 | — ms |
-| p95 | — ms |
-| p99 | — ms |
-| Error rate | — % |
-| Peak RPS | — |
+| Metric     | Result |
+| ---------- | ------ |
+| p50        | — ms   |
+| p95        | — ms   |
+| p99        | — ms   |
+| Error rate | — %    |
+| Peak RPS   | —      |
 
 > Fill in actual numbers by running `npm run load-test` against the target environment
 > and copying the summary output here before merging backend changes that touch the

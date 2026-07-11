@@ -24,8 +24,14 @@ interface ProjectMapMarkerProps {
   position: LatLngExpression;
 }
 
-export default function ProjectMapMarker({ project, position }: ProjectMapMarkerProps) {
-  const pct = Math.min(progressPercent(project.raisedXLM, project.goalXLM), 100);
+export default function ProjectMapMarker({
+  project,
+  position,
+}: ProjectMapMarkerProps) {
+  const pct = Math.min(
+    progressPercent(project.raisedXLM, project.goalXLM),
+    100,
+  );
   const icon = CATEGORY_ICONS[project.category] ?? "🌿";
 
   return (
@@ -39,7 +45,11 @@ export default function ProjectMapMarker({ project, position }: ProjectMapMarker
         maxWidth={280}
       >
         {/* Mini project card ------------------------------------------------ */}
-        <div className="flex flex-col gap-2 p-0.5" role="region" aria-label={`Project: ${project.name}`}>
+        <div
+          className="flex flex-col gap-2 p-0.5"
+          role="region"
+          aria-label={`Project: ${project.name}`}
+        >
           {/* Header: icon + name */}
           <div className="flex items-start gap-2">
             <span className="text-xl leading-none mt-0.5" aria-hidden="true">
@@ -71,7 +81,9 @@ export default function ProjectMapMarker({ project, position }: ProjectMapMarker
               />
             </div>
             <div className="flex items-center justify-between text-[11px] text-[#4F46E5] font-body">
-              <span className="font-semibold">{formatXLM(project.raisedXLM, 0)} raised</span>
+              <span className="font-semibold">
+                {formatXLM(project.raisedXLM, 0)} raised
+              </span>
               <span className="text-[#64748B]">{pct.toFixed(0)}%</span>
             </div>
           </div>
@@ -80,7 +92,7 @@ export default function ProjectMapMarker({ project, position }: ProjectMapMarker
           <Link
             href={`/donate?project=${project.id}`}
             className="mt-1 block w-full text-center text-xs font-body font-semibold text-white rounded-lg py-1.5 px-3 transition-all focus:outline-none focus:ring-2 focus:ring-[#818CF8] focus:ring-offset-1 hover:opacity-90 active:opacity-80"
-            style={{background: "linear-gradient(135deg, #4F46E5, #7C3AED)"}}
+            style={{ background: "linear-gradient(135deg, #4F46E5, #7C3AED)" }}
           >
             Donate →
           </Link>

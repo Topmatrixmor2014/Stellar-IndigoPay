@@ -1,13 +1,13 @@
 export interface ExtensionSettings {
   backendUrl: string;
-  network: 'testnet' | 'mainnet';
+  network: "testnet" | "mainnet";
   defaultDonationAmount: string;
 }
 
 export const DEFAULT_SETTINGS: ExtensionSettings = {
-  backendUrl: 'https://api.stellar-indigopay.app',
-  network: 'testnet',
-  defaultDonationAmount: '5',
+  backendUrl: "https://api.stellar-indigopay.app",
+  network: "testnet",
+  defaultDonationAmount: "5",
 };
 
 export function loadSettings(): Promise<ExtensionSettings> {
@@ -38,9 +38,9 @@ function truncateAddress(address: string): string {
 
 async function getWalletPublicKey(): Promise<string | null> {
   const freighter = (window as any).freighter;
-  if (!freighter || typeof freighter.getPublicKey !== 'function') return null;
+  if (!freighter || typeof freighter.getPublicKey !== "function") return null;
   try {
-    return await freighter.getPublicKey() as string;
+    return (await freighter.getPublicKey()) as string;
   } catch {
     return null;
   }
@@ -48,7 +48,7 @@ async function getWalletPublicKey(): Promise<string | null> {
 
 async function isFreighterConnected(): Promise<boolean> {
   const freighter = (window as any).freighter;
-  if (!freighter || typeof freighter.isConnected !== 'function') return false;
+  if (!freighter || typeof freighter.isConnected !== "function") return false;
   try {
     const result = await freighter.isConnected();
     return result === true || result?.isConnected === true;
@@ -59,7 +59,7 @@ async function isFreighterConnected(): Promise<boolean> {
 
 async function freighterDisconnect(): Promise<void> {
   const freighter = (window as any).freighter;
-  if (freighter && typeof freighter.disconnect === 'function') {
+  if (freighter && typeof freighter.disconnect === "function") {
     try {
       await freighter.disconnect();
     } catch {
@@ -70,40 +70,52 @@ async function freighterDisconnect(): Promise<void> {
 
 // --- Settings page UI ---
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const backBtn = document.getElementById('back-btn') as HTMLButtonElement;
-  const form = document.getElementById('settings-form') as HTMLFormElement;
-  const urlInput = document.getElementById('backend-url') as HTMLInputElement;
-  const urlError = document.getElementById('url-error') as HTMLSpanElement;
-  const amountInput = document.getElementById('default-amount') as HTMLInputElement;
-  const btnTestnet = document.getElementById('btn-testnet') as HTMLButtonElement;
-  const btnMainnet = document.getElementById('btn-mainnet') as HTMLButtonElement;
-  const mainnetWarning = document.getElementById('mainnet-warning') as HTMLSpanElement;
-  const saveStatus = document.getElementById('save-status') as HTMLDivElement;
-  const walletAddressText = document.getElementById('wallet-address-text') as HTMLSpanElement;
-  const walletDot = document.getElementById('wallet-dot') as HTMLSpanElement;
-  const walletActionBtn = document.getElementById('wallet-action-btn') as HTMLButtonElement;
+document.addEventListener("DOMContentLoaded", async () => {
+  const backBtn = document.getElementById("back-btn") as HTMLButtonElement;
+  const form = document.getElementById("settings-form") as HTMLFormElement;
+  const urlInput = document.getElementById("backend-url") as HTMLInputElement;
+  const urlError = document.getElementById("url-error") as HTMLSpanElement;
+  const amountInput = document.getElementById(
+    "default-amount",
+  ) as HTMLInputElement;
+  const btnTestnet = document.getElementById(
+    "btn-testnet",
+  ) as HTMLButtonElement;
+  const btnMainnet = document.getElementById(
+    "btn-mainnet",
+  ) as HTMLButtonElement;
+  const mainnetWarning = document.getElementById(
+    "mainnet-warning",
+  ) as HTMLSpanElement;
+  const saveStatus = document.getElementById("save-status") as HTMLDivElement;
+  const walletAddressText = document.getElementById(
+    "wallet-address-text",
+  ) as HTMLSpanElement;
+  const walletDot = document.getElementById("wallet-dot") as HTMLSpanElement;
+  const walletActionBtn = document.getElementById(
+    "wallet-action-btn",
+  ) as HTMLButtonElement;
 
-  let selectedNetwork: 'testnet' | 'mainnet' = 'testnet';
+  let selectedNetwork: "testnet" | "mainnet" = "testnet";
   let walletConnected = false;
 
-  function setActiveNetwork(network: 'testnet' | 'mainnet') {
+  function setActiveNetwork(network: "testnet" | "mainnet") {
     selectedNetwork = network;
-    btnTestnet.classList.toggle('network-btn-active', network === 'testnet');
-    btnMainnet.classList.toggle('network-btn-active', network === 'mainnet');
-    mainnetWarning.classList.toggle('hidden', network !== 'mainnet');
+    btnTestnet.classList.toggle("network-btn-active", network === "testnet");
+    btnMainnet.classList.toggle("network-btn-active", network === "mainnet");
+    mainnetWarning.classList.toggle("hidden", network !== "mainnet");
   }
 
   function updateWalletUI(connected: boolean, publicKey: string | null = null) {
     walletConnected = connected;
     if (connected && publicKey) {
       walletAddressText.textContent = truncateAddress(publicKey);
-      walletDot.className = 'dot online';
-      walletActionBtn.textContent = 'Disconnect';
+      walletDot.className = "dot online";
+      walletActionBtn.textContent = "Disconnect";
     } else {
-      walletAddressText.textContent = 'Not connected';
-      walletDot.className = 'dot';
-      walletActionBtn.textContent = 'Connect Wallet';
+      walletAddressText.textContent = "Not connected";
+      walletDot.className = "dot";
+      walletActionBtn.textContent = "Connect Wallet";
     }
   }
 
@@ -122,14 +134,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateWalletUI(false);
   }
 
-  backBtn.addEventListener('click', () => {
-    window.location.href = 'popup.html';
+  backBtn.addEventListener("click", () => {
+    window.location.href = "popup.html";
   });
 
-  btnTestnet.addEventListener('click', () => setActiveNetwork('testnet'));
-  btnMainnet.addEventListener('click', () => setActiveNetwork('mainnet'));
+  btnTestnet.addEventListener("click", () => setActiveNetwork("testnet"));
+  btnMainnet.addEventListener("click", () => setActiveNetwork("mainnet"));
 
-  walletActionBtn.addEventListener('click', async () => {
+  walletActionBtn.addEventListener("click", async () => {
     if (walletConnected) {
       await freighterDisconnect();
       updateWalletUI(false);
@@ -141,22 +153,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    urlError.classList.add('hidden');
-    saveStatus.textContent = '';
-    saveStatus.className = 'status-message';
+    urlError.classList.add("hidden");
+    saveStatus.textContent = "";
+    saveStatus.className = "status-message";
 
     const rawUrl = urlInput.value.trim();
     try {
       new URL(rawUrl);
     } catch {
-      urlError.classList.remove('hidden');
+      urlError.classList.remove("hidden");
       return;
     }
 
     const defaultAmount = amountInput.value.trim();
-    const amount = defaultAmount && parseFloat(defaultAmount) > 0 ? defaultAmount : '5';
+    const amount =
+      defaultAmount && parseFloat(defaultAmount) > 0 ? defaultAmount : "5";
 
     try {
       await saveSettings({
@@ -164,11 +177,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         network: selectedNetwork,
         defaultDonationAmount: amount,
       });
-      saveStatus.textContent = 'Settings saved.';
-      saveStatus.classList.add('success');
+      saveStatus.textContent = "Settings saved.";
+      saveStatus.classList.add("success");
     } catch (err: any) {
       saveStatus.textContent = `Failed to save: ${err.message}`;
-      saveStatus.classList.add('error');
+      saveStatus.classList.add("error");
     }
   });
 });

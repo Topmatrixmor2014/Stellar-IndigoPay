@@ -2,7 +2,13 @@
  * lib/priceContext.tsx — Global XLM/USD price context.
  * Fetches once on mount from CoinGecko free API; fails silently.
  */
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 
 interface PriceContextValue {
   xlmUsd: number | null;
@@ -38,9 +44,7 @@ export function PriceProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <PriceContext.Provider value={{ xlmUsd }}>
-      {children}
-    </PriceContext.Provider>
+    <PriceContext.Provider value={{ xlmUsd }}>{children}</PriceContext.Provider>
   );
 }
 

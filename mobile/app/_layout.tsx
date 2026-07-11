@@ -2,17 +2,20 @@
  * app/_layout.tsx
  * Root layout for the mobile app using expo-router
  */
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { useColorScheme } from 'react-native';
-import { useEffect } from 'react';
-import { useRouter } from 'expo-router';
-import { ThemeProvider, themes } from './theme';
-import { useDeepLink } from '../hooks/useDeepLink';
-import { setupNotificationListener, setupNotificationResponseListener } from '../utils/notifications';
-import { ErrorBoundary } from '../components/ErrorBoundary';
-import { AuthProvider } from '../providers/AuthProvider';
-import { init as initErrorReporter } from '../lib/errorReporter';
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useColorScheme } from "react-native";
+import { useEffect } from "react";
+import { useRouter } from "expo-router";
+import { ThemeProvider, themes } from "./theme";
+import { useDeepLink } from "../hooks/useDeepLink";
+import {
+  setupNotificationListener,
+  setupNotificationResponseListener,
+} from "../utils/notifications";
+import { ErrorBoundary } from "../components/ErrorBoundary";
+import { AuthProvider } from "../providers/AuthProvider";
+import { init as initErrorReporter } from "../lib/errorReporter";
 
 function DeepLinkHandler() {
   useDeepLink();
@@ -27,7 +30,9 @@ function NotificationHandler() {
     const receivedSub = setupNotificationListener();
 
     // Tap-on-notification → navigate to project detail (#483)
-    const responseSub = setupNotificationResponseListener((path) => router.push(path as any));
+    const responseSub = setupNotificationResponseListener((path) =>
+      router.push(path as any),
+    );
 
     return () => {
       receivedSub.remove();
@@ -40,7 +45,7 @@ function NotificationHandler() {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const themeMode = colorScheme === 'dark' ? 'dark' : 'light';
+  const themeMode = colorScheme === "dark" ? "dark" : "light";
   const theme = themes[themeMode];
 
   // Best-effort optional-SDK init: silently fall through when
@@ -60,20 +65,37 @@ export default function RootLayout() {
         <NotificationHandler />
         <AuthProvider>
           <StatusBar style={theme.statusBarStyle} />
-          <Stack screenOptions={{
-            headerStyle: { backgroundColor: theme.header },
-            headerTintColor: theme.headerText,
-            headerTitleStyle: { fontFamily: 'Lora_700Bold' },
-          }}>
-            <Stack.Screen name="index" options={{ title: 'Home' }} />
-            <Stack.Screen name="projects" options={{ title: 'Projects' }} />
-            <Stack.Screen name="projects/[id]" options={{ title: 'Project Details' }} />
-            <Stack.Screen name="donate/[id]" options={{ title: 'Donate' }} />
-            <Stack.Screen name="impact" options={{ title: 'My Impact' }} />
-            <Stack.Screen name="profile/[address]" options={{ title: 'Donor Profile' }} />
-            <Stack.Screen name="leaderboard" options={{ title: 'Leaderboard' }} />
-            <Stack.Screen name="recurring" options={{ title: 'Monthly Giving' }} />
-            <Stack.Screen name="scan" options={{ title: 'Scan to Donate', headerShown: false }} />
+          <Stack
+            screenOptions={{
+              headerStyle: { backgroundColor: theme.header },
+              headerTintColor: theme.headerText,
+              headerTitleStyle: { fontFamily: "Lora_700Bold" },
+            }}
+          >
+            <Stack.Screen name="index" options={{ title: "Home" }} />
+            <Stack.Screen name="projects" options={{ title: "Projects" }} />
+            <Stack.Screen
+              name="projects/[id]"
+              options={{ title: "Project Details" }}
+            />
+            <Stack.Screen name="donate/[id]" options={{ title: "Donate" }} />
+            <Stack.Screen name="impact" options={{ title: "My Impact" }} />
+            <Stack.Screen
+              name="profile/[address]"
+              options={{ title: "Donor Profile" }}
+            />
+            <Stack.Screen
+              name="leaderboard"
+              options={{ title: "Leaderboard" }}
+            />
+            <Stack.Screen
+              name="recurring"
+              options={{ title: "Monthly Giving" }}
+            />
+            <Stack.Screen
+              name="scan"
+              options={{ title: "Scan to Donate", headerShown: false }}
+            />
           </Stack>
         </AuthProvider>
       </ThemeProvider>

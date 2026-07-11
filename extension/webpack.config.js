@@ -1,21 +1,21 @@
-const path = require('path');
+const path = require("path");
 
 module.exports = {
-  mode: 'production',
-  devtool: 'source-map',
+  mode: "production",
+  devtool: "source-map",
   entry: {
-    popup: './src/popup.ts',
-    settings: './src/settings.ts',
-    'content-script': './src/content-script.ts',
-    background: './src/background.ts',
+    popup: "./src/popup.ts",
+    settings: "./src/settings.ts",
+    "content-script": "./src/content-script.ts",
+    background: "./src/background.ts",
   },
   output: {
-    filename: '[name].js',
-    path: path.resolve(__dirname, 'dist'),
+    filename: "[name].js",
+    path: path.resolve(__dirname, "dist"),
     clean: true,
   },
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: [".ts", ".js"],
     fallback: {
       buffer: false,
       crypto: false,
@@ -33,7 +33,7 @@ module.exports = {
     rules: [
       {
         test: /\.ts$/,
-        use: 'ts-loader',
+        use: "ts-loader",
         exclude: /node_modules/,
       },
     ],

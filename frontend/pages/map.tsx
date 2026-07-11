@@ -20,20 +20,17 @@ import { fetchProjects } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
 
 // ── Dynamic import — Leaflet requires a real browser environment ───────────────
-const ProjectMap = dynamic(
-  () => import("@/components/ProjectMap"),
-  {
-    ssr:     false,
-    loading: () => (
-      <div className="flex h-full w-full items-center justify-center bg-forest-50">
-        <div className="flex flex-col items-center gap-3 text-forest-600">
-          <span className="text-3xl animate-spin">🌍</span>
-          <span className="text-sm font-body">Loading map…</span>
-        </div>
+const ProjectMap = dynamic(() => import("@/components/ProjectMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full w-full items-center justify-center bg-forest-50">
+      <div className="flex flex-col items-center gap-3 text-forest-600">
+        <span className="text-3xl animate-spin">🌍</span>
+        <span className="text-sm font-body">Loading map…</span>
       </div>
-    ),
-  },
-);
+    </div>
+  ),
+});
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -61,11 +58,12 @@ export default function MapPage({ projects, fetchedAt }: MapPageProps) {
 
       {/* Full-viewport layout ──────────────────────────────────────────────── */}
       <div className="flex flex-col" style={{ height: "calc(100vh - 64px)" }}>
-
         {/* Top banner ───────────────────────────────────────────────────────── */}
         <div className="flex items-center justify-between gap-4 px-4 py-2.5 bg-white dark:bg-[#14142D] border-b border-[rgba(99,102,241,0.10)] dark:border-[rgba(129,140,248,0.12)] shadow-sm flex-shrink-0">
           <div className="flex items-center gap-2.5">
-            <span className="text-xl" aria-hidden="true">🌍</span>
+            <span className="text-xl" aria-hidden="true">
+              🌍
+            </span>
             <div>
               <h1 className="font-display font-bold text-[#0F172A] dark:text-[#E2E8F0] text-base leading-tight">
                 {t("map.title")}
@@ -79,7 +77,10 @@ export default function MapPage({ projects, fetchedAt }: MapPageProps) {
           <div className="flex items-center gap-2">
             {/* Project count badge */}
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[rgba(99,102,241,0.08)] dark:bg-[rgba(129,140,248,0.10)] text-[#4F46E5] dark:text-[#818CF8] text-xs font-body font-semibold border border-[rgba(99,102,241,0.15)] dark:border-[rgba(129,140,248,0.20)]">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
+              <span
+                className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"
+                aria-hidden="true"
+              />
               {activeCount} {t("map.activeProjects")}
             </span>
 
@@ -99,8 +100,12 @@ export default function MapPage({ projects, fetchedAt }: MapPageProps) {
             /* Empty state ---------------------------------------------------- */
             <div className="flex h-full w-full flex-col items-center justify-center gap-4 bg-forest-50 text-forest-600 px-4 text-center">
               <span className="text-5xl">🌿</span>
-              <p className="font-display font-semibold text-lg">{t("map.noProjects")}</p>
-              <p className="text-sm font-body text-forest-400">{t("map.noProjectsDesc")}</p>
+              <p className="font-display font-semibold text-lg">
+                {t("map.noProjects")}
+              </p>
+              <p className="text-sm font-body text-forest-400">
+                {t("map.noProjectsDesc")}
+              </p>
               <Link href="/projects" className="btn-primary text-sm mt-2">
                 {t("map.browseAll")}
               </Link>
@@ -111,7 +116,10 @@ export default function MapPage({ projects, fetchedAt }: MapPageProps) {
 
           {/* Bottom-left attribution note (subtle) --------------------------- */}
           <p className="absolute bottom-2 left-3 z-[1000] text-[10px] text-gray-400 pointer-events-none select-none hidden sm:block">
-            {t("map.dataUpdated").replace("{time}", new Date(fetchedAt).toLocaleTimeString())}
+            {t("map.dataUpdated").replace(
+              "{time}",
+              new Date(fetchedAt).toLocaleTimeString(),
+            )}
           </p>
         </div>
       </div>
@@ -121,7 +129,9 @@ export default function MapPage({ projects, fetchedAt }: MapPageProps) {
 
 // ── Server-side data fetching ──────────────────────────────────────────────────
 
-export const getServerSideProps: GetServerSideProps<MapPageProps> = async () => {
+export const getServerSideProps: GetServerSideProps<
+  MapPageProps
+> = async () => {
   try {
     // Only show active, verified projects on the map
     const projects = await fetchProjects({ status: "active" });

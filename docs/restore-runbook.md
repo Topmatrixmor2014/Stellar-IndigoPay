@@ -68,7 +68,7 @@ from the running cluster.
 
 1. Re-enable scheduled backups (the restored DB has no cron).
 2. Verify webhook delivery resume: check `webhook_deliveries WHERE
-   status='pending' AND next_attempt_at <= NOW()`.
+status='pending' AND next_attempt_at <= NOW()`.
 3. Open a post-incident review within 48 hours.
 4. Update RTO/RPO numbers in `docs/disaster-recovery.md` if the
    incident was longer/shorter than the target.

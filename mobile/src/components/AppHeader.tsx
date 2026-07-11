@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { WalletConnect } from './WalletConnect';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { WalletConnect } from "./WalletConnect";
 
 export function AppHeader() {
   return (
@@ -13,14 +13,14 @@ export function AppHeader() {
 
 const styles = StyleSheet.create({
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
+    borderBottomColor: "#f3f4f6",
   },
-  logo: { fontSize: 18, fontWeight: '700', color: '#15803d' },
+  logo: { fontSize: 18, fontWeight: "700", color: "#15803d" },
 });

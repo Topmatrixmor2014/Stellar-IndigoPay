@@ -20,7 +20,7 @@ export default function CircularProgress({
     const p = Math.min(Math.max(percentage, 0), 100);
     const progressOffset = ((100 - p) / 100) * circumference;
 
-    // Small delay ensures the initial render (with 0% circle) 
+    // Small delay ensures the initial render (with 0% circle)
     // happens, and then CSS animates it filling up.
     const timer = setTimeout(() => {
       setOffset(progressOffset);
@@ -38,7 +38,10 @@ export default function CircularProgress({
   }
 
   return (
-    <div className="relative inline-flex items-center justify-center font-body" style={{ width: size, height: size }}>
+    <div
+      className="relative inline-flex items-center justify-center font-body"
+      style={{ width: size, height: size }}
+    >
       <svg className="transform -rotate-90" width={size} height={size}>
         {/* Background rounded track */}
         <circle
@@ -62,7 +65,10 @@ export default function CircularProgress({
           cy={size / 2}
         />
       </svg>
-      <span className="absolute font-semibold text-[#0F172A] dark:text-[#E2E8F0]" style={{ fontSize: Math.max(10, size * 0.25) }}>
+      <span
+        className="absolute font-semibold text-[#0F172A] dark:text-[#E2E8F0]"
+        style={{ fontSize: Math.max(10, size * 0.25) }}
+      >
         {Math.round(percentage)}%
       </span>
     </div>

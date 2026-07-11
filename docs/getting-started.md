@@ -7,10 +7,11 @@ Welcome! This guide will walk you step-by-step from zero to making your first te
 ## 1. Prerequisites
 
 Before you begin, make sure you have the following installed:
-| Tool | Version |
-|------|---------|
-| Node.js | ≥ 18 |
-| npm | Latest |
+
+| Tool             | Version           |
+| ---------------- | ----------------- |
+| Node.js          | ≥ 18              |
+| npm              | Latest            |
 | Freighter Wallet | Browser extension |
 
 ### ✅ Node.js
@@ -90,8 +91,8 @@ http://localhost:3000
 
 - Go to: http://localhost:3000/dashboard
 - You should see:
-    - A donation badge
-    - Your CO₂ offset contribution
+  - A donation badge
+  - Your CO₂ offset contribution
 
 ## 6. View on the Blockchain
 

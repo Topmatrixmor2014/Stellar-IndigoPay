@@ -19,7 +19,8 @@ export default function DonationTicker() {
 
   useEffect(() => {
     // Fetch initial latest payments
-    server.payments()
+    server
+      .payments()
       .limit(5)
       .order("desc")
       .call()
@@ -35,7 +36,8 @@ export default function DonationTicker() {
       });
 
     // Stream new payments
-    const closeStream = server.payments()
+    const closeStream = server
+      .payments()
       .cursor("now")
       .stream({
         onmessage: (payment: any) => {
@@ -67,7 +69,10 @@ export default function DonationTicker() {
           <div key={item.id} className="flex items-center gap-2 text-sm">
             <span className="text-[#A5B4FC]">{shortenAddress(item.from)}</span>
             <span className="font-mono text-emerald-400">
-              +{item.asset === "XLM" ? formatXLM(item.amount) : `${parseFloat(item.amount).toFixed(2)} ${item.asset}`}
+              +
+              {item.asset === "XLM"
+                ? formatXLM(item.amount)
+                : `${parseFloat(item.amount).toFixed(2)} ${item.asset}`}
             </span>
             <span className="text-[#64748B] text-xs">{item.time}</span>
           </div>
@@ -79,8 +84,12 @@ export default function DonationTicker() {
           animation: marquee 30s linear infinite;
         }
         @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
         }
       `}</style>
     </div>

@@ -39,7 +39,10 @@ interface ErrorBoundaryState {
  * because React only supports `componentDidCatch` / static
  * `getDerivedStateFromError` on classes.
  */
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   state: ErrorBoundaryState = { error: null };
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
@@ -89,11 +92,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             {error.stack}
           </pre>
         )}
-        <button
-          type="button"
-          onClick={this.reset}
-          className="btn-primary"
-        >
+        <button type="button" onClick={this.reset} className="btn-primary">
           Reload this section
         </button>
       </div>

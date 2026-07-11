@@ -20,9 +20,9 @@
  *   dependency — the wrapper holds the app together even when Sentry
  *   is not installed (CI, dev, OSS forks).
  */
-import { Platform } from 'react-native';
+import { Platform } from "react-native";
 
-const REPORT_ENDPOINT = '/api/errors/report';
+const REPORT_ENDPOINT = "/api/errors/report";
 
 export interface ReportContext {
   /** React errorInfo.componentStack or a stringified imperative summary. */
@@ -43,7 +43,7 @@ export interface ReportContext {
 export async function init(): Promise<void> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-    const sentry = require('@sentry/react-native');
+    const sentry = require("@sentry/react-native");
     if (sentry?.init) {
       sentry.init({
         dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
@@ -64,18 +64,18 @@ export async function init(): Promise<void> {
  */
 export async function captureException(
   error: Error,
-  info: ReportContext = {}
+  info: ReportContext = {},
 ): Promise<boolean> {
   // Always log locally first — Metro / a future dev console can pick
   // this up even if the wrapper has no transport configured.
-  if (Platform.OS !== 'web') {
+  if (Platform.OS !== "web") {
     // eslint-disable-next-line no-console
-    console.error('[ErrorBoundary]', error?.message ?? String(error), info);
+    console.error("[ErrorBoundary]", error?.message ?? String(error), info);
   }
 
   let sentToBackend = false;
   try {
-    const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4000';
+    const apiUrl = process.env.EXPO_PUBLIC_API_URL || "http://localhost:4000";
     const body = JSON.stringify({
       message: error?.message ?? String(error),
       stack: error?.stack,
@@ -89,8 +89,8 @@ export async function captureException(
     // RN bridge open during a render-error fallback.
     const timeout = setTimeout(() => controller.abort(), 3000);
     const res = await fetch(`${apiUrl}${REPORT_ENDPOINT}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body,
       signal: controller.signal,
     });
@@ -105,7 +105,7 @@ export async function captureException(
   let sentToSentry = false;
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-    const sentry = require('@sentry/react-native');
+    const sentry = require("@sentry/react-native");
     if (sentry?.captureException) {
       sentry.captureException(error, { extra: info });
       sentToSentry = true;

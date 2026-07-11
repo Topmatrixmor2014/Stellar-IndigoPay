@@ -1,5 +1,12 @@
 import { useMemo } from "react";
-import { badgeEmoji, badgeLabel, formatCO2, formatDate, formatXLM, shortenAddress } from "@/utils/format";
+import {
+  badgeEmoji,
+  badgeLabel,
+  formatCO2,
+  formatDate,
+  formatXLM,
+  shortenAddress,
+} from "@/utils/format";
 import type { BadgeTier } from "@/utils/types";
 
 export default function ImpactCertificate(props: {
@@ -36,7 +43,8 @@ export default function ImpactCertificate(props: {
               Impact Certificate
             </h2>
             <p className="text-[#C7D2FE] text-sm mt-2 font-body">
-              This certificate recognizes climate impact achieved through on-chain donations.
+              This certificate recognizes climate impact achieved through
+              on-chain donations.
             </p>
           </div>
           <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-3xl">
@@ -47,7 +55,9 @@ export default function ImpactCertificate(props: {
 
       <div className="px-8 py-8">
         <div className="text-center mb-8">
-          <p className="text-sm text-[#475569] dark:text-[#94A3B8] font-body">Presented to</p>
+          <p className="text-sm text-[#475569] dark:text-[#94A3B8] font-body">
+            Presented to
+          </p>
           <p className="font-display text-3xl font-bold text-[#0F172A] dark:text-[#E2E8F0] mt-2">
             {donorName?.trim() ? donorName : shortenAddress(donorAddress)}
           </p>
@@ -98,7 +108,8 @@ export default function ImpactCertificate(props: {
           </h3>
           {projectsSupported.length === 0 ? (
             <p className="text-sm text-[#475569] dark:text-[#94A3B8] font-body">
-              Your supported projects will appear here after your first donation.
+              Your supported projects will appear here after your first
+              donation.
             </p>
           ) : (
             <ul className="text-sm text-[#0F172A] dark:text-[#E2E8F0] font-body grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">

@@ -29,7 +29,8 @@ export default function MilestoneTracker({
 
   const sorted = [...milestones].sort((a, b) => a.order - b.order);
   const completedCount = sorted.filter((m) => m.completedAt).length;
-  const progress = sorted.length > 0 ? Math.round((completedCount / sorted.length) * 100) : 0;
+  const progress =
+    sorted.length > 0 ? Math.round((completedCount / sorted.length) * 100) : 0;
 
   const handleComplete = async (milestoneId: string) => {
     if (!onComplete) return;
@@ -45,7 +46,9 @@ export default function MilestoneTracker({
     return (
       <div className="card text-center py-12">
         <p className="text-4xl mb-3">🎯</p>
-        <p className="font-display text-lg text-[#0F172A] dark:text-[#E2E8F0] mb-1">No milestones yet</p>
+        <p className="font-display text-lg text-[#0F172A] dark:text-[#E2E8F0] mb-1">
+          No milestones yet
+        </p>
         <p className="text-sm text-[#475569] dark:text-[#94A3B8] font-body">
           Milestones will appear here as the project sets goals.
         </p>
@@ -65,7 +68,9 @@ export default function MilestoneTracker({
           </p>
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-[#4F46E5] dark:text-[#818CF8]">{progress}%</div>
+          <div className="text-2xl font-bold text-[#4F46E5] dark:text-[#818CF8]">
+            {progress}%
+          </div>
           <div className="w-24 h-2 bg-[rgba(99,102,241,0.10)] dark:bg-[rgba(129,140,248,0.12)] rounded-full mt-1">
             <div
               className="h-full bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] rounded-full transition-all"
@@ -93,12 +98,22 @@ export default function MilestoneTracker({
                     "relative z-10 flex items-center justify-center w-10 h-10 rounded-full border-2 flex-shrink-0",
                     isCompleted
                       ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] border-0 text-white"
-                      : "bg-white dark:bg-[#14142D] border-[rgba(99,102,241,0.30)] dark:border-[rgba(129,140,248,0.35)] text-[#64748B] dark:text-[#94A3B8]"
+                      : "bg-white dark:bg-[#14142D] border-[rgba(99,102,241,0.30)] dark:border-[rgba(129,140,248,0.35)] text-[#64748B] dark:text-[#94A3B8]",
                   )}
                 >
                   {isCompleted ? (
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={3}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   ) : (
                     <span className="text-sm font-bold">{index + 1}</span>
@@ -109,7 +124,8 @@ export default function MilestoneTracker({
                 <div
                   className={clsx(
                     "flex-1 pb-6",
-                    !isLast && "border-b border-[rgba(99,102,241,0.08)] dark:border-[rgba(129,140,248,0.10)]"
+                    !isLast &&
+                      "border-b border-[rgba(99,102,241,0.08)] dark:border-[rgba(129,140,248,0.10)]",
                   )}
                 >
                   <div className="flex items-start justify-between gap-4">
@@ -117,7 +133,9 @@ export default function MilestoneTracker({
                       <h4
                         className={clsx(
                           "font-display font-semibold",
-                          isCompleted ? "text-[#4F46E5] dark:text-[#818CF8] line-through" : "text-[#0F172A] dark:text-[#E2E8F0]"
+                          isCompleted
+                            ? "text-[#4F46E5] dark:text-[#818CF8] line-through"
+                            : "text-[#0F172A] dark:text-[#E2E8F0]",
                         )}
                       >
                         {milestone.title}
@@ -141,11 +159,13 @@ export default function MilestoneTracker({
 
                   <div className="flex items-center gap-3 mt-2 text-xs text-[#64748B] dark:text-[#94A3B8] font-body">
                     <span>
-                      📅 Target: {new Date(milestone.targetDate).toLocaleDateString()}
+                      📅 Target:{" "}
+                      {new Date(milestone.targetDate).toLocaleDateString()}
                     </span>
                     {isCompleted && milestone.completedAt && (
                       <span className="text-[#4F46E5] dark:text-[#818CF8]">
-                        ✅ Completed: {new Date(milestone.completedAt).toLocaleDateString()}
+                        ✅ Completed:{" "}
+                        {new Date(milestone.completedAt).toLocaleDateString()}
                       </span>
                     )}
                   </div>

@@ -12,9 +12,9 @@ const SecureStore = {
     return storage.has(key) ? storage.get(key) : null;
   }),
   setItemAsync: jest.fn(async (key, value) => {
-    if (typeof value !== 'string') {
+    if (typeof value !== "string") {
       throw new TypeError(
-        'expo-secure-store setItemAsync requires a string value'
+        "expo-secure-store setItemAsync requires a string value",
       );
     }
     storage.set(key, value);

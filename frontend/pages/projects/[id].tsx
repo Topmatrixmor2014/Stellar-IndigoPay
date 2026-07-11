@@ -9,16 +9,43 @@ import Link from "next/link";
 import DonateForm from "@/components/DonateForm";
 import DonationFeed from "@/components/DonationFeed";
 import ProjectProgressBar from "@/components/ProjectProgressBar";
-import ToastNotification, { type ToastItem } from "@/components/ToastNotification";
+import ToastNotification, {
+  type ToastItem,
+} from "@/components/ToastNotification";
 import WalletConnect from "@/components/WalletConnect";
 import CircularProgress from "@/components/CircularProgress";
 import MonthlyGivingSetup from "@/components/MonthlyGivingSetup";
 import DescriptionAccordion from "@/components/DescriptionAccordion";
 import WalletAddressQRCode from "@/components/WalletAddressQRCode";
-import { fetchProject, fetchProjectUpdates, subscribeToProject, fetchSubscriberCount, createProjectCampaign, fetchProjectMatches, generateProjectSummary, toggleUpdateLike, followProject, unfollowProject } from "@/lib/api";
+import {
+  fetchProject,
+  fetchProjectUpdates,
+  subscribeToProject,
+  fetchSubscriberCount,
+  createProjectCampaign,
+  fetchProjectMatches,
+  generateProjectSummary,
+  toggleUpdateLike,
+  followProject,
+  unfollowProject,
+} from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
-import { formatXLM, formatCO2, progressPercent, timeAgo, statusClass, statusLabel, CATEGORY_ICONS, copyToClipboard, shortenAddress } from "@/utils/format";
-import { accountUrl, fetchProjectDiscussion, type ProjectDiscussionMessage } from "@/lib/stellar";
+import {
+  formatXLM,
+  formatCO2,
+  progressPercent,
+  timeAgo,
+  statusClass,
+  statusLabel,
+  CATEGORY_ICONS,
+  copyToClipboard,
+  shortenAddress,
+} from "@/utils/format";
+import {
+  accountUrl,
+  fetchProjectDiscussion,
+  type ProjectDiscussionMessage,
+} from "@/lib/stellar";
 import { markMonthlySubscriptionPaid } from "@/lib/monthlyGiving";
 import type {
   ClimateProject,
@@ -51,14 +78,20 @@ export default function ProjectDetail({
 
   const [project, setProject] = useState<ClimateProject | null>(null);
   const [updates, setUpdates] = useState<ProjectUpdate[]>([]);
-  const [updateLikes, setUpdateLikes] = useState<Record<string, { liked: boolean; likeCount: number }>>({});
+  const [updateLikes, setUpdateLikes] = useState<
+    Record<string, { liked: boolean; likeCount: number }>
+  >({});
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'error'>('idle');
-  const [shareState, setShareState] = useState<'idle' | 'copied'>('idle');
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">(
+    "idle",
+  );
+  const [shareState, setShareState] = useState<"idle" | "copied">("idle");
   const [shareCount, setShareCount] = useState<number>(0);
   const [calcAmount, setCalcAmount] = useState<string>("50");
-  const [subState, setSubState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [subState, setSubState] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const [subError, setSubError] = useState<string | null>(null);
   const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
   const [showMonthlySetup, setShowMonthlySetup] = useState(false);
@@ -78,7 +111,9 @@ export default function ProjectDetail({
   const [discussionLoading, setDiscussionLoading] = useState(false);
   const [matches, setMatches] = useState<any[]>([]);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
-  const [aiSummaryState, setAiSummaryState] = useState<"idle" | "loading" | "error">("idle");
+  const [aiSummaryState, setAiSummaryState] = useState<
+    "idle" | "loading" | "error"
+  >("idle");
   const [aiSummaryError, setAiSummaryError] = useState<string | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followCount, setFollowCount] = useState(0);
@@ -92,7 +127,9 @@ export default function ProjectDetail({
       ? router.query.monthlySubId
       : null;
   const prefillReplyMemo =
-    typeof router.query.replyMemo === "string" ? router.query.replyMemo : undefined;
+    typeof router.query.replyMemo === "string"
+      ? router.query.replyMemo
+      : undefined;
 
   useEffect(() => {
     if (!id) return;
@@ -173,7 +210,7 @@ export default function ProjectDetail({
     }
   };
 
-  const incrementShare = () => setShareCount(prev => prev + 1);
+  const incrementShare = () => setShareCount((prev) => prev + 1);
 
   const handleCopyLink = async () => {
     if (!project) return;
@@ -662,7 +699,11 @@ export default function ProjectDetail({
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 animate-pulse">
         <Head>
-          <title>{ogProject?.name ? `${ogProject.name} — Stellar IndigoPay` : "Project — Stellar IndigoPay"}</title>
+          <title>
+            {ogProject?.name
+              ? `${ogProject.name} — Stellar IndigoPay`
+              : "Project — Stellar IndigoPay"}
+          </title>
         </Head>
         <div className="h-8 bg-forest-200 rounded w-2/3 mb-4" />
         <div className="card space-y-4">
@@ -689,7 +730,7 @@ export default function ProjectDetail({
   const calcAmountNum = parseFloat(calcAmount) || 0;
   const estimatedCO2 = calcAmountNum * (project.co2OffsetKg || 0);
   const treesEquivalent = estimatedCO2 / 22;
-  
+
   let analogy = "";
   if (treesEquivalent === 0) analogy = "Enter an amount to see your impact!";
   else if (treesEquivalent < 1) analogy = "A tiny sprout of change! 🌱";
@@ -697,8 +738,11 @@ export default function ProjectDetail({
   else if (treesEquivalent < 50) analogy = "A growing mini-forest! 🌲";
   else analogy = "A massive impact for our planet! 🌍";
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://stellar-indigopay.app";
-  const ogTitle = ogProject ? `${ogProject.name} — Stellar IndigoPay` : "Stellar IndigoPay";
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL || "https://stellar-indigopay.app";
+  const ogTitle = ogProject
+    ? `${ogProject.name} — Stellar IndigoPay`
+    : "Stellar IndigoPay";
   const ogDescription = ogProject
     ? `${ogProject.description.slice(0, 160).trimEnd()}… Support this ${ogProject.category} project on Stellar IndigoPay.`
     : "Donate XLM directly to verified climate projects on Stellar.";
@@ -723,7 +767,9 @@ export default function ProjectDetail({
       </Head>
       <ToastNotification
         toasts={toasts}
-        onDismiss={(toastId) => setToasts((prev) => prev.filter((t) => t.id !== toastId))}
+        onDismiss={(toastId) =>
+          setToasts((prev) => prev.filter((t) => t.id !== toastId))
+        }
       />
       {isComplete && (
         <div className="celebration-overlay">
@@ -885,13 +931,15 @@ export default function ProjectDetail({
                           ? "bg-green-50 text-green-700 border-green-300 hover:bg-red-50 hover:text-red-600 hover:border-red-300"
                           : "bg-forest-50 text-forest-700 border-forest-200 hover:bg-green-50 hover:text-green-700 hover:border-green-300"
                       } ${followLoading ? "opacity-60 cursor-not-allowed" : ""}`}
-                      title={isFollowing ? "Unfollow project" : "Follow project"}
+                      title={
+                        isFollowing ? "Unfollow project" : "Follow project"
+                      }
                     >
                       {followLoading
                         ? "…"
                         : isFollowing
-                        ? `✓ Following${followCount > 0 ? ` (${followCount})` : ""}`
-                        : `Follow${followCount > 0 ? ` (${followCount})` : ""}`}
+                          ? `✓ Following${followCount > 0 ? ` (${followCount})` : ""}`
+                          : `Follow${followCount > 0 ? ` (${followCount})` : ""}`}
                     </button>
                   )}
                   <button
@@ -932,8 +980,12 @@ export default function ProjectDetail({
                   {(project.averageRating || 0) > 0 && (
                     <div className="flex items-center gap-1">
                       <span className="text-amber-400 text-sm">★</span>
-                      <span className="text-forest-900 text-sm font-bold">{project.averageRating?.toFixed(1)}</span>
-                      <span className="text-[#8aaa8a] dark:text-forest-300 text-xs">({project.ratingCount} reviews)</span>
+                      <span className="text-forest-900 text-sm font-bold">
+                        {project.averageRating?.toFixed(1)}
+                      </span>
+                      <span className="text-[#8aaa8a] dark:text-forest-300 text-xs">
+                        ({project.ratingCount} reviews)
+                      </span>
                     </div>
                   )}
                 </div>
@@ -955,7 +1007,11 @@ export default function ProjectDetail({
                   />
                   <div className="flex items-center justify-between text-sm text-[#5a7a5a] font-body">
                     <span>{formatXLM(project.raisedXLM)} raised</span>
-                    <span>{Number(project.goalXLM) > 0 ? `towards ${formatXLM(project.goalXLM)} goal` : "No goal set"}</span>
+                    <span>
+                      {Number(project.goalXLM) > 0
+                        ? `towards ${formatXLM(project.goalXLM)} goal`
+                        : "No goal set"}
+                    </span>
                   </div>
                 </div>
               )}
@@ -1002,13 +1058,16 @@ export default function ProjectDetail({
                           ℹ️
                         </button>
                         <span className="tooltip-text" role="tooltip">
-                          Estimated CO₂ offset based on this project&apos;s declared
-                          impact rate per XLM donated. Actual results may vary.
+                          Estimated CO₂ offset based on this project&apos;s
+                          declared impact rate per XLM donated. Actual results
+                          may vary.
                         </span>
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-[#8aaa8a] dark:text-forest-300 font-body">{s.label}</p>
+                  <p className="text-xs text-[#8aaa8a] dark:text-forest-300 font-body">
+                    {s.label}
+                  </p>
                 </div>
               ))}
             </div>
@@ -1095,11 +1154,14 @@ export default function ProjectDetail({
           {/* AI-generated impact summary — sits above the full description so
               donors can decide in <30s whether to read more. The owner sees a
               Refresh button; everyone sees the disclaimer. */}
-          {(project.aiSummary || (publicKey && publicKey === project.walletAddress)) && (
+          {(project.aiSummary ||
+            (publicKey && publicKey === project.walletAddress)) && (
             <div className="card border-l-4 border-forest-500 bg-forest-50/40">
               <div className="flex items-start justify-between gap-3 mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg" aria-hidden="true">✨</span>
+                  <span className="text-lg" aria-hidden="true">
+                    ✨
+                  </span>
                   <h2 className="font-display text-base font-semibold text-forest-900">
                     Impact at a glance
                   </h2>
@@ -1114,11 +1176,17 @@ export default function ProjectDetail({
                       setAiSummaryState("loading");
                       setAiSummaryError(null);
                       try {
-                        const result = await generateProjectSummary(project.id, publicKey);
+                        const result = await generateProjectSummary(
+                          project.id,
+                          publicKey,
+                        );
                         setProject({ ...project, ...result });
                         setAiSummaryState("idle");
                       } catch (err: unknown) {
-                        const msg = err instanceof Error ? err.message : "Failed to generate summary";
+                        const msg =
+                          err instanceof Error
+                            ? err.message
+                            : "Failed to generate summary";
                         setAiSummaryError(msg);
                         setAiSummaryState("error");
                       }
@@ -1141,12 +1209,15 @@ export default function ProjectDetail({
                 </p>
               ) : (
                 <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] italic font-body">
-                  No AI summary yet. Click &ldquo;Generate summary&rdquo; to create one for donors.
+                  No AI summary yet. Click &ldquo;Generate summary&rdquo; to
+                  create one for donors.
                 </p>
               )}
 
               {aiSummaryError && (
-                <p className="mt-2 text-xs text-red-600 font-body">{aiSummaryError}</p>
+                <p className="mt-2 text-xs text-red-600 font-body">
+                  {aiSummaryError}
+                </p>
               )}
 
               <p className="mt-3 text-[11px] text-[#7a9a7a] font-body leading-snug">
@@ -1187,15 +1258,21 @@ export default function ProjectDetail({
               </h2>
               <div className="space-y-4">
                 {project.milestones.map((m) => {
-                  const reached = parseFloat(project.raisedXLM) >= (parseFloat(project.goalXLM) * m.percentage / 100);
+                  const reached =
+                    parseFloat(project.raisedXLM) >=
+                    (parseFloat(project.goalXLM) * m.percentage) / 100;
                   return (
                     <div key={m.id} className="relative">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${m.reachedAt ? 'bg-emerald-500 text-white' : reached ? 'bg-amber-400 text-white' : 'bg-forest-100 text-forest-700'}`}>
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${m.reachedAt ? "bg-emerald-500 text-white" : reached ? "bg-amber-400 text-white" : "bg-forest-100 text-forest-700"}`}
+                          >
                             {m.percentage}%
                           </div>
-                          <span className="text-sm font-semibold text-forest-900 font-body">{m.title}</span>
+                          <span className="text-sm font-semibold text-forest-900 font-body">
+                            {m.title}
+                          </span>
                         </div>
                         {m.transactionHash && (
                           <a
@@ -1209,9 +1286,11 @@ export default function ProjectDetail({
                         )}
                       </div>
                       <div className="w-full bg-forest-100 h-1.5 rounded-full overflow-hidden">
-                        <div 
-                          className={`h-full transition-all duration-1000 ${m.reachedAt ? 'bg-emerald-500' : reached ? 'bg-amber-400' : 'bg-forest-300'}`}
-                          style={{ width: `${Math.min(100, (parseFloat(project.raisedXLM) / (parseFloat(project.goalXLM) * m.percentage / 100)) * 100)}%` }}
+                        <div
+                          className={`h-full transition-all duration-1000 ${m.reachedAt ? "bg-emerald-500" : reached ? "bg-amber-400" : "bg-forest-300"}`}
+                          style={{
+                            width: `${Math.min(100, (parseFloat(project.raisedXLM) / ((parseFloat(project.goalXLM) * m.percentage) / 100)) * 100)}%`,
+                          }}
                         />
                       </div>
                     </div>
@@ -1352,7 +1431,9 @@ export default function ProjectDetail({
               {t("project.projectUpdates")}
             </h2>
             {updates.length === 0 ? (
-              <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body">{t("project.noUpdatesYet")}</p>
+              <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body">
+                {t("project.noUpdatesYet")}
+              </p>
             ) : (
               <div className="space-y-4">
                 {updates.map((u) => {
@@ -1372,7 +1453,9 @@ export default function ProjectDetail({
                       </div>
                       <div
                         className="text-[#5a7a5a] dark:text-[#8aaa8a] text-sm leading-relaxed font-body prose prose-sm max-w-none"
-                        dangerouslySetInnerHTML={{ __html: renderMarkdown(u.body) }}
+                        dangerouslySetInnerHTML={{
+                          __html: renderMarkdown(u.body),
+                        }}
                       />
                       <div className="flex items-center gap-3 mt-2">
                         <button
@@ -1424,25 +1507,37 @@ export default function ProjectDetail({
               <h2 className="font-display text-lg font-semibold text-forest-900">
                 Donor Discussion
               </h2>
-              <span className="text-xs text-[#8aaa8a] dark:text-forest-300 font-body">On-chain memos</span>
+              <span className="text-xs text-[#8aaa8a] dark:text-forest-300 font-body">
+                On-chain memos
+              </span>
             </div>
             <p className="text-xs text-[#5a7a5a] dark:text-[#8aaa8a] font-body mb-4">
-              Discuss by donating — messages are Stellar transaction memos from real donations.
+              Discuss by donating — messages are Stellar transaction memos from
+              real donations.
             </p>
 
             {discussionLoading ? (
-              <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body">Loading discussion…</p>
+              <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body">
+                Loading discussion…
+              </p>
             ) : discussion.length === 0 ? (
               <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] font-body">
-                No memo messages yet. Be the first to leave a message with your donation.
+                No memo messages yet. Be the first to leave a message with your
+                donation.
               </p>
             ) : (
               <div className="space-y-3">
                 {discussion.slice(-50).map((m) => {
                   const suggested = `Reply to ${m.from.slice(0, 6)}…: `;
-                  const replyMemo = suggested.length <= 100 ? suggested : suggested.slice(0, 100);
+                  const replyMemo =
+                    suggested.length <= 100
+                      ? suggested
+                      : suggested.slice(0, 100);
                   return (
-                    <div key={m.id} className="p-3 rounded-xl border border-forest-100 bg-white">
+                    <div
+                      key={m.id}
+                      className="p-3 rounded-xl border border-forest-100 bg-white"
+                    >
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="text-xs text-[#8aaa8a] dark:text-forest-300 font-body">
                           <a
@@ -1454,12 +1549,19 @@ export default function ProjectDetail({
                             {m.from.slice(0, 6)}…{m.from.slice(-6)}
                           </a>
                           <span className="mx-2">•</span>
-                          <span className="font-semibold text-forest-900">{formatXLM(m.amount, 2)}</span>
+                          <span className="font-semibold text-forest-900">
+                            {formatXLM(m.amount, 2)}
+                          </span>
                           <span className="mx-2">•</span>
                           <span>{timeAgo(m.createdAt)}</span>
                         </div>
                         <button
-                          onClick={() => router.push({ pathname: router.pathname, query: { ...router.query, replyMemo } })}
+                          onClick={() =>
+                            router.push({
+                              pathname: router.pathname,
+                              query: { ...router.query, replyMemo },
+                            })
+                          }
                           className="text-xs font-semibold text-forest-700 hover:underline self-start sm:self-auto"
                           title="Reply by donating with a pre-filled memo"
                         >
@@ -1479,7 +1581,6 @@ export default function ProjectDetail({
 
         {/* ── Sidebar ─────────────────────────────────────────────────── */}
         <div className="space-y-4">
-
           {/* Sticky mobile donate button */}
           <div className="fixed bottom-0 left-0 right-0 z-40 p-3 bg-white/95 backdrop-blur-sm border-t border-forest-200 sm:hidden">
             {publicKey ? (
@@ -1496,23 +1597,29 @@ export default function ProjectDetail({
 
           {/* Impact Calculator */}
           <div className="card bg-forest-50 border-forest-200">
-            <h3 className="font-display font-semibold text-forest-900 mb-2">Impact Calculator</h3>
-            <p className="text-xs text-[#5a7a5a] dark:text-[#8aaa8a] mb-3 font-body">See what your donation can achieve before you give.</p>
-            
+            <h3 className="font-display font-semibold text-forest-900 mb-2">
+              Impact Calculator
+            </h3>
+            <p className="text-xs text-[#5a7a5a] dark:text-[#8aaa8a] mb-3 font-body">
+              See what your donation can achieve before you give.
+            </p>
+
             <div className="flex flex-wrap gap-2 mb-3">
-              {["10", "25", "50", "100", "250"].map(p => (
+              {["10", "25", "50", "100", "250"].map((p) => (
                 <button
                   key={p}
                   onClick={() => setCalcAmount(p)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
-                    calcAmount === p ? "bg-forest-600 text-white border-forest-600 shadow-sm" : "bg-white text-forest-700 border-forest-200 hover:border-forest-400"
+                    calcAmount === p
+                      ? "bg-forest-600 text-white border-forest-600 shadow-sm"
+                      : "bg-white text-forest-700 border-forest-200 hover:border-forest-400"
                   }`}
                 >
                   {p} XLM
                 </button>
               ))}
             </div>
-            
+
             <div className="mb-4">
               <input
                 type="number"
@@ -1523,19 +1630,25 @@ export default function ProjectDetail({
                 className="w-full px-3 py-2 text-sm rounded-lg border border-forest-200 bg-white focus:outline-none focus:ring-2 focus:ring-forest-400 font-body placeholder:text-forest-300"
               />
             </div>
-            
+
             {calcAmountNum > 0 && (
               <div className="p-3 bg-white rounded-lg border border-forest-100 shadow-sm animate-fade-in">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-lg">♻️</span>
-                  <span className="font-semibold text-forest-800 text-sm font-body">{formatCO2(estimatedCO2)} offset</span>
+                  <span className="font-semibold text-forest-800 text-sm font-body">
+                    {formatCO2(estimatedCO2)} offset
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-lg">🌳</span>
-                  <span className="font-semibold text-forest-800 text-sm font-body">~{treesEquivalent.toFixed(1)} trees/year</span>
+                  <span className="font-semibold text-forest-800 text-sm font-body">
+                    ~{treesEquivalent.toFixed(1)} trees/year
+                  </span>
                 </div>
                 <div className="pt-2 border-t border-forest-50 text-center">
-                  <span className="text-xs text-forest-600 font-medium italic font-body">{analogy}</span>
+                  <span className="text-xs text-forest-600 font-medium italic font-body">
+                    {analogy}
+                  </span>
                 </div>
               </div>
             )}
@@ -1543,31 +1656,32 @@ export default function ProjectDetail({
 
           {publicKey ? (
             <div id="donate-form">
-            <DonateForm
-              project={project}
-              publicKey={publicKey}
-              initialAmount={prefillAmount}
-              initialMessage={prefillReplyMemo}
-              onSuccess={() => {
-                if (monthlySubId && prefillAmount) {
-                  const parsedPrefillAmount = Number.parseFloat(prefillAmount);
-                  if (
-                    Number.isFinite(parsedPrefillAmount) &&
-                    parsedPrefillAmount > 0
-                  ) {
-                    markMonthlySubscriptionPaid(
-                      monthlySubId,
-                      parsedPrefillAmount.toFixed(7),
-                    );
+              <DonateForm
+                project={project}
+                publicKey={publicKey}
+                initialAmount={prefillAmount}
+                initialMessage={prefillReplyMemo}
+                onSuccess={() => {
+                  if (monthlySubId && prefillAmount) {
+                    const parsedPrefillAmount =
+                      Number.parseFloat(prefillAmount);
+                    if (
+                      Number.isFinite(parsedPrefillAmount) &&
+                      parsedPrefillAmount > 0
+                    ) {
+                      markMonthlySubscriptionPaid(
+                        monthlySubId,
+                        parsedPrefillAmount.toFixed(7),
+                      );
+                    }
                   }
-                }
-                setRefreshKey((k) => k + 1);
-                setTimeout(
-                  () => fetchProject(project.id).then(setProject),
-                  2000,
-                );
-              }}
-            />
+                  setRefreshKey((k) => k + 1);
+                  setTimeout(
+                    () => fetchProject(project.id).then(setProject),
+                    2000,
+                  );
+                }}
+              />
             </div>
           ) : (
             <div>
@@ -1580,9 +1694,13 @@ export default function ProjectDetail({
 
           {/* Share card */}
           <div className="card text-center bg-forest-50 border-forest-200">
-            <p className="font-display font-semibold text-forest-900 mb-2">Spread the word 🌍</p>
-            <p className="text-xs text-[#5a7a5a] dark:text-[#8aaa8a] mb-3 font-body">Share this project with friends and family to increase its impact.</p>
-            
+            <p className="font-display font-semibold text-forest-900 mb-2">
+              Spread the word 🌍
+            </p>
+            <p className="text-xs text-[#5a7a5a] dark:text-[#8aaa8a] mb-3 font-body">
+              Share this project with friends and family to increase its impact.
+            </p>
+
             <div className="grid grid-cols-1 gap-2 mb-3">
               <button
                 onClick={handleCopyLink}
@@ -1590,12 +1708,30 @@ export default function ProjectDetail({
                 title="Copy Link"
                 aria-label="Copy Link"
               >
-                {shareState === 'copied' ? '✓' : (
-                   <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                {shareState === "copied" ? (
+                  "✓"
+                ) : (
+                  <svg
+                    className="w-5 h-5 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                    />
+                  </svg>
                 )}
               </button>
             </div>
-            {shareCount > 0 && <p className="text-xs text-forest-700 font-semibold mb-3">{shareCount} shares so far!</p>}
+            {shareCount > 0 && (
+              <p className="text-xs text-forest-700 font-semibold mb-3">
+                {shareCount} shares so far!
+              </p>
+            )}
 
             <Link
               href={`/donate/${project.id}`}
@@ -1611,8 +1747,8 @@ export default function ProjectDetail({
               Impact Report 📊
             </p>
             <p className="text-xs text-[#5a7a5a] dark:text-[#8aaa8a] mb-3 font-body">
-              Download a print-friendly summary of this project&apos;s progress and
-              impact.
+              Download a print-friendly summary of this project&apos;s progress
+              and impact.
             </p>
             <button
               onClick={handlePrintReport}

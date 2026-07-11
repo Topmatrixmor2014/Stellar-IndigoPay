@@ -10,8 +10,13 @@ interface AnimatedNumberProps {
   formatter?: (val: number) => string;
 }
 
-export default function AnimatedNumber({ value, duration = 1500, formatter }: AnimatedNumberProps) {
-  const numericValue = typeof value === "string" ? parseFloat(value.replace(/,/g, "")) : value;
+export default function AnimatedNumber({
+  value,
+  duration = 1500,
+  formatter,
+}: AnimatedNumberProps) {
+  const numericValue =
+    typeof value === "string" ? parseFloat(value.replace(/,/g, "")) : value;
   const [displayValue, setDisplayValue] = useState(0);
   const startTimeRef = useRef<number | null>(null);
 
@@ -21,7 +26,7 @@ export default function AnimatedNumber({ value, duration = 1500, formatter }: An
     const animate = (time: number) => {
       if (startTimeRef.current === null) startTimeRef.current = time;
       const progress = Math.min((time - startTimeRef.current) / duration, 1);
-      
+
       const easedProgress = 1 - Math.pow(1 - progress, 3); // Ease out cubic
       setDisplayValue(easedProgress * numericValue);
 
@@ -34,5 +39,11 @@ export default function AnimatedNumber({ value, duration = 1500, formatter }: An
     return () => cancelAnimationFrame(animationFrameId);
   }, [numericValue, duration]);
 
-  return <>{formatter ? formatter(displayValue) : Math.floor(displayValue).toLocaleString()}</>;
+  return (
+    <>
+      {formatter
+        ? formatter(displayValue)
+        : Math.floor(displayValue).toLocaleString()}
+    </>
+  );
 }

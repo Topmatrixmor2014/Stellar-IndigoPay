@@ -101,8 +101,7 @@ export function applyThemeToDocument(theme: EffectiveTheme): void {
 const DEFAULT_FOR_HYDRATION: ThemeMode = "system";
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] =
-    useState<ThemeMode>(DEFAULT_FOR_HYDRATION);
+  const [theme, setThemeState] = useState<ThemeMode>(DEFAULT_FOR_HYDRATION);
   const [systemDark, setSystemDark] = useState<boolean>(false);
   const [mounted, setMounted] = useState<boolean>(false);
 
@@ -132,7 +131,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // When the OS preference flips while we're in "system" mode, keep the
   // effective theme in sync.
   useEffect(() => {
-    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+    if (
+      typeof window === "undefined" ||
+      typeof window.matchMedia !== "function"
+    ) {
       return;
     }
     const mql = window.matchMedia("(prefers-color-scheme: dark)");
@@ -169,7 +171,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     [theme, effective, mounted, setTheme, toggleTheme],
   );
 
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+  );
 }
 
 export function useTheme(): ThemeContextValue {

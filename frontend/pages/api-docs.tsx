@@ -24,15 +24,17 @@ const endpoints: ApiEndpoint[] = [
     example: {
       response: {
         success: true,
-        data: [{
-          id: "123e4567-e89b-12d3-a456-426614174000",
-          name: "Reforestation Initiative",
-          description: "Planting trees across Asia",
-          category: "Reforestation",
-          raisedXLM: "5000.0000000",
-          goalXLM: "10000.0000000",
-          donorCount: 42,
-        }],
+        data: [
+          {
+            id: "123e4567-e89b-12d3-a456-426614174000",
+            name: "Reforestation Initiative",
+            description: "Planting trees across Asia",
+            category: "Reforestation",
+            raisedXLM: "5000.0000000",
+            goalXLM: "10000.0000000",
+            donorCount: 42,
+          },
+        ],
       },
     },
   },
@@ -63,7 +65,8 @@ const endpoints: ApiEndpoint[] = [
     description: "Create a donation matching offer",
     example: {
       request: {
-        matcherAddress: "GBUQWP3BOUZX34ULNQG23RQ6F4YUSXHTQSXUSMIQSTBE2EURIDVXL6B",
+        matcherAddress:
+          "GBUQWP3BOUZX34ULNQG23RQ6F4YUSXHTQSXUSMIQSTBE2EURIDVXL6B",
         capXLM: "1000",
         multiplier: 2,
         expiresAt: "2026-05-25T00:00:00Z",
@@ -90,16 +93,18 @@ const endpoints: ApiEndpoint[] = [
     example: {
       response: {
         success: true,
-        data: [{
-          id: "match-id-123",
-          projectId: "project-id",
-          matcherAddress: "GBUQWP...",
-          capXLM: "1000",
-          multiplier: 2,
-          matchedXLM: "250.5",
-          remainingXLM: "749.5",
-          expiresAt: "2026-05-25T00:00:00Z",
-        }],
+        data: [
+          {
+            id: "match-id-123",
+            projectId: "project-id",
+            matcherAddress: "GBUQWP...",
+            capXLM: "1000",
+            multiplier: 2,
+            matchedXLM: "250.5",
+            remainingXLM: "749.5",
+            expiresAt: "2026-05-25T00:00:00Z",
+          },
+        ],
       },
     },
   },
@@ -137,13 +142,15 @@ const endpoints: ApiEndpoint[] = [
     example: {
       response: {
         success: true,
-        data: [{
-          id: "donation-id",
-          message: "Great project!",
-          donorAddress: "GBUQWP...",
-          amountXLM: "100.0000000",
-          createdAt: "2026-04-25T12:00:00Z",
-        }],
+        data: [
+          {
+            id: "donation-id",
+            message: "Great project!",
+            donorAddress: "GBUQWP...",
+            amountXLM: "100.0000000",
+            createdAt: "2026-04-25T12:00:00Z",
+          },
+        ],
       },
     },
   },
@@ -155,14 +162,16 @@ const endpoints: ApiEndpoint[] = [
     example: {
       response: {
         success: true,
-        data: [{
-          rank: 1,
-          publicKey: "GBUQWP...",
-          displayName: "Climate Champion",
-          totalDonatedXLM: "5000.0000000",
-          projectsSupported: 12,
-          topBadge: "🌍",
-        }],
+        data: [
+          {
+            rank: 1,
+            publicKey: "GBUQWP...",
+            displayName: "Climate Champion",
+            totalDonatedXLM: "5000.0000000",
+            projectsSupported: 12,
+            topBadge: "🌍",
+          },
+        ],
       },
     },
   },
@@ -179,7 +188,7 @@ const endpoints: ApiEndpoint[] = [
           displayName: "Climate Champion",
           totalDonatedXLM: "5000.0000000",
           projectsSupported: 12,
-          badges: [{tier: "🌍"}],
+          badges: [{ tier: "🌍" }],
         },
       },
     },
@@ -229,11 +238,15 @@ function EndpointCard({ endpoint }: { endpoint: ApiEndpoint }) {
         baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000",
       });
 
-      const path = endpoint.path.replace(":id", "featured").replace(":projectId", "1");
-      const method = endpoint.method.toLowerCase() as "get" | "post" | "put" | "delete" | "patch";
-      const res = method === "get" || method === "delete"
-        ? await api[method](path)
-        : await api[method](path, endpoint.example?.request);
+      const path = endpoint.path
+        .replace(":id", "featured")
+        .replace(":projectId", "1");
+      const method = endpoint.method.toLowerCase() as
+        "get" | "post" | "put" | "delete" | "patch";
+      const res =
+        method === "get" || method === "delete"
+          ? await api[method](path)
+          : await api[method](path, endpoint.example?.request);
       setResponse(res.data);
     } catch (err: any) {
       setError(err.message || "Failed to fetch");
@@ -245,12 +258,18 @@ function EndpointCard({ endpoint }: { endpoint: ApiEndpoint }) {
   return (
     <div className="card border-l-4 border-forest-600">
       <div className="flex items-start gap-4 mb-4">
-        <span className={`px-3 py-1 rounded font-bold text-sm ${methodColors[endpoint.method]}`}>
+        <span
+          className={`px-3 py-1 rounded font-bold text-sm ${methodColors[endpoint.method]}`}
+        >
           {endpoint.method}
         </span>
         <div className="flex-1">
-          <p className="font-mono text-sm font-semibold text-forest-900">{endpoint.path}</p>
-          <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] mt-1">{endpoint.description}</p>
+          <p className="font-mono text-sm font-semibold text-forest-900">
+            {endpoint.path}
+          </p>
+          <p className="text-sm text-[#5a7a5a] dark:text-[#8aaa8a] mt-1">
+            {endpoint.description}
+          </p>
         </div>
       </div>
 
@@ -258,7 +277,9 @@ function EndpointCard({ endpoint }: { endpoint: ApiEndpoint }) {
         <div className="space-y-3">
           {endpoint.example.request && (
             <div className="bg-forest-50 p-3 rounded border border-forest-200">
-              <p className="text-xs font-semibold text-forest-900 mb-2">Request Body:</p>
+              <p className="text-xs font-semibold text-forest-900 mb-2">
+                Request Body:
+              </p>
               <pre className="text-xs overflow-auto text-forest-700">
                 {JSON.stringify(endpoint.example.request, null, 2)}
               </pre>
@@ -267,7 +288,9 @@ function EndpointCard({ endpoint }: { endpoint: ApiEndpoint }) {
 
           {endpoint.example.response && (
             <div className="bg-forest-50 p-3 rounded border border-forest-200">
-              <p className="text-xs font-semibold text-forest-900 mb-2">Example Response:</p>
+              <p className="text-xs font-semibold text-forest-900 mb-2">
+                Example Response:
+              </p>
               <pre className="text-xs overflow-auto text-forest-700">
                 {JSON.stringify(endpoint.example.response, null, 2)}
               </pre>
@@ -292,7 +315,9 @@ function EndpointCard({ endpoint }: { endpoint: ApiEndpoint }) {
               {error && <p className="text-sm text-red-700">Error: {error}</p>}
               {response && (
                 <>
-                  <p className="text-xs font-semibold text-blue-900 mb-2">Response:</p>
+                  <p className="text-xs font-semibold text-blue-900 mb-2">
+                    Response:
+                  </p>
                   <pre className="text-xs overflow-auto text-blue-700">
                     {JSON.stringify(response, null, 2)}
                   </pre>
@@ -316,13 +341,20 @@ export default function ApiDocsPage() {
           API Documentation
         </h1>
         <p className="text-[#5a7a5a] dark:text-[#8aaa8a] max-w-2xl font-body leading-relaxed">
-          Integrate IndigoPay into your application with our REST API. All responses return JSON with a <code className="bg-forest-50 px-2 py-1 rounded text-sm">success</code> field.
+          Integrate IndigoPay into your application with our REST API. All
+          responses return JSON with a{" "}
+          <code className="bg-forest-50 px-2 py-1 rounded text-sm">
+            success
+          </code>{" "}
+          field.
         </p>
       </div>
 
       {/* Base URL */}
       <div className="card mb-8 border-l-4 border-purple-600">
-        <p className="text-xs uppercase tracking-widest font-bold text-purple-700 mb-2">Base URL</p>
+        <p className="text-xs uppercase tracking-widest font-bold text-purple-700 mb-2">
+          Base URL
+        </p>
         <code className="font-mono bg-purple-50 px-4 py-2 rounded block text-sm text-purple-900 overflow-auto">
           {process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}
         </code>

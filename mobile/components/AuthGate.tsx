@@ -19,15 +19,15 @@
  * labelled button so the path-forward is explicit. Wiring the actual
  * onboarding flow is Phase 2.
  */
-import React, { type ReactNode } from 'react';
+import React, { type ReactNode } from "react";
 import {
   ActivityIndicator,
   Pressable,
   StyleSheet,
   Text,
   View,
-} from 'react-native';
-import { useAuth, type AuthState } from '../providers/AuthProvider';
+} from "react-native";
+import { useAuth, type AuthState } from "../providers/AuthProvider";
 
 export interface AuthGateProps {
   children: ReactNode;
@@ -39,12 +39,12 @@ export interface AuthGateProps {
 
 export function AuthGate({
   children,
-  promptTitle = 'Unlock to continue',
-  promptBody = 'IndigoPay requires a quick biometric check before showing this screen.',
+  promptTitle = "Unlock to continue",
+  promptBody = "IndigoPay requires a quick biometric check before showing this screen.",
 }: AuthGateProps) {
   const { isAuthenticated, isUnlocking, unlock, state } = useAuth();
 
-  if (state === 'unlocked' && isAuthenticated) return <>{children}</>;
+  if (state === "unlocked" && isAuthenticated) return <>{children}</>;
 
   return (
     <View
@@ -78,7 +78,7 @@ function FallbackContent({
   isUnlocking,
   onUnlock,
 }: FallbackContentProps) {
-  if (state === 'hydrating') {
+  if (state === "hydrating") {
     return (
       <>
         <ActivityIndicator color="#e8f1ea" />
@@ -89,17 +89,18 @@ function FallbackContent({
     );
   }
 
-  if (state === 'cleared') {
+  if (state === "cleared") {
     return (
       <>
         <Text style={styles.icon} accessibilityElementsHidden>
-          {'\ud83d\ude4b'}
+          {"\ud83d\ude4b"}
         </Text>
         <Text style={styles.title} accessibilityRole="header">
           Set up IndigoPay
         </Text>
         <Text style={styles.body}>
-          Tap below to connect a Stellar wallet and authorise your first donation.
+          Tap below to connect a Stellar wallet and authorise your first
+          donation.
         </Text>
         <Pressable
           accessibilityRole="button"
@@ -122,7 +123,7 @@ function FallbackContent({
   return (
     <>
       <Text style={styles.icon} accessibilityElementsHidden>
-        {'\ud83d\udd12'}
+        {"\ud83d\udd12"}
       </Text>
       <Text style={styles.title} accessibilityRole="header">
         {promptTitle}
@@ -158,8 +159,8 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
     paddingTop: 56,
-    alignItems: 'center',
-    backgroundColor: '#0a1410',
+    alignItems: "center",
+    backgroundColor: "#0a1410",
   },
   icon: {
     fontSize: 38,
@@ -167,26 +168,26 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: '700',
-    color: '#e8f1ea',
+    fontWeight: "700",
+    color: "#e8f1ea",
     marginBottom: 8,
-    textAlign: 'center',
+    textAlign: "center",
   },
   body: {
     fontSize: 14,
-    color: '#a8b8ac',
-    textAlign: 'center',
+    color: "#a8b8ac",
+    textAlign: "center",
     marginBottom: 24,
     lineHeight: 20,
   },
   button: {
-    backgroundColor: '#227239',
+    backgroundColor: "#227239",
     paddingHorizontal: 28,
     paddingVertical: 12,
     borderRadius: 8,
     minWidth: 160,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonBusy: {
     opacity: 0.7,
@@ -196,7 +197,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#ffffff',
+    fontWeight: "600",
+    color: "#ffffff",
   },
 });

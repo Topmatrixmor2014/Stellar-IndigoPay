@@ -61,7 +61,7 @@ components:
       description: Stellar public key.
       schema:
         type: string
-        pattern: '^G[A-Z0-9]{55}$'
+        pattern: "^G[A-Z0-9]{55}$"
     UpdateIdParam:
       name: updateId
       in: path
@@ -102,38 +102,38 @@ components:
       required: true
       schema:
         type: string
-        pattern: '^G[A-Z0-9]{55}$'
+        pattern: "^G[A-Z0-9]{55}$"
   responses:
     BadRequest:
       description: The request payload or query parameters are invalid.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
     Unauthorized:
       description: Authentication is required or the provided token is invalid.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
     Forbidden:
       description: The authenticated account is not allowed to perform this operation.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
     NotFound:
       description: The requested resource was not found.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
     InternalError:
       description: An unexpected server error occurred.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
   schemas:
     ErrorResponse:
       type: object
@@ -549,10 +549,21 @@ components:
           maxLength: 200
         category:
           type: string
-          enum: [Reforestation, Solar Energy, Ocean Conservation, Clean Water, Wildlife Protection, Carbon Capture, Wind Energy, Sustainable Agriculture, Other]
+          enum:
+            [
+              Reforestation,
+              Solar Energy,
+              Ocean Conservation,
+              Clean Water,
+              Wildlife Protection,
+              Carbon Capture,
+              Wind Energy,
+              Sustainable Agriculture,
+              Other,
+            ]
         wallet_address:
           type: string
-          pattern: '^G[A-Z0-9]{55}$'
+          pattern: "^G[A-Z0-9]{55}$"
         goal_xlm:
           type: number
           default: 0
@@ -599,7 +610,7 @@ components:
           format: uuid
         donorAddress:
           type: string
-          pattern: '^G[A-Z0-9]{55}$'
+          pattern: "^G[A-Z0-9]{55}$"
         amountXLM:
           type: number
           minimum: 0.0000001
@@ -613,14 +624,14 @@ components:
           maxLength: 100
         transactionHash:
           type: string
-          pattern: '^[a-fA-F0-9]{64}$'
+          pattern: "^[a-fA-F0-9]{64}$"
     CreateProfileRequest:
       type: object
       required: [publicKey]
       properties:
         publicKey:
           type: string
-          pattern: '^G[A-Z0-9]{55}$'
+          pattern: "^G[A-Z0-9]{55}$"
         displayName:
           type: string
           maxLength: 30
@@ -636,7 +647,7 @@ components:
           format: uuid
         donorAddress:
           type: string
-          pattern: '^G[A-Z0-9]{55}$'
+          pattern: "^G[A-Z0-9]{55}$"
         rating:
           type: integer
           minimum: 1
@@ -660,7 +671,7 @@ components:
       properties:
         donorAddress:
           type: string
-          pattern: '^G[A-Z0-9]{55}$'
+          pattern: "^G[A-Z0-9]{55}$"
     AdminLoginRequest:
       type: object
       required: [username, password]
@@ -718,7 +729,7 @@ components:
           enum: [ios, android]
         walletAddress:
           type: string
-          pattern: '^G[A-Z0-9]{55}$'
+          pattern: "^G[A-Z0-9]{55}$"
     NotificationFollowRequest:
       type: object
       required: [projectId, token]
@@ -730,7 +741,7 @@ components:
           type: string
         walletAddress:
           type: string
-          pattern: '^G[A-Z0-9]{55}$'
+          pattern: "^G[A-Z0-9]{55}$"
     NotificationUnfollowRequest:
       type: object
       required: [projectId, token]
@@ -746,7 +757,7 @@ components:
       properties:
         matcherAddress:
           type: string
-          pattern: '^G[A-Z0-9]{55}$'
+          pattern: "^G[A-Z0-9]{55}$"
         capXLM:
           type: number
           minimum: 0.0000001
@@ -763,7 +774,7 @@ paths:
       summary: Get featured project
       description: Returns the currently featured active project.
       responses:
-        '200':
+        "200":
           description: Featured project payload.
           content:
             application/json:
@@ -773,16 +784,16 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: '#/components/schemas/Project'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/Project"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/projects:
     get:
       tags: [Projects]
       summary: List projects
       parameters:
-        - $ref: '#/components/parameters/LimitQuery'
-        - $ref: '#/components/parameters/CursorQuery'
+        - $ref: "#/components/parameters/LimitQuery"
+        - $ref: "#/components/parameters/CursorQuery"
         - name: category
           in: query
           schema:
@@ -796,13 +807,13 @@ paths:
           in: query
           schema:
             type: string
-            enum: ['true']
+            enum: ["true"]
         - name: search
           in: query
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Paginated project list.
           content:
             application/json:
@@ -814,7 +825,7 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Project'
+                      $ref: "#/components/schemas/Project"
                   next_cursor:
                     type: string
                     nullable: true
@@ -828,9 +839,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateProjectRequest'
+              $ref: "#/components/schemas/CreateProjectRequest"
       responses:
-        '201':
+        "201":
           description: Project created.
           content:
             application/json:
@@ -840,17 +851,17 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: '#/components/schemas/Project'
-        '400':
-          $ref: '#/components/responses/BadRequest'
+                    $ref: "#/components/schemas/Project"
+        "400":
+          $ref: "#/components/responses/BadRequest"
   /api/projects/{id}/verify:
     get:
       tags: [Projects]
       summary: Verify a project on-chain
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
+        - $ref: "#/components/parameters/ProjectId"
       responses:
-        '200':
+        "200":
           description: On-chain verification status.
           content:
             application/json:
@@ -876,15 +887,15 @@ paths:
       tags: [Projects]
       summary: Create a campaign
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
+        - $ref: "#/components/parameters/ProjectId"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateCampaignRequest'
+              $ref: "#/components/schemas/CreateCampaignRequest"
       responses:
-        '201':
+        "201":
           description: Campaign created.
           content:
             application/json:
@@ -894,18 +905,18 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: '#/components/schemas/Campaign'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/Campaign"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
     get:
       tags: [Projects]
       summary: List campaigns for a project
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
+        - $ref: "#/components/parameters/ProjectId"
       responses:
-        '200':
+        "200":
           description: List of campaigns.
           content:
             application/json:
@@ -917,15 +928,15 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Campaign'
+                      $ref: "#/components/schemas/Campaign"
   /api/projects/{id}/milestones:
     get:
       tags: [Projects]
       summary: List project milestones
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
+        - $ref: "#/components/parameters/ProjectId"
       responses:
-        '200':
+        "200":
           description: Milestone list.
           content:
             application/json:
@@ -937,20 +948,20 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Milestone'
+                      $ref: "#/components/schemas/Milestone"
     post:
       tags: [Projects]
       summary: Create a milestone
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
+        - $ref: "#/components/parameters/ProjectId"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateMilestoneRequest'
+              $ref: "#/components/schemas/CreateMilestoneRequest"
       responses:
-        '201':
+        "201":
           description: Milestone created.
           content:
             application/json:
@@ -960,24 +971,24 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: '#/components/schemas/Milestone'
-        '400':
-          $ref: '#/components/responses/BadRequest'
+                    $ref: "#/components/schemas/Milestone"
+        "400":
+          $ref: "#/components/responses/BadRequest"
   /api/projects/{id}/milestones/{milestoneId}/reach:
     post:
       tags: [Projects]
       summary: Mark a milestone as reached
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
-        - $ref: '#/components/parameters/MilestoneId'
+        - $ref: "#/components/parameters/ProjectId"
+        - $ref: "#/components/parameters/MilestoneId"
       requestBody:
         required: false
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ReachMilestoneRequest'
+              $ref: "#/components/schemas/ReachMilestoneRequest"
       responses:
-        '200':
+        "200":
           description: Milestone updated.
           content:
             application/json:
@@ -987,9 +998,9 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: '#/components/schemas/Milestone'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/Milestone"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/projects/admin/register:
     post:
       tags: [Projects]
@@ -999,9 +1010,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AdminRegisterProjectRequest'
+              $ref: "#/components/schemas/AdminRegisterProjectRequest"
       responses:
-        '200':
+        "200":
           description: Registration transaction XDR returned.
           content:
             application/json:
@@ -1012,8 +1023,8 @@ paths:
                     type: boolean
                   xdr:
                     type: string
-        '500':
-          $ref: '#/components/responses/InternalError'
+        "500":
+          $ref: "#/components/responses/InternalError"
   /api/projects/admin/confirm:
     post:
       tags: [Projects]
@@ -1023,9 +1034,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AdminConfirmProjectRequest'
+              $ref: "#/components/schemas/AdminConfirmProjectRequest"
       responses:
-        '200':
+        "200":
           description: Project confirmation result.
           content:
             application/json:
@@ -1035,17 +1046,17 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: '#/components/schemas/Project'
-        '500':
-          $ref: '#/components/responses/InternalError'
+                    $ref: "#/components/schemas/Project"
+        "500":
+          $ref: "#/components/responses/InternalError"
   /api/projects/{id}:
     get:
       tags: [Projects]
       summary: Get a project by id
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
+        - $ref: "#/components/parameters/ProjectId"
       responses:
-        '200':
+        "200":
           description: Project details.
           content:
             application/json:
@@ -1055,15 +1066,15 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: '#/components/schemas/Project'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/Project"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/projects/{id}/generate-summary:
     post:
       tags: [Projects]
       summary: Enqueue a donor-facing AI summary
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
+        - $ref: "#/components/parameters/ProjectId"
       requestBody:
         required: true
         content:
@@ -1075,7 +1086,7 @@ paths:
                 adminAddress:
                   type: string
       responses:
-        '202':
+        "202":
           description: Summary generation queued.
           content:
             application/json:
@@ -1089,24 +1100,24 @@ paths:
                     properties:
                       status:
                         type: string
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/projects/{id}/matching:
     post:
       tags: [Projects]
       summary: Create a donation matching offer
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
+        - $ref: "#/components/parameters/ProjectId"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProjectMatchingRequest'
+              $ref: "#/components/schemas/ProjectMatchingRequest"
       responses:
-        '201':
+        "201":
           description: Matching offer created.
           content:
             application/json:
@@ -1116,16 +1127,16 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: '#/components/schemas/DonationMatch'
-        '400':
-          $ref: '#/components/responses/BadRequest'
+                    $ref: "#/components/schemas/DonationMatch"
+        "400":
+          $ref: "#/components/responses/BadRequest"
     get:
       tags: [Projects]
       summary: List active matching offers for a project
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
+        - $ref: "#/components/parameters/ProjectId"
       responses:
-        '200':
+        "200":
           description: Matching offers.
           content:
             application/json:
@@ -1137,21 +1148,21 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/DonationMatch'
+                      $ref: "#/components/schemas/DonationMatch"
   /api/projects/{id}/status:
     patch:
       tags: [Projects]
       summary: Update project status
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
+        - $ref: "#/components/parameters/ProjectId"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AdminStatusRequest'
+              $ref: "#/components/schemas/AdminStatusRequest"
       responses:
-        '200':
+        "200":
           description: Project status updated.
           content:
             application/json:
@@ -1161,11 +1172,11 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: '#/components/schemas/Project'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/Project"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/donations:
     post:
       tags: [Donations]
@@ -1176,9 +1187,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateDonationRequest'
+              $ref: "#/components/schemas/CreateDonationRequest"
       responses:
-        '201':
+        "201":
           description: Donation recorded.
           content:
             application/json:
@@ -1188,17 +1199,17 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: '#/components/schemas/Donation'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/Donation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/donations/project/{projectId}/messages:
     get:
       tags: [Donations]
       summary: List donation messages for a project
       parameters:
-        - $ref: '#/components/parameters/ProjectIdParam'
+        - $ref: "#/components/parameters/ProjectIdParam"
         - name: limit
           in: query
           schema:
@@ -1207,7 +1218,7 @@ paths:
             maximum: 50
             default: 10
       responses:
-        '200':
+        "200":
           description: Donation messages.
           content:
             application/json:
@@ -1219,13 +1230,13 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Donation'
+                      $ref: "#/components/schemas/Donation"
   /api/donations/project/{projectId}:
     get:
       tags: [Donations]
       summary: List donations for a project
       parameters:
-        - $ref: '#/components/parameters/ProjectIdParam'
+        - $ref: "#/components/parameters/ProjectIdParam"
         - name: limit
           in: query
           schema:
@@ -1238,7 +1249,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Project donation history.
           content:
             application/json:
@@ -1250,7 +1261,7 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Donation'
+                      $ref: "#/components/schemas/Donation"
                   nextCursor:
                     type: string
                     nullable: true
@@ -1259,9 +1270,9 @@ paths:
       tags: [Donations]
       summary: List donations by donor
       parameters:
-        - $ref: '#/components/parameters/PublicKeyParam'
+        - $ref: "#/components/parameters/PublicKeyParam"
       responses:
-        '200':
+        "200":
           description: Donor donation history.
           content:
             application/json:
@@ -1273,17 +1284,17 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Donation'
-        '400':
-          $ref: '#/components/responses/BadRequest'
+                      $ref: "#/components/schemas/Donation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
   /api/profiles/{publicKey}:
     get:
       tags: [Profiles]
       summary: Get a profile by public key
       parameters:
-        - $ref: '#/components/parameters/PublicKeyParam'
+        - $ref: "#/components/parameters/PublicKeyParam"
       responses:
-        '200':
+        "200":
           description: Profile data.
           content:
             application/json:
@@ -1293,11 +1304,11 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: '#/components/schemas/Profile'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/Profile"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/profiles:
     post:
       tags: [Profiles]
@@ -1308,9 +1319,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateProfileRequest'
+              $ref: "#/components/schemas/CreateProfileRequest"
       responses:
-        '200':
+        "200":
           description: Profile upserted.
           content:
             application/json:
@@ -1320,18 +1331,18 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: '#/components/schemas/Profile'
-        '400':
-          $ref: '#/components/responses/BadRequest'
+                    $ref: "#/components/schemas/Profile"
+        "400":
+          $ref: "#/components/responses/BadRequest"
   /api/leaderboard:
     get:
       tags: [Leaderboard]
       summary: Get the donation leaderboard
       parameters:
-        - $ref: '#/components/parameters/LimitQuery'
-        - $ref: '#/components/parameters/PeriodQuery'
+        - $ref: "#/components/parameters/LimitQuery"
+        - $ref: "#/components/parameters/PeriodQuery"
       responses:
-        '200':
+        "200":
           description: Leaderboard entries.
           content:
             application/json:
@@ -1343,7 +1354,7 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/LeaderboardEntry'
+                      $ref: "#/components/schemas/LeaderboardEntry"
   /api/notifications/register:
     post:
       tags: [Notifications]
@@ -1354,9 +1365,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NotificationRegisterRequest'
+              $ref: "#/components/schemas/NotificationRegisterRequest"
       responses:
-        '200':
+        "200":
           description: Token registered or updated.
           content:
             application/json:
@@ -1370,8 +1381,8 @@ paths:
                     properties:
                       tokenId:
                         type: string
-        '400':
-          $ref: '#/components/responses/BadRequest'
+        "400":
+          $ref: "#/components/responses/BadRequest"
   /api/notifications/follow:
     post:
       tags: [Notifications]
@@ -1382,9 +1393,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NotificationFollowRequest'
+              $ref: "#/components/schemas/NotificationFollowRequest"
       responses:
-        '201':
+        "201":
           description: Follow relationship created.
           content:
             application/json:
@@ -1394,11 +1405,11 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: '#/components/schemas/NotificationFollow'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/NotificationFollow"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/notifications/unfollow:
     post:
       tags: [Notifications]
@@ -1409,9 +1420,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NotificationUnfollowRequest'
+              $ref: "#/components/schemas/NotificationUnfollowRequest"
       responses:
-        '200':
+        "200":
           description: Unfollow result.
           content:
             application/json:
@@ -1434,7 +1445,7 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Followed projects.
           content:
             application/json:
@@ -1446,11 +1457,11 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/FollowedProject'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                      $ref: "#/components/schemas/FollowedProject"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/ratings:
     post:
       tags: [Ratings]
@@ -1461,9 +1472,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateRatingRequest'
+              $ref: "#/components/schemas/CreateRatingRequest"
       responses:
-        '201':
+        "201":
           description: Rating stored.
           content:
             application/json:
@@ -1473,17 +1484,17 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: '#/components/schemas/Rating'
-        '400':
-          $ref: '#/components/responses/BadRequest'
+                    $ref: "#/components/schemas/Rating"
+        "400":
+          $ref: "#/components/responses/BadRequest"
   /api/ratings/pending:
     get:
       tags: [Ratings]
       summary: Get a pending rating candidate for a donor
       parameters:
-        - $ref: '#/components/parameters/DonorAddressQuery'
+        - $ref: "#/components/parameters/DonorAddressQuery"
       responses:
-        '200':
+        "200":
           description: Pending rating candidate.
           content:
             application/json:
@@ -1511,9 +1522,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateUpdateRequest'
+              $ref: "#/components/schemas/CreateUpdateRequest"
       responses:
-        '201':
+        "201":
           description: Update created.
           content:
             application/json:
@@ -1523,28 +1534,28 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: '#/components/schemas/ProjectUpdate'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/ProjectUpdate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/updates/{updateId}/like:
     post:
       tags: [Updates]
       summary: Toggle a like for a project update
       security: []
       parameters:
-        - $ref: '#/components/parameters/UpdateIdParam'
+        - $ref: "#/components/parameters/UpdateIdParam"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LikeUpdateRequest'
+              $ref: "#/components/schemas/LikeUpdateRequest"
       responses:
-        '200':
+        "200":
           description: Like state updated.
           content:
             application/json:
@@ -1560,23 +1571,23 @@ paths:
                         type: boolean
                       likeCount:
                         type: integer
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/updates/{updateId}/likes:
     get:
       tags: [Updates]
       summary: Get like count and current user's like status
       parameters:
-        - $ref: '#/components/parameters/UpdateIdParam'
+        - $ref: "#/components/parameters/UpdateIdParam"
         - name: donorAddress
           in: query
           schema:
             type: string
-            pattern: '^G[A-Z0-9]{55}$'
+            pattern: "^G[A-Z0-9]{55}$"
       responses:
-        '200':
+        "200":
           description: Like status payload.
           content:
             application/json:
@@ -1597,7 +1608,7 @@ paths:
       tags: [Jobs]
       summary: List recent jobs
       responses:
-        '200':
+        "200":
           description: Job list.
           content:
             application/json:
@@ -1609,13 +1620,13 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Job'
+                      $ref: "#/components/schemas/Job"
   /api/jobs/{id}/release:
     patch:
       tags: [Jobs]
       summary: Release escrow for a job
       parameters:
-        - $ref: '#/components/parameters/JobId'
+        - $ref: "#/components/parameters/JobId"
       requestBody:
         required: true
         content:
@@ -1626,9 +1637,9 @@ paths:
               properties:
                 releaseTransactionHash:
                   type: string
-                  pattern: '^[a-fA-F0-9]{64}$'
+                  pattern: "^[a-fA-F0-9]{64}$"
       responses:
-        '200':
+        "200":
           description: Job updated.
           content:
             application/json:
@@ -1638,19 +1649,19 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: '#/components/schemas/Job'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/Job"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/jobs/{id}:
     get:
       tags: [Jobs]
       summary: Get a job by id
       parameters:
-        - $ref: '#/components/parameters/JobId'
+        - $ref: "#/components/parameters/JobId"
       responses:
-        '200':
+        "200":
           description: Job details.
           content:
             application/json:
@@ -1660,15 +1671,15 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: '#/components/schemas/Job'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/Job"
+        "404":
+          $ref: "#/components/responses/NotFound"
   /api/stats/global:
     get:
       tags: [Stats]
       summary: Get global platform stats
       responses:
-        '200':
+        "200":
           description: Platform totals.
           content:
             application/json:
@@ -1678,13 +1689,13 @@ paths:
                   success:
                     type: boolean
                   data:
-                    $ref: '#/components/schemas/StatsGlobal'
+                    $ref: "#/components/schemas/StatsGlobal"
   /api/stats/categories:
     get:
       tags: [Stats]
       summary: Get project counts by category
       responses:
-        '200':
+        "200":
           description: Category counts.
           content:
             application/json:
@@ -1696,7 +1707,7 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/CategoryStat'
+                      $ref: "#/components/schemas/CategoryStat"
   /api/admin/login:
     post:
       tags: [Admin]
@@ -1707,16 +1718,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AdminLoginRequest'
+              $ref: "#/components/schemas/AdminLoginRequest"
       responses:
-        '200':
+        "200":
           description: Admin authentication tokens.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AdminLoginResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                $ref: "#/components/schemas/AdminLoginResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
   /api/admin/refresh:
     post:
       tags: [Admin]
@@ -1727,29 +1738,29 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AdminRefreshRequest'
+              $ref: "#/components/schemas/AdminRefreshRequest"
       responses:
-        '200':
+        "200":
           description: Refreshed admin token.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AdminRefreshResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                $ref: "#/components/schemas/AdminRefreshResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
   /api/admin/me:
     get:
       tags: [Admin]
       summary: Get current admin identity
       responses:
-        '200':
+        "200":
           description: Current admin identity.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AdminMeResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                $ref: "#/components/schemas/AdminMeResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
   /api/admin/audit-log:
     get:
       tags: [Admin]
@@ -1777,11 +1788,11 @@ paths:
             maximum: 200
             default: 50
       responses:
-        '200':
+        "200":
           description: Audit log page.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AdminAuditLogResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                $ref: "#/components/schemas/AdminAuditLogResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"

@@ -125,7 +125,10 @@ describe("ApplyPage", () => {
     const user = userEvent.setup();
 
     await user.type(screen.getByLabelText("apply.orgName *"), "Acme Climate");
-    await user.type(screen.getByLabelText("apply.contactEmail *"), "hello@acme.org");
+    await user.type(
+      screen.getByLabelText("apply.contactEmail *"),
+      "hello@acme.org",
+    );
     await user.type(
       screen.getByLabelText("apply.walletAddress *"),
       "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF",
@@ -135,15 +138,15 @@ describe("ApplyPage", () => {
     // Project step
     expect(screen.getByText("apply.stepProject")).toBeTruthy();
     await user.type(screen.getByLabelText("apply.projectName *"), "Acme Solar");
-    await user.type(screen.getByLabelText("apply.projectLocation *"), "Nairobi");
+    await user.type(
+      screen.getByLabelText("apply.projectLocation *"),
+      "Nairobi",
+    );
     await user.click(screen.getByRole("button", { name: /common\.next/ }));
 
     // Impact step
     expect(screen.getByText("apply.stepImpact")).toBeTruthy();
-    await user.type(
-      screen.getByLabelText("apply.co2PerXLM *"),
-      "0.05",
-    );
+    await user.type(screen.getByLabelText("apply.co2PerXLM *"), "0.05");
     await user.click(screen.getByRole("button", { name: /common\.next/ }));
 
     // Documents step — skip uploading, just go next
@@ -181,14 +184,20 @@ describe("ApplyPage", () => {
 
     // Forward to Documents step.
     await user.type(screen.getByLabelText("apply.orgName *"), "Acme Climate");
-    await user.type(screen.getByLabelText("apply.contactEmail *"), "hello@acme.org");
+    await user.type(
+      screen.getByLabelText("apply.contactEmail *"),
+      "hello@acme.org",
+    );
     await user.type(
       screen.getByLabelText("apply.walletAddress *"),
       "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF",
     );
     await user.click(screen.getByRole("button", { name: /common\.next/ }));
     await user.type(screen.getByLabelText("apply.projectName *"), "Acme Solar");
-    await user.type(screen.getByLabelText("apply.projectLocation *"), "Nairobi");
+    await user.type(
+      screen.getByLabelText("apply.projectLocation *"),
+      "Nairobi",
+    );
     await user.click(screen.getByRole("button", { name: /common\.next/ }));
     await user.type(screen.getByLabelText("apply.co2PerXLM *"), "0.05");
     await user.click(screen.getByRole("button", { name: /common\.next/ }));
@@ -216,14 +225,20 @@ describe("ApplyPage", () => {
     const user = userEvent.setup();
 
     await user.type(screen.getByLabelText("apply.orgName *"), "Acme Climate");
-    await user.type(screen.getByLabelText("apply.contactEmail *"), "hello@acme.org");
+    await user.type(
+      screen.getByLabelText("apply.contactEmail *"),
+      "hello@acme.org",
+    );
     await user.type(
       screen.getByLabelText("apply.walletAddress *"),
       "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF",
     );
     await user.click(screen.getByRole("button", { name: /common\.next/ }));
     await user.type(screen.getByLabelText("apply.projectName *"), "Acme Solar");
-    await user.type(screen.getByLabelText("apply.projectLocation *"), "Nairobi");
+    await user.type(
+      screen.getByLabelText("apply.projectLocation *"),
+      "Nairobi",
+    );
     await user.click(screen.getByRole("button", { name: /common\.next/ }));
     await user.type(screen.getByLabelText("apply.co2PerXLM *"), "0.05");
     await user.click(screen.getByRole("button", { name: /common\.next/ }));

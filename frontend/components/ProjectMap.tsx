@@ -42,9 +42,9 @@ const DEFAULT_ICON = L.divIcon({
       <circle cx="12" cy="12" r="5" fill="#ffffff" opacity="0.9"/>
     </svg>
   `,
-  iconSize:   [24, 36],
+  iconSize: [24, 36],
   iconAnchor: [12, 36],
-  popupAnchor:[0,  -38],
+  popupAnchor: [0, -38],
 });
 
 // Patch the prototype so every Marker in this page gets the custom icon
@@ -66,10 +66,12 @@ export default function ProjectMap({ projects }: ProjectMapProps) {
   useEffect(() => {
     // Only import once; subsequent HMR reloads skip this because the link
     // element already exists in the document head.
-    if (typeof document !== "undefined" &&
-        !document.head.querySelector('link[href*="leaflet"]')) {
+    if (
+      typeof document !== "undefined" &&
+      !document.head.querySelector('link[href*="leaflet"]')
+    ) {
       const link = document.createElement("link");
-      link.rel  = "stylesheet";
+      link.rel = "stylesheet";
       link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
       link.integrity = "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=";
       link.crossOrigin = "anonymous";
@@ -87,7 +89,10 @@ export default function ProjectMap({ projects }: ProjectMapProps) {
       zoomControl={false}
       className="h-full w-full"
       // Restrict panning so users can't scroll past the poles
-      maxBounds={[[-90, -180], [90, 180]]}
+      maxBounds={[
+        [-90, -180],
+        [90, 180],
+      ]}
       maxBoundsViscosity={1.0}
       aria-label="World map of active climate projects"
     >
@@ -103,7 +108,7 @@ export default function ProjectMap({ projects }: ProjectMapProps) {
 
       {/* Project markers */}
       {projects.map((project) => {
-        const base     = geocodeLocation(project.location);
+        const base = geocodeLocation(project.location);
         const position = jitterCoords(base, project.id);
         return (
           <ProjectMapMarker

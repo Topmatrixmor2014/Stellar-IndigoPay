@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 
 export function useAutocomplete<T>(
   fetcher: (query: string) => Promise<T[]>,
-  delay: number = 300
+  delay: number = 300,
 ) {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [results, setResults] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -24,7 +24,7 @@ export function useAutocomplete<T>(
         setResults(data);
         setIsOpen(data.length > 0);
       } catch (error) {
-        console.error('Autocomplete fetch error:', error);
+        console.error("Autocomplete fetch error:", error);
       } finally {
         setLoading(false);
       }
@@ -36,17 +36,17 @@ export function useAutocomplete<T>(
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isOpen) return;
 
-    if (e.key === 'ArrowDown') {
+    if (e.key === "ArrowDown") {
       e.preventDefault();
-      setActiveIndex(prev => (prev < results.length - 1 ? prev + 1 : prev));
-    } else if (e.key === 'ArrowUp') {
+      setActiveIndex((prev) => (prev < results.length - 1 ? prev + 1 : prev));
+    } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setActiveIndex(prev => (prev > 0 ? prev - 1 : prev));
-    } else if (e.key === 'Enter') {
+      setActiveIndex((prev) => (prev > 0 ? prev - 1 : prev));
+    } else if (e.key === "Enter") {
       if (activeIndex >= 0 && activeIndex < results.length) {
         // This will be handled by the component using this hook
       }
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       setIsOpen(false);
     }
   };
@@ -60,6 +60,6 @@ export function useAutocomplete<T>(
     setIsOpen,
     activeIndex,
     setActiveIndex,
-    handleKeyDown
+    handleKeyDown,
   };
 }

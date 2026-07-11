@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 export default function WorldMap() {
   // Hardcoded locations for visual demonstration
@@ -14,34 +14,91 @@ export default function WorldMap() {
 
   return (
     <div className="w-full flex flex-col items-center py-4 relative group">
-      <p className="text-sm text-[#4F46E5] dark:text-[#818CF8] mb-4 font-medium">Active project regions</p>
-      
-      <svg 
-        viewBox="0 0 1000 500" 
-        className="w-full max-w-4xl drop-shadow-md" 
-        fill="none" 
+      <p className="text-sm text-[#4F46E5] dark:text-[#818CF8] mb-4 font-medium">
+        Active project regions
+      </p>
+
+      <svg
+        viewBox="0 0 1000 500"
+        className="w-full max-w-4xl drop-shadow-md"
+        fill="none"
         stroke="currentColor"
       >
         {/* Simple stylized world map paths */}
         {/* North America */}
-        <path d="M 120 100 Q 150 40 250 80 T 300 150 T 250 200 T 150 180 Z" fill="#D4D8FF" stroke="#818CF8" strokeWidth="2" className="transition-colors hover:fill-[#C7D2FE]" />
+        <path
+          d="M 120 100 Q 150 40 250 80 T 300 150 T 250 200 T 150 180 Z"
+          fill="#D4D8FF"
+          stroke="#818CF8"
+          strokeWidth="2"
+          className="transition-colors hover:fill-[#C7D2FE]"
+        />
         {/* South America */}
-        <path d="M 230 200 Q 300 200 320 280 Q 300 400 280 420 Q 250 350 220 250 Z" fill="#D4D8FF" stroke="#818CF8" strokeWidth="2" className="transition-colors hover:fill-[#C7D2FE]" />
+        <path
+          d="M 230 200 Q 300 200 320 280 Q 300 400 280 420 Q 250 350 220 250 Z"
+          fill="#D4D8FF"
+          stroke="#818CF8"
+          strokeWidth="2"
+          className="transition-colors hover:fill-[#C7D2FE]"
+        />
         {/* Europe */}
-        <path d="M 400 80 Q 480 50 520 80 T 500 150 Q 450 160 420 140 Z" fill="#D4D8FF" stroke="#818CF8" strokeWidth="2" className="transition-colors hover:fill-[#C7D2FE]" />
+        <path
+          d="M 400 80 Q 480 50 520 80 T 500 150 Q 450 160 420 140 Z"
+          fill="#D4D8FF"
+          stroke="#818CF8"
+          strokeWidth="2"
+          className="transition-colors hover:fill-[#C7D2FE]"
+        />
         {/* Africa */}
-        <path d="M 440 160 Q 550 150 580 220 Q 550 350 520 360 Q 480 300 460 250 Z" fill="#D4D8FF" stroke="#818CF8" strokeWidth="2" className="transition-colors hover:fill-[#C7D2FE]" />
+        <path
+          d="M 440 160 Q 550 150 580 220 Q 550 350 520 360 Q 480 300 460 250 Z"
+          fill="#D4D8FF"
+          stroke="#818CF8"
+          strokeWidth="2"
+          className="transition-colors hover:fill-[#C7D2FE]"
+        />
         {/* Asia */}
-        <path d="M 500 80 Q 600 40 750 60 T 800 150 Q 750 220 650 200 Q 550 180 520 120 Z" fill="#D4D8FF" stroke="#818CF8" strokeWidth="2" className="transition-colors hover:fill-[#C7D2FE]" />
+        <path
+          d="M 500 80 Q 600 40 750 60 T 800 150 Q 750 220 650 200 Q 550 180 520 120 Z"
+          fill="#D4D8FF"
+          stroke="#818CF8"
+          strokeWidth="2"
+          className="transition-colors hover:fill-[#C7D2FE]"
+        />
         {/* Australia */}
-        <path d="M 750 250 Q 820 230 850 280 Q 820 330 780 320 Z" fill="#D4D8FF" stroke="#818CF8" strokeWidth="2" className="transition-colors hover:fill-[#C7D2FE]" />
-        
+        <path
+          d="M 750 250 Q 820 230 850 280 Q 820 330 780 320 Z"
+          fill="#D4D8FF"
+          stroke="#818CF8"
+          strokeWidth="2"
+          className="transition-colors hover:fill-[#C7D2FE]"
+        />
+
         {/* Pulsing Dots for Projects */}
         {locations.map((loc, i) => (
           <g key={i}>
-            <circle cx={loc.cx} cy={loc.cy} r="16" fill="#4F46E5" className="opacity-20 animate-ping" />
-            <circle cx={loc.cx} cy={loc.cy} r="6" fill="#4F46E5" className="shadow-lg" />
-            <text x={loc.cx} y={loc.cy - 15} className="text-xs fill-[#4338CA] dark:fill-[#C7D2FE] font-bold opacity-0 transition-opacity duration-300" textAnchor="middle">{loc.name}</text>
+            <circle
+              cx={loc.cx}
+              cy={loc.cy}
+              r="16"
+              fill="#4F46E5"
+              className="opacity-20 animate-ping"
+            />
+            <circle
+              cx={loc.cx}
+              cy={loc.cy}
+              r="6"
+              fill="#4F46E5"
+              className="shadow-lg"
+            />
+            <text
+              x={loc.cx}
+              y={loc.cy - 15}
+              className="text-xs fill-[#4338CA] dark:fill-[#C7D2FE] font-bold opacity-0 transition-opacity duration-300"
+              textAnchor="middle"
+            >
+              {loc.name}
+            </text>
           </g>
         ))}
       </svg>

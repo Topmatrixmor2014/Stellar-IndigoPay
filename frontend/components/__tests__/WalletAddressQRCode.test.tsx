@@ -63,7 +63,7 @@ describe("buildSep0007Uri", () => {
 describe("WalletAddressQRCode", () => {
   it("renders the toggle button collapsed by default", () => {
     render(
-      <WalletAddressQRCode walletAddress={WALLET} projectName={PROJECT_NAME} />
+      <WalletAddressQRCode walletAddress={WALLET} projectName={PROJECT_NAME} />,
     );
     const btn = screen.getByRole("button", { name: /scan to donate/i });
     expect(btn).toBeInTheDocument();
@@ -72,7 +72,7 @@ describe("WalletAddressQRCode", () => {
 
   it("does not show the QR canvas or wallet address before expanding", () => {
     render(
-      <WalletAddressQRCode walletAddress={WALLET} projectName={PROJECT_NAME} />
+      <WalletAddressQRCode walletAddress={WALLET} projectName={PROJECT_NAME} />,
     );
     expect(screen.queryByTestId("qr-canvas")).not.toBeInTheDocument();
     expect(screen.queryByText(WALLET)).not.toBeInTheDocument();
@@ -80,7 +80,7 @@ describe("WalletAddressQRCode", () => {
 
   it("expands the panel and shows the QR canvas when the button is clicked", () => {
     render(
-      <WalletAddressQRCode walletAddress={WALLET} projectName={PROJECT_NAME} />
+      <WalletAddressQRCode walletAddress={WALLET} projectName={PROJECT_NAME} />,
     );
     fireEvent.click(screen.getByRole("button", { name: /scan to donate/i }));
 
@@ -89,7 +89,7 @@ describe("WalletAddressQRCode", () => {
 
   it("shows the wallet address text when expanded", () => {
     render(
-      <WalletAddressQRCode walletAddress={WALLET} projectName={PROJECT_NAME} />
+      <WalletAddressQRCode walletAddress={WALLET} projectName={PROJECT_NAME} />,
     );
     fireEvent.click(screen.getByRole("button", { name: /scan to donate/i }));
 
@@ -98,7 +98,7 @@ describe("WalletAddressQRCode", () => {
 
   it("sets aria-expanded=true after expanding", () => {
     render(
-      <WalletAddressQRCode walletAddress={WALLET} projectName={PROJECT_NAME} />
+      <WalletAddressQRCode walletAddress={WALLET} projectName={PROJECT_NAME} />,
     );
     const btn = screen.getByRole("button", { name: /scan to donate/i });
     fireEvent.click(btn);
@@ -108,7 +108,7 @@ describe("WalletAddressQRCode", () => {
 
   it("collapses the panel again when the button is clicked a second time", () => {
     render(
-      <WalletAddressQRCode walletAddress={WALLET} projectName={PROJECT_NAME} />
+      <WalletAddressQRCode walletAddress={WALLET} projectName={PROJECT_NAME} />,
     );
     const btn = screen.getByRole("button");
     fireEvent.click(btn); // expand
@@ -120,7 +120,7 @@ describe("WalletAddressQRCode", () => {
 
   it("passes a valid SEP-0007 URI as the QR value", () => {
     render(
-      <WalletAddressQRCode walletAddress={WALLET} projectName={PROJECT_NAME} />
+      <WalletAddressQRCode walletAddress={WALLET} projectName={PROJECT_NAME} />,
     );
     fireEvent.click(screen.getByRole("button", { name: /scan to donate/i }));
 
@@ -132,7 +132,7 @@ describe("WalletAddressQRCode", () => {
 
   it("renders an accessible region with a descriptive aria-label when expanded", () => {
     render(
-      <WalletAddressQRCode walletAddress={WALLET} projectName={PROJECT_NAME} />
+      <WalletAddressQRCode walletAddress={WALLET} projectName={PROJECT_NAME} />,
     );
     fireEvent.click(screen.getByRole("button", { name: /scan to donate/i }));
 

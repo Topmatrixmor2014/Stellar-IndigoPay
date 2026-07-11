@@ -6,7 +6,7 @@
  * QR format expected: a Stellar public key (G…) or a deep-link of the form
  *   indigopay://donate?wallet=G...&project=<projectId>
  */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -14,20 +14,22 @@ import {
   TouchableOpacity,
   Linking,
   Platform,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+} from "react-native";
+import { useRouter } from "expo-router";
+import { CameraView, useCameraPermissions } from "expo-camera";
 
 const STELLAR_KEY_RE = /^G[A-Z2-7]{55}$/;
-const DEEP_LINK_RE   = /indigopay:\/\/donate\?(.+)/;
+const DEEP_LINK_RE = /indigopay:\/\/donate\?(.+)/;
 
-function parseScan(data: string): { wallet: string; projectId?: string } | null {
+function parseScan(
+  data: string,
+): { wallet: string; projectId?: string } | null {
   const deepMatch = data.match(DEEP_LINK_RE);
   if (deepMatch) {
     const params = new URLSearchParams(deepMatch[1]);
-    const wallet = params.get('wallet') ?? '';
+    const wallet = params.get("wallet") ?? "";
     if (STELLAR_KEY_RE.test(wallet)) {
-      return { wallet, projectId: params.get('project') ?? undefined };
+      return { wallet, projectId: params.get("project") ?? undefined };
     }
     return null;
   }
@@ -56,7 +58,7 @@ export default function ScanScreen() {
 
     const parsed = parseScan(data);
     if (!parsed) {
-      setError('QR code is not a valid IndigoPay wallet address. Try again.');
+      setError("QR code is not a valid IndigoPay wallet address. Try again.");
       setTimeout(() => {
         setError(null);
         cooldown.current = false;
@@ -86,11 +88,13 @@ export default function ScanScreen() {
   if (!permission.granted) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.message}>Camera access is required to scan QR codes.</Text>
+        <Text style={styles.message}>
+          Camera access is required to scan QR codes.
+        </Text>
         <TouchableOpacity style={styles.button} onPress={requestPermission}>
           <Text style={styles.buttonText}>Grant Permission</Text>
         </TouchableOpacity>
-        {Platform.OS !== 'web' && (
+        {Platform.OS !== "web" && (
           <TouchableOpacity
             style={[styles.button, styles.buttonSecondary]}
             onPress={() => Linking.openSettings()}
@@ -108,7 +112,7 @@ export default function ScanScreen() {
         style={StyleSheet.absoluteFillObject}
         facing="back"
         onBarcodeScanned={scanned ? undefined : handleBarcode}
-        barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
+        barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
       />
 
       {/* Viewfinder overlay */}
@@ -128,7 +132,9 @@ export default function ScanScreen() {
           {error ? (
             <Text style={styles.errorText}>{error}</Text>
           ) : scanned ? (
-            <Text style={styles.successText}>QR scanned — opening donation screen…</Text>
+            <Text style={styles.successText}>
+              QR scanned — opening donation screen…
+            </Text>
           ) : (
             <Text style={styles.hint}>
               Point the camera at a project wallet QR code
@@ -138,7 +144,10 @@ export default function ScanScreen() {
           {scanned && (
             <TouchableOpacity
               style={[styles.button, { marginTop: 16 }]}
-              onPress={() => { setScanned(false); cooldown.current = false; }}
+              onPress={() => {
+                setScanned(false);
+                cooldown.current = false;
+              }}
             >
               <Text style={styles.buttonText}>Scan Again</Text>
             </TouchableOpacity>
@@ -155,51 +164,51 @@ const BORDER = 3;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
   },
   centered: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 24,
-    backgroundColor: '#f0f7f0',
+    backgroundColor: "#f0f7f0",
   },
   message: {
     fontSize: 16,
-    color: '#1a2e1a',
-    textAlign: 'center',
+    color: "#1a2e1a",
+    textAlign: "center",
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#227239',
+    backgroundColor: "#227239",
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 10,
     marginTop: 8,
   },
   buttonSecondary: {
-    backgroundColor: '#5a7a5a',
+    backgroundColor: "#5a7a5a",
   },
   buttonText: {
-    color: '#fff',
-    fontWeight: '700',
+    color: "#fff",
+    fontWeight: "700",
     fontSize: 15,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    flexDirection: 'column',
+    flexDirection: "column",
   },
   topOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.55)',
+    backgroundColor: "rgba(0,0,0,0.55)",
   },
   middleRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     height: 260,
   },
   sideOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.55)',
+    backgroundColor: "rgba(0,0,0,0.55)",
   },
   viewfinder: {
     width: 260,
@@ -207,31 +216,31 @@ const styles = StyleSheet.create({
   },
   bottomOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.55)',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.55)",
+    alignItems: "center",
     paddingTop: 20,
     paddingHorizontal: 24,
   },
   hint: {
-    color: '#c8e6c9',
+    color: "#c8e6c9",
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
   },
   errorText: {
-    color: '#ff8a80',
+    color: "#ff8a80",
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
   },
   successText: {
-    color: '#a5d6a7',
+    color: "#a5d6a7",
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
   },
   corner: {
-    position: 'absolute',
+    position: "absolute",
     width: CORNER,
     height: CORNER,
-    borderColor: '#4caf50',
+    borderColor: "#4caf50",
   },
   topLeft: {
     top: 0,

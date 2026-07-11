@@ -5,14 +5,29 @@
 import { useEffect, useState, useCallback } from "react";
 import Head from "next/head";
 import {
-  CONTRACT_ID, NETWORK_PASSPHRASE, rpcServer, server,
-  getDonorStats, submitTransaction, formatTransactionError,
+  CONTRACT_ID,
+  NETWORK_PASSPHRASE,
+  rpcServer,
+  server,
+  getDonorStats,
+  submitTransaction,
+  formatTransactionError,
 } from "@/lib/stellar";
-import { getConnectedPublicKey, connectWallet, signTransactionWithWallet } from "@/lib/wallet";
+import {
+  getConnectedPublicKey,
+  connectWallet,
+  signTransactionWithWallet,
+} from "@/lib/wallet";
 import { fetchProjects } from "@/lib/api";
 import { shortenAddress } from "@/utils/format";
 import {
-  Contract, TransactionBuilder, Address, nativeToScVal, rpc, scValToNative, Account,
+  Contract,
+  TransactionBuilder,
+  Address,
+  nativeToScVal,
+  rpc,
+  scValToNative,
+  Account,
 } from "@stellar/stellar-sdk";
 
 // Stellat ledger ≈ 5 s — approximate deadline display from ledger offset.
@@ -29,18 +44,25 @@ interface Proposal {
   currentLedger: number;
 }
 
-async function fetchProposal(projectId: string, currentLedger: number): Promise<Proposal | null> {
+async function fetchProposal(
+  projectId: string,
+  currentLedger: number,
+): Promise<Proposal | null> {
   try {
     const contract = new Contract(CONTRACT_ID);
     const dummyAccount = new Account(
-      "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF", "-1",
+      "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF",
+      "-1",
     );
     const tx = new TransactionBuilder(dummyAccount, {
       fee: "100",
       networkPassphrase: NETWORK_PASSPHRASE,
     })
       .addOperation(
-        contract.call("get_proposal", nativeToScVal(projectId, { type: "string" })),
+        contract.call(
+          "get_proposal",
+          nativeToScVal(projectId, { type: "string" }),
+        ),
       )
       .setTimeout(30)
       .build();
@@ -70,7 +92,11 @@ async function fetchProposal(projectId: string, currentLedger: number): Promise<
   }
 }
 
-async function buildVoteTransaction(voter: string, projectId: string, approve: boolean) {
+async function buildVoteTransaction(
+  voter: string,
+  projectId: string,
+  approve: boolean,
+) {
   const contract = new Contract(CONTRACT_ID);
   const source = await server.loadAccount(voter);
   const tx = new TransactionBuilder(source, {
@@ -120,20 +146,27 @@ export default function GovernancePage() {
       const currentLedger = statusResult.sequence;
 
       const settled = await Promise.allSettled(
-        projects.map((p) => fetchProposal(p.id, currentLedger).then((proposal) => {
-          if (proposal) proposal.projectName = p.name;
-          return proposal;
-        })),
+        projects.map((p) =>
+          fetchProposal(p.id, currentLedger).then((proposal) => {
+            if (proposal) proposal.projectName = p.name;
+            return proposal;
+          }),
+        ),
       );
 
       const active = settled
-        .filter((r): r is PromiseFulfilledResult<Proposal> => r.status === "fulfilled" && r.value !== null)
+        .filter(
+          (r): r is PromiseFulfilledResult<Proposal> =>
+            r.status === "fulfilled" && r.value !== null,
+        )
         .map((r) => r.value)
         .filter((p) => !p.resolved && p.deadlineLedger > currentLedger);
 
       setProposals(active);
     } catch (err) {
-      setError("Failed to load proposals. Make sure the Soroban RPC is reachable.");
+      setError(
+        "Failed to load proposals. Make sure the Soroban RPC is reachable.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -150,7 +183,8 @@ export default function GovernancePage() {
       if (pk) {
         try {
           const stats = await getDonorStats(pk);
-          if (mounted && stats && stats.badge !== "None") setIsBadgeHolder(true);
+          if (mounted && stats && stats.badge !== "None")
+            setIsBadgeHolder(true);
         } catch {
           // not a badge holder yet
         }
@@ -160,18 +194,25 @@ export default function GovernancePage() {
     }
 
     init();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [loadProposals]);
 
   async function handleConnect() {
     const { publicKey: pk, error: err } = await connectWallet();
-    if (err) { setError(err); return; }
+    if (err) {
+      setError(err);
+      return;
+    }
     setPublicKey(pk);
     if (pk) {
       try {
         const stats = await getDonorStats(pk);
         if (stats && stats.badge !== "None") setIsBadgeHolder(true);
-      } catch { /* not a badge holder */ }
+      } catch {
+        /* not a badge holder */
+      }
     }
   }
 
@@ -182,14 +223,22 @@ export default function GovernancePage() {
     try {
       const tx = await buildVoteTransaction(publicKey, projectId, approve);
       setTxStatus((prev) => ({ ...prev, [projectId]: "Sign in Freighter…" }));
-      const { signedXDR, error: signErr } = await signTransactionWithWallet(tx.toXDR());
+      const { signedXDR, error: signErr } = await signTransactionWithWallet(
+        tx.toXDR(),
+      );
       if (signErr || !signedXDR) throw new Error(signErr || "Signing failed");
       setTxStatus((prev) => ({ ...prev, [projectId]: "Submitting…" }));
       await submitTransaction(signedXDR);
-      setTxStatus((prev) => ({ ...prev, [projectId]: approve ? "Voted: Approve ✓" : "Voted: Reject ✓" }));
+      setTxStatus((prev) => ({
+        ...prev,
+        [projectId]: approve ? "Voted: Approve ✓" : "Voted: Reject ✓",
+      }));
       loadProposals();
     } catch (err) {
-      setTxStatus((prev) => ({ ...prev, [projectId]: `Error: ${formatTransactionError(err)}` }));
+      setTxStatus((prev) => ({
+        ...prev,
+        [projectId]: `Error: ${formatTransactionError(err)}`,
+      }));
     } finally {
       setVotingId(null);
     }
@@ -203,7 +252,10 @@ export default function GovernancePage() {
     <div className="min-h-screen bg-[#fcfdfc] font-body text-forest-900 pb-20">
       <Head>
         <title>Governance | Stellar IndigoPay</title>
-        <meta name="description" content="Vote on project verification proposals with your impact badge." />
+        <meta
+          name="description"
+          content="Vote on project verification proposals with your impact badge."
+        />
       </Head>
 
       <main className="max-w-3xl mx-auto px-4 py-12 sm:px-6">
@@ -212,8 +264,9 @@ export default function GovernancePage() {
             Community <span className="text-gradient">Governance</span>
           </h1>
           <p className="mt-3 text-[#475569] dark:text-[#94A3B8]">
-            Badge holders vote to verify new climate projects. You need at least a{" "}
-            <span className="font-semibold">Seedling badge</span> (≥ 10 XLM donated) to cast a vote.
+            Badge holders vote to verify new climate projects. You need at least
+            a <span className="font-semibold">Seedling badge</span> (≥ 10 XLM
+            donated) to cast a vote.
           </p>
         </div>
 
@@ -222,8 +275,10 @@ export default function GovernancePage() {
           {publicKey ? (
             <div className="flex items-center justify-between gap-4">
               <div>
-              <p className="text-sm text-[#64748B]">Connected as</p>
-              <p className="font-mono text-sm font-medium text-[#0F172A] dark:text-[#E2E8F0]">{shortenAddress(publicKey)}</p>
+                <p className="text-sm text-[#64748B]">Connected as</p>
+                <p className="font-mono text-sm font-medium text-[#0F172A] dark:text-[#E2E8F0]">
+                  {shortenAddress(publicKey)}
+                </p>
               </div>
               <span
                 className={`rounded-full px-3 py-1 text-xs font-semibold ${
@@ -237,7 +292,9 @@ export default function GovernancePage() {
             </div>
           ) : (
             <div className="flex items-center justify-between gap-4">
-              <p className="text-sm text-[#64748B]">Connect your Freighter wallet to vote.</p>
+              <p className="text-sm text-[#64748B]">
+                Connect your Freighter wallet to vote.
+              </p>
               <button
                 onClick={handleConnect}
                 className="btn-primary rounded-full px-4 py-2 text-sm"
@@ -250,8 +307,9 @@ export default function GovernancePage() {
 
         {/* Quorum notice */}
         <div className="mb-6 rounded-xl bg-[rgba(245,158,11,0.06)] border border-[rgba(245,158,11,0.20)] px-4 py-3 text-sm text-[#B45309] dark:text-[#FBBF24]">
-          Quorum threshold: <strong>{QUORUM_THRESHOLD} votes</strong>. A proposal passes when
-          votes&nbsp;for &gt; votes&nbsp;against and the deadline passes.
+          Quorum threshold: <strong>{QUORUM_THRESHOLD} votes</strong>. A
+          proposal passes when votes&nbsp;for &gt; votes&nbsp;against and the
+          deadline passes.
         </div>
 
         {error && (
@@ -261,18 +319,24 @@ export default function GovernancePage() {
         )}
 
         {isLoading ? (
-          <p className="text-center text-[#64748B] dark:text-[#94A3B8] py-16">Loading proposals…</p>
+          <p className="text-center text-[#64748B] dark:text-[#94A3B8] py-16">
+            Loading proposals…
+          </p>
         ) : proposals.length === 0 ? (
           <div className="card rounded-2xl p-12 text-center">
-            <p className="text-[#64748B] dark:text-[#94A3B8]">No open proposals at the moment.</p>
+            <p className="text-[#64748B] dark:text-[#94A3B8]">
+              No open proposals at the moment.
+            </p>
             <p className="mt-1 text-sm text-[#94A3B8]">
-              Admins create proposals via <code className="text-xs">create_proposal</code> on the contract.
+              Admins create proposals via{" "}
+              <code className="text-xs">create_proposal</code> on the contract.
             </p>
           </div>
         ) : (
           <div className="space-y-4">
             {proposals.map((proposal) => {
-              const ledgersLeft = proposal.deadlineLedger - proposal.currentLedger;
+              const ledgersLeft =
+                proposal.deadlineLedger - proposal.currentLedger;
               const votes = totalVotes(proposal);
               const pct = passPercent(proposal);
               const status = txStatus[proposal.projectId];
@@ -289,8 +353,9 @@ export default function GovernancePage() {
                       <h2 className="text-base font-semibold text-[#0F172A] dark:text-[#E2E8F0]">
                         {proposal.projectName || proposal.projectId}
                       </h2>
-<p className="text-xs text-[#64748B] dark:text-[#94A3B8] mt-0.5">
-                        Project ID: <code className="font-mono">{proposal.projectId}</code>
+                      <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mt-0.5">
+                        Project ID:{" "}
+                        <code className="font-mono">{proposal.projectId}</code>
                       </p>
                     </div>
                     <div className="flex flex-col items-end gap-1 shrink-0">
@@ -308,9 +373,21 @@ export default function GovernancePage() {
                   {/* Tally bar */}
                   <div className="mb-4">
                     <div className="flex justify-between text-xs text-[#64748B] dark:text-[#94A3B8] mb-1">
-                      <span>For: <strong className="text-[#4F46E5] dark:text-[#818CF8]">{proposal.votesFor}</strong></span>
-                      <span><strong>{votes}</strong> total votes</span>
-                      <span>Against: <strong className="text-[#E11D48]">{proposal.votesAgainst}</strong></span>
+                      <span>
+                        For:{" "}
+                        <strong className="text-[#4F46E5] dark:text-[#818CF8]">
+                          {proposal.votesFor}
+                        </strong>
+                      </span>
+                      <span>
+                        <strong>{votes}</strong> total votes
+                      </span>
+                      <span>
+                        Against:{" "}
+                        <strong className="text-[#E11D48]">
+                          {proposal.votesAgainst}
+                        </strong>
+                      </span>
                     </div>
                     <div className="h-2 w-full rounded-full bg-[rgba(99,102,241,0.10)] dark:bg-[rgba(129,140,248,0.12)] overflow-hidden">
                       <div
@@ -318,7 +395,9 @@ export default function GovernancePage() {
                         style={{ width: `${pct}%` }}
                       />
                     </div>
-                    <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mt-1 text-right">{pct}% approval</p>
+                    <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mt-1 text-right">
+                      {pct}% approval
+                    </p>
                   </div>
 
                   {/* Vote buttons */}
@@ -342,7 +421,9 @@ export default function GovernancePage() {
                   ) : null}
 
                   {status && (
-                    <p className="mt-3 text-xs text-[#64748B] dark:text-[#94A3B8] text-center">{status}</p>
+                    <p className="mt-3 text-xs text-[#64748B] dark:text-[#94A3B8] text-center">
+                      {status}
+                    </p>
                   )}
 
                   {!publicKey && (
@@ -352,7 +433,8 @@ export default function GovernancePage() {
                   )}
                   {publicKey && !isBadgeHolder && (
                     <p className="mt-2 text-xs text-[#94A3B8] text-center">
-                      You need at least a Seedling badge to vote. Donate ≥ 10 XLM to earn one.
+                      You need at least a Seedling badge to vote. Donate ≥ 10
+                      XLM to earn one.
                     </p>
                   )}
                 </article>

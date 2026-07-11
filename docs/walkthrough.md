@@ -13,6 +13,7 @@ A step-by-step guide to making your first climate donation on Stellar Testnet in
 > ```
 >
 > Suggested recording scope (≈ 3–4 min):
+>
 > 1. Installing Freighter & switching to Testnet
 > 2. Funding via Friendbot
 > 3. Connecting wallet in the app

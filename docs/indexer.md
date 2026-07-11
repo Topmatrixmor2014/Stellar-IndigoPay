@@ -11,9 +11,7 @@ The indexer is a background service that listens for native XLM payments on the 
 The indexer uses the [Stellar SDK](https://github.com/stellar/js-stellar-sdk) `OperationsCallBuilder` to open a **Server-Sent Events (SSE)** connection to Horizon. The stream delivers real-time operations as they are included in ledgers.
 
 ```js
-stellarServer.operations()
-  .cursor("now")
-  .stream({ onmessage, onerror });
+stellarServer.operations().cursor("now").stream({ onmessage, onerror });
 ```
 
 - The `operations()` endpoint returns all operations on the network.
@@ -128,21 +126,21 @@ The status is exposed via the `/health` endpoint:
 
 ## Configuration
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `HORIZON_URL` | `https://horizon-testnet.stellar.org` | Horizon server endpoint |
-| `DATABASE_URL` | — | PostgreSQL connection string |
-| Wallet cache refresh | 10 minutes | Interval for refreshing project wallets |
+| Variable             | Default                               | Description                             |
+| -------------------- | ------------------------------------- | --------------------------------------- |
+| `HORIZON_URL`        | `https://horizon-testnet.stellar.org` | Horizon server endpoint                 |
+| `DATABASE_URL`       | —                                     | PostgreSQL connection string            |
+| Wallet cache refresh | 10 minutes                            | Interval for refreshing project wallets |
 
 ---
 
 ## Code Reference
 
-| File | Purpose |
-|------|---------|
+| File                                     | Purpose                                                                                     |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------- |
 | `backend/src/services/indexerService.js` | Core indexer — SSE stream, payment processing, deduplication, DB writes, WebSocket emission |
-| `backend/src/services/stellar.js` | Exports the `Horizon.Server` instance used by the indexer |
-| `backend/src/server.js` | Calls `startIndexer(io)` during server boot |
-| `backend/src/routes/health.js` | Exposes `getStatus()` in the `/health` response |
-| `backend/src/services/store.js` | `computeBadges()` used to assign donor tiers |
-| `backend/src/db/pool.js` | PostgreSQL connection pool |
+| `backend/src/services/stellar.js`        | Exports the `Horizon.Server` instance used by the indexer                                   |
+| `backend/src/server.js`                  | Calls `startIndexer(io)` during server boot                                                 |
+| `backend/src/routes/health.js`           | Exposes `getStatus()` in the `/health` response                                             |
+| `backend/src/services/store.js`          | `computeBadges()` used to assign donor tiers                                                |
+| `backend/src/db/pool.js`                 | PostgreSQL connection pool                                                                  |

@@ -51,7 +51,9 @@ export default function JobDetailPage({ publicKey, onConnect }: JobPageProps) {
       const j = await fetchJob(jobId);
       setJob(j);
     } catch {
-      setLoadError("Could not load this job. Check the link or try again later.");
+      setLoadError(
+        "Could not load this job. Check the link or try again later.",
+      );
       setJob(null);
     } finally {
       setLoading(false);
@@ -63,15 +65,12 @@ export default function JobDetailPage({ publicKey, onConnect }: JobPageProps) {
     load();
   }, [router.isReady, jobId, load]);
 
-  const isClient =
-    Boolean(publicKey && job && publicKey === job.clientPublicKey);
-  const canRelease =
-    Boolean(
-      job &&
-        job.status === "in_escrow" &&
-        isClient &&
-        ESCROW_CONTRACT_ID,
-    );
+  const isClient = Boolean(
+    publicKey && job && publicKey === job.clientPublicKey,
+  );
+  const canRelease = Boolean(
+    job && job.status === "in_escrow" && isClient && ESCROW_CONTRACT_ID,
+  );
 
   const handleApproveRelease = async () => {
     if (!job || !publicKey || !ESCROW_CONTRACT_ID) return;
@@ -93,7 +92,9 @@ export default function JobDetailPage({ publicKey, onConnect }: JobPageProps) {
         tx.toXDR(),
       );
       if (signErr || !signedXDR) {
-        throw new Error(signErr || "Wallet did not return a signed transaction.");
+        throw new Error(
+          signErr || "Wallet did not return a signed transaction.",
+        );
       }
 
       setStep("submitting");
@@ -122,7 +123,9 @@ export default function JobDetailPage({ publicKey, onConnect }: JobPageProps) {
       setStep("success");
     } catch (err: unknown) {
       const msg =
-        err instanceof Error ? err.message : "Something went wrong. Please try again.";
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.";
       setActionError(msg);
       setStep("error");
       setTimeout(() => {
@@ -143,16 +146,20 @@ export default function JobDetailPage({ publicKey, onConnect }: JobPageProps) {
   if (!jobId || loadError || !job) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-16">
-        <p className="text-red-600 mb-4 font-body">{loadError || "Job not found."}</p>
-        <Link href="/jobs" className="text-forest-600 hover:underline font-body">
+        <p className="text-red-600 mb-4 font-body">
+          {loadError || "Job not found."}
+        </p>
+        <Link
+          href="/jobs"
+          className="text-forest-600 hover:underline font-body"
+        >
           ← Back to jobs
         </Link>
       </div>
     );
   }
 
-  const showSuccessBanner =
-    step === "success" || job.status === "completed";
+  const showSuccessBanner = step === "success" || job.status === "completed";
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 animate-fade-in">
@@ -193,7 +200,9 @@ export default function JobDetailPage({ publicKey, onConnect }: JobPageProps) {
             <dt className="text-[#8aaa8a] dark:text-forest-300 uppercase tracking-wide text-xs font-bold mb-1">
               Escrow (XLM)
             </dt>
-            <dd className="font-semibold text-forest-900">{formatXLM(job.amountEscrowXlm)}</dd>
+            <dd className="font-semibold text-forest-900">
+              {formatXLM(job.amountEscrowXlm)}
+            </dd>
           </div>
           <div>
             <dt className="text-[#8aaa8a] dark:text-forest-300 uppercase tracking-wide text-xs font-bold mb-1">

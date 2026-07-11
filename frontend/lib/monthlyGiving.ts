@@ -7,7 +7,9 @@ function addMonths(isoDate: string, months: number) {
   const day = date.getUTCDate();
   date.setUTCDate(1);
   date.setUTCMonth(date.getUTCMonth() + months);
-  const maxDay = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate();
+  const maxDay = new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0),
+  ).getUTCDate();
   date.setUTCDate(Math.min(day, maxDay));
   return date.toISOString();
 }
@@ -26,7 +28,10 @@ export function loadMonthlySubscriptions(): MonthlySubscription[] {
 
 export function saveMonthlySubscriptions(subscriptions: MonthlySubscription[]) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(MONTHLY_GIVING_STORAGE_KEY, JSON.stringify(subscriptions));
+  window.localStorage.setItem(
+    MONTHLY_GIVING_STORAGE_KEY,
+    JSON.stringify(subscriptions),
+  );
 }
 
 export function createMonthlySubscription(input: {
@@ -56,19 +61,29 @@ export function createMonthlySubscription(input: {
   return subscription;
 }
 
-export function markMonthlySubscriptionPaid(subscriptionId: string, amountXLM: string) {
+export function markMonthlySubscriptionPaid(
+  subscriptionId: string,
+  amountXLM: string,
+) {
   const all = loadMonthlySubscriptions();
   const updated = all.map((sub) => {
     if (sub.id !== subscriptionId || sub.status !== "active") return sub;
 
     const nextRemaining =
-      sub.remainingMonths === null ? null : Math.max(sub.remainingMonths - 1, 0);
+      sub.remainingMonths === null
+        ? null
+        : Math.max(sub.remainingMonths - 1, 0);
     const completed = nextRemaining === 0;
-    const nextStatus: MonthlySubscription["status"] = completed ? "completed" : "active";
+    const nextStatus: MonthlySubscription["status"] = completed
+      ? "completed"
+      : "active";
 
     return {
       ...sub,
-      history: [{ paidAt: new Date().toISOString(), amountXLM }, ...sub.history],
+      history: [
+        { paidAt: new Date().toISOString(), amountXLM },
+        ...sub.history,
+      ],
       remainingMonths: nextRemaining,
       status: nextStatus,
       nextDueDate: completed ? sub.nextDueDate : addMonths(sub.nextDueDate, 1),

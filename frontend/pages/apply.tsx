@@ -39,7 +39,14 @@ interface FormData {
   notes: string;
 }
 
-const STEPS: Step[] = ["org", "project", "impact", "documents", "review", "done"];
+const STEPS: Step[] = [
+  "org",
+  "project",
+  "impact",
+  "documents",
+  "review",
+  "done",
+];
 const STEP_LABELS: Record<Step, string> = {
   org: "Organisation",
   project: "Project",
@@ -51,7 +58,8 @@ const STEP_LABELS: Record<Step, string> = {
 
 const STELLAR_ADDRESS_RE = /^G[A-Z2-7]{55}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const ACCEPTED_DOC_TYPES = ".pdf,.png,.jpg,.jpeg,.webp,.gif,.doc,.docx,.xls,.xlsx,.txt,.csv,.zip";
+const ACCEPTED_DOC_TYPES =
+  ".pdf,.png,.jpg,.jpeg,.webp,.gif,.doc,.docx,.xls,.xlsx,.txt,.csv,.zip";
 
 function Field({
   label,
@@ -75,7 +83,9 @@ function Field({
         <span className="label">{label}</span>
         {children}
       </label>
-      {helper && !error && <p className="text-xs text-[#8aaa8a] font-body">{helper}</p>}
+      {helper && !error && (
+        <p className="text-xs text-[#8aaa8a] font-body">{helper}</p>
+      )}
       {error && <p className="text-xs text-red-500 font-body">{error}</p>}
     </div>
   );
@@ -90,7 +100,9 @@ export default function ApplyPage() {
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState("");
   const [reviewTimeline, setReviewTimeline] = useState("5–10 business days");
-  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [fieldErrors, setFieldErrors] = useState<
+    Partial<Record<keyof FormData, string>>
+  >({});
   const [documents, setDocuments] = useState<VerificationDocument[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
@@ -111,12 +123,16 @@ export default function ApplyPage() {
     notes: "",
   });
 
-  const set = (field: keyof FormData) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
-  ) => {
-    setForm((prev) => ({ ...prev, [field]: e.target.value }));
-    setFieldErrors((prev) => ({ ...prev, [field]: undefined }));
-  };
+  const set =
+    (field: keyof FormData) =>
+    (
+      e: React.ChangeEvent<
+        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      >,
+    ) => {
+      setForm((prev) => ({ ...prev, [field]: e.target.value }));
+      setFieldErrors((prev) => ({ ...prev, [field]: undefined }));
+    };
 
   function validateStep(): boolean {
     const errs: Partial<Record<keyof FormData, string>> = {};
@@ -124,7 +140,8 @@ export default function ApplyPage() {
     if (step === "org") {
       if (!form.organizationName.trim()) errs.organizationName = T("required");
       if (!form.contactEmail.trim()) errs.contactEmail = T("required");
-      else if (!EMAIL_RE.test(form.contactEmail)) errs.contactEmail = T("invalidEmail");
+      else if (!EMAIL_RE.test(form.contactEmail))
+        errs.contactEmail = T("invalidEmail");
       if (!STELLAR_ADDRESS_RE.test(form.walletAddress.trim())) {
         errs.walletAddress = T("invalidWallet");
       }
@@ -138,11 +155,15 @@ export default function ApplyPage() {
 
     if (step === "impact") {
       const co2 = Number(form.co2PerXLM);
-      if (!form.co2PerXLM || !Number.isFinite(co2) || co2 < 0) errs.co2PerXLM = T("invalidCO2");
+      if (!form.co2PerXLM || !Number.isFinite(co2) || co2 < 0)
+        errs.co2PerXLM = T("invalidCO2");
       const annual = form.expectedAnnualTonnesCO2
         ? Number(form.expectedAnnualTonnesCO2)
         : 0;
-      if (form.expectedAnnualTonnesCO2 && (!Number.isFinite(annual) || annual < 0)) {
+      if (
+        form.expectedAnnualTonnesCO2 &&
+        (!Number.isFinite(annual) || annual < 0)
+      ) {
         errs.expectedAnnualTonnesCO2 = T("invalidCO2");
       }
     }
@@ -212,7 +233,8 @@ export default function ApplyPage() {
         projectLocation: form.projectLocation.trim(),
         projectDescription: form.projectDescription.trim() || undefined,
         co2PerXLM: form.co2PerXLM.trim(),
-        expectedAnnualTonnesCO2: form.expectedAnnualTonnesCO2.trim() || undefined,
+        expectedAnnualTonnesCO2:
+          form.expectedAnnualTonnesCO2.trim() || undefined,
         supportingDocuments: documents,
         notes: form.notes.trim() || undefined,
       };
@@ -221,7 +243,9 @@ export default function ApplyPage() {
       setStep("done");
     } catch (err: any) {
       const msg =
-        err?.response?.data?.error ?? err?.response?.data?.message ?? "Submission failed. Please try again.";
+        err?.response?.data?.error ??
+        err?.response?.data?.message ??
+        "Submission failed. Please try again.";
       setServerError(msg);
       // Don't move back to "review" if the API still wants the form filled —
       // surface the message so the submitter can correct and retry.
@@ -237,9 +261,13 @@ export default function ApplyPage() {
     return (
       <div className="max-w-xl mx-auto px-4 py-20 text-center animate-fade-in">
         <div className="text-6xl mb-6">🔍</div>
-        <h1 className="font-display text-3xl font-bold text-forest-900 mb-3">{T("subThanks")}</h1>
+        <h1 className="font-display text-3xl font-bold text-forest-900 mb-3">
+          {T("subThanks")}
+        </h1>
         <p className="text-[#5a7a5a] font-body mb-8">
-          {T("subCopy").replace("{timeline}", reviewTimeline).replace("{email}", form.contactEmail)}
+          {T("subCopy")
+            .replace("{timeline}", reviewTimeline)
+            .replace("{email}", form.contactEmail)}
         </p>
         <button className="btn-primary" onClick={() => router.push("/")}>
           {T("backToHome")}
@@ -252,11 +280,13 @@ export default function ApplyPage() {
     <div className="max-w-2xl mx-auto px-4 py-10 animate-fade-in">
       <p className="text-xs uppercase tracking-widest text-forest-600 font-bold mb-2 font-body">
         {T("pageTitle")}
-      </p>        <h1 className="font-display text-3xl font-bold text-[#0F172A] dark:text-[#E2E8F0] mb-2">
-          {T("pageTitle")}
-        </h1>
-        <p className="text-[#475569] dark:text-[#94A3B8] font-body mb-8 text-sm">{T("pageIntro")}</p>
-
+      </p>{" "}
+      <h1 className="font-display text-3xl font-bold text-[#0F172A] dark:text-[#E2E8F0] mb-2">
+        {T("pageTitle")}
+      </h1>
+      <p className="text-[#475569] dark:text-[#94A3B8] font-body mb-8 text-sm">
+        {T("pageIntro")}
+      </p>
       {/* Step indicator */}
       <div className="flex items-center gap-2 mb-10">
         {progressSteps.map((s, i) => (
@@ -266,26 +296,29 @@ export default function ApplyPage() {
                 i < stepIndex
                   ? "bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] border-0 text-white"
                   : i === stepIndex
-                  ? "border-[#4F46E5] dark:border-[#818CF8] text-[#4F46E5] dark:text-[#818CF8] bg-white dark:bg-[#14142D]"
-                  : "border-[rgba(99,102,241,0.15)] dark:border-[rgba(129,140,248,0.20)] text-[#64748B] dark:text-[#94A3B8] bg-white dark:bg-[#14142D]"
+                    ? "border-[#4F46E5] dark:border-[#818CF8] text-[#4F46E5] dark:text-[#818CF8] bg-white dark:bg-[#14142D]"
+                    : "border-[rgba(99,102,241,0.15)] dark:border-[rgba(129,140,248,0.20)] text-[#64748B] dark:text-[#94A3B8] bg-white dark:bg-[#14142D]"
               }`}
             >
               {i < stepIndex ? "✓" : i + 1}
             </div>
             <span
               className={`text-xs font-body hidden sm:block ${
-                i === stepIndex ? "text-[#0F172A] dark:text-[#E2E8F0] font-semibold" : "text-[#64748B] dark:text-[#94A3B8]"
+                i === stepIndex
+                  ? "text-[#0F172A] dark:text-[#E2E8F0] font-semibold"
+                  : "text-[#64748B] dark:text-[#94A3B8]"
               }`}
             >
               {STEP_LABELS[s]}
             </span>
             {i < progressSteps.length - 1 && (
-              <div className={`flex-1 h-px ${i < stepIndex ? "bg-[#4F46E5] dark:bg-[#818CF8]" : "bg-[rgba(99,102,241,0.10)] dark:bg-[rgba(129,140,248,0.12)]"}`} />
+              <div
+                className={`flex-1 h-px ${i < stepIndex ? "bg-[#4F46E5] dark:bg-[#818CF8]" : "bg-[rgba(99,102,241,0.10)] dark:bg-[rgba(129,140,248,0.12)]"}`}
+              />
             )}
           </div>
         ))}
       </div>
-
       <div className="card p-6 space-y-5">
         {/* Step: org */}
         {step === "org" && (
@@ -293,7 +326,10 @@ export default function ApplyPage() {
             <h2 className="font-display text-xl font-bold text-[#0F172A] dark:text-[#E2E8F0]">
               {T("stepOrg")}
             </h2>
-            <Field label={`${T("orgName")} *`} error={fieldErrors.organizationName}>
+            <Field
+              label={`${T("orgName")} *`}
+              error={fieldErrors.organizationName}
+            >
               <input
                 className="input-field"
                 value={form.organizationName}
@@ -351,7 +387,10 @@ export default function ApplyPage() {
             <h2 className="font-display text-xl font-bold text-[#0F172A] dark:text-[#E2E8F0]">
               {T("stepProject")}
             </h2>
-            <Field label={`${T("projectName")} *`} error={fieldErrors.projectName}>
+            <Field
+              label={`${T("projectName")} *`}
+              error={fieldErrors.projectName}
+            >
               <input
                 className="input-field"
                 value={form.projectName}
@@ -359,7 +398,10 @@ export default function ApplyPage() {
                 placeholder="Acme Solar Farm Phase 1"
               />
             </Field>
-            <Field label={`${T("projectCategory")} *`} error={fieldErrors.projectCategory}>
+            <Field
+              label={`${T("projectCategory")} *`}
+              error={fieldErrors.projectCategory}
+            >
               <select
                 className="input-field"
                 value={form.projectCategory}
@@ -372,7 +414,10 @@ export default function ApplyPage() {
                 ))}
               </select>
             </Field>
-            <Field label={`${T("projectLocation")} *`} error={fieldErrors.projectLocation}>
+            <Field
+              label={`${T("projectLocation")} *`}
+              error={fieldErrors.projectLocation}
+            >
               <input
                 className="input-field"
                 value={form.projectLocation}
@@ -448,8 +493,12 @@ export default function ApplyPage() {
             <h2 className="font-display text-xl font-bold text-[#0F172A] dark:text-[#E2E8F0]">
               {T("documentsTitle")}
             </h2>
-            <p className="text-[#475569] dark:text-[#94A3B8] text-sm font-body">{T("documentsHint")}</p>
-            <p className="text-xs text-[#64748B] dark:text-[#94A3B8] font-body">{T("storageNote")}</p>
+            <p className="text-[#475569] dark:text-[#94A3B8] text-sm font-body">
+              {T("documentsHint")}
+            </p>
+            <p className="text-xs text-[#64748B] dark:text-[#94A3B8] font-body">
+              {T("storageNote")}
+            </p>
 
             <div className="rounded-lg border border-dashed border-forest-200 p-4 flex flex-col gap-3 bg-forest-50/40">
               <input
@@ -461,7 +510,9 @@ export default function ApplyPage() {
                 aria-label={T("documentsTitle")}
               />
               {uploading && (
-                <p className="text-xs text-[#4F46E5] dark:text-[#818CF8] font-body">{T("uploading")}</p>
+                <p className="text-xs text-[#4F46E5] dark:text-[#818CF8] font-body">
+                  {T("uploading")}
+                </p>
               )}
               {uploadError && (
                 <p className="text-xs text-red-500 font-body">{uploadError}</p>
@@ -469,15 +520,23 @@ export default function ApplyPage() {
             </div>
 
             {documents.length === 0 ? (
-              <p className="text-sm text-[#64748B] dark:text-[#94A3B8] font-body">{T("noDocuments")}</p>
+              <p className="text-sm text-[#64748B] dark:text-[#94A3B8] font-body">
+                {T("noDocuments")}
+              </p>
             ) : (
               <ul className="divide-y divide-forest-100 rounded-lg border border-forest-100 overflow-hidden">
                 {documents.map((doc, i) => (
-                  <li key={`${doc.url}-${i}`} className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-[#14142D]">
+                  <li
+                    key={`${doc.url}-${i}`}
+                    className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-[#14142D]"
+                  >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[#0F172A] dark:text-[#E2E8F0] truncate font-body">{doc.name}</p>
+                      <p className="text-sm font-medium text-[#0F172A] dark:text-[#E2E8F0] truncate font-body">
+                        {doc.name}
+                      </p>
                       <p className="text-xs text-[#64748B] dark:text-[#94A3B8] font-body truncate">
-                        {doc.backend} · {doc.size ? `${(doc.size / 1024).toFixed(1)} KB` : "—"}
+                        {doc.backend} ·{" "}
+                        {doc.size ? `${(doc.size / 1024).toFixed(1)} KB` : "—"}
                       </p>
                     </div>
                     <a
@@ -513,36 +572,68 @@ export default function ApplyPage() {
             </p>
             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm font-body">
               <div>
-                <dt className="text-xs text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">{T("orgName")}</dt>
-                <dd className="text-[#0F172A] dark:text-[#E2E8F0]">{form.organizationName || "—"}</dd>
+                <dt className="text-xs text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">
+                  {T("orgName")}
+                </dt>
+                <dd className="text-[#0F172A] dark:text-[#E2E8F0]">
+                  {form.organizationName || "—"}
+                </dd>
               </div>
               <div>
-                <dt className="text-xs text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">{T("contactEmail")}</dt>
-                <dd className="text-forest-900 break-all">{form.contactEmail || "—"}</dd>
+                <dt className="text-xs text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">
+                  {T("contactEmail")}
+                </dt>
+                <dd className="text-forest-900 break-all">
+                  {form.contactEmail || "—"}
+                </dd>
               </div>
               <div>
-                <dt className="text-xs text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">{T("walletAddress")}</dt>
-                <dd className="font-mono text-xs text-[#0F172A] dark:text-[#E2E8F0] break-all">{form.walletAddress || "—"}</dd>
+                <dt className="text-xs text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">
+                  {T("walletAddress")}
+                </dt>
+                <dd className="font-mono text-xs text-[#0F172A] dark:text-[#E2E8F0] break-all">
+                  {form.walletAddress || "—"}
+                </dd>
               </div>
               <div>
-                <dt className="text-xs text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">{T("projectName")}</dt>
-                <dd className="text-[#0F172A] dark:text-[#E2E8F0]">{form.projectName || "—"}</dd>
+                <dt className="text-xs text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">
+                  {T("projectName")}
+                </dt>
+                <dd className="text-[#0F172A] dark:text-[#E2E8F0]">
+                  {form.projectName || "—"}
+                </dd>
               </div>
               <div>
-                <dt className="text-xs text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">{T("projectCategory")}</dt>
-                <dd className="text-[#0F172A] dark:text-[#E2E8F0]">{form.projectCategory || "—"}</dd>
+                <dt className="text-xs text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">
+                  {T("projectCategory")}
+                </dt>
+                <dd className="text-[#0F172A] dark:text-[#E2E8F0]">
+                  {form.projectCategory || "—"}
+                </dd>
               </div>
               <div>
-                <dt className="text-xs text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">{T("projectLocation")}</dt>
-                <dd className="text-[#0F172A] dark:text-[#E2E8F0]">{form.projectLocation || "—"}</dd>
+                <dt className="text-xs text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">
+                  {T("projectLocation")}
+                </dt>
+                <dd className="text-[#0F172A] dark:text-[#E2E8F0]">
+                  {form.projectLocation || "—"}
+                </dd>
               </div>
               <div>
-                <dt className="text-xs text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">{T("co2PerXLM")}</dt>
-                <dd className="text-[#0F172A] dark:text-[#E2E8F0]">{form.co2PerXLM || "—"}</dd>
+                <dt className="text-xs text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">
+                  {T("co2PerXLM")}
+                </dt>
+                <dd className="text-[#0F172A] dark:text-[#E2E8F0]">
+                  {form.co2PerXLM || "—"}
+                </dd>
               </div>
               <div>
-                <dt className="text-xs text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">{T("annualTonnes")}</dt>
-                <dd className="text-[#0F172A] dark:text-[#E2E8F0]">{form.expectedAnnualTonnesCO2 || "—"}</dd>
+                <dt className="text-xs text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">
+                  {T("annualTonnes")}
+                </dt>
+                <dd className="text-[#0F172A] dark:text-[#E2E8F0]">
+                  {form.expectedAnnualTonnesCO2 || "—"}
+                </dd>
               </div>
               <div className="sm:col-span-2">
                 <dt className="text-xs text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wider">
@@ -562,7 +653,6 @@ export default function ApplyPage() {
           </>
         )}
       </div>
-
       {/* Navigation */}
       <div className="flex justify-between mt-6">
         <button

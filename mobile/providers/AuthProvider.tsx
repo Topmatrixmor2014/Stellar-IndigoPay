@@ -36,26 +36,26 @@ import React, {
   useRef,
   useState,
   type ReactNode,
-} from 'react';
-import { AppState, type AppStateStatus } from 'react-native';
-import * as secureStore from '../lib/secureStore';
-import { authenticate } from '../hooks/useBiometricAuth';
+} from "react";
+import { AppState, type AppStateStatus } from "react-native";
+import * as secureStore from "../lib/secureStore";
+import { authenticate } from "../hooks/useBiometricAuth";
 
-const SESSION_KEY = 'wallet_session';
+const SESSION_KEY = "wallet_session";
 const AUTO_LOCK_BACKGROUND_MS = 60_000;
 
 export interface WalletSession {
   /** Stellar Ed25519 public key (G…). */
   publicKey: string;
   /** 'PUBLIC' or 'TESTNET' — matches stellar-sdk Network enum string. */
-  network: 'PUBLIC' | 'TESTNET';
+  network: "PUBLIC" | "TESTNET";
   /** Opaque signed nonce the backend can verify on auth refresh. */
   authNonce: string;
   /** Epoch ms when the user unlocked on this device. */
   lastLoginAt: number;
 }
 
-export type AuthState = 'hydrating' | 'locked' | 'unlocked' | 'cleared';
+export type AuthState = "hydrating" | "locked" | "unlocked" | "cleared";
 
 export interface AuthContextValue {
   state: AuthState;
@@ -79,7 +79,7 @@ export interface AuthContextValue {
 }
 
 const noopContext: AuthContextValue = {
-  state: 'locked',
+  state: "locked",
   isAuthenticated: false,
   isUnlocking: false,
   session: null,
@@ -96,7 +96,7 @@ export interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [state, setState] = useState<AuthState>('hydrating');
+  const [state, setState] = useState<AuthState>("hydrating");
   const [session, setSession] = useState<WalletSession | null>(null);
   const [isUnlocking, setIsUnlocking] = useState(false);
   const backgroundedAtRef = useRef<number | null>(null);
@@ -113,10 +113,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const stored = await secureStore.get<WalletSession>(SESSION_KEY);
       if (!mountedRef.current) return;
       if (stored === null) {
-        setState('cleared');
+        setState("cleared");
         setSession(null);
       } else {
-        setState('locked');
+        setState("locked");
         setSession(null); // do not expose until unlock()
       }
     })();
@@ -128,47 +128,44 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // ---- Auto-lock on AppState background >= 60s.
   useEffect(() => {
     function onChange(next: AppStateStatus) {
-      if (next === 'background' || next === 'inactive') {
+      if (next === "background" || next === "inactive") {
         backgroundedAtRef.current = Date.now();
-      } else if (next === 'active') {
+      } else if (next === "active") {
         const since = backgroundedAtRef.current;
         backgroundedAtRef.current = null;
-        if (
-          since !== null &&
-          Date.now() - since >= AUTO_LOCK_BACKGROUND_MS
-        ) {
-          setState((prev) => (prev === 'unlocked' ? 'locked' : prev));
+        if (since !== null && Date.now() - since >= AUTO_LOCK_BACKGROUND_MS) {
+          setState((prev) => (prev === "unlocked" ? "locked" : prev));
           setSession(null);
         }
       }
     }
-    const sub = AppState.addEventListener('change', onChange);
+    const sub = AppState.addEventListener("change", onChange);
     return () => sub.remove();
   }, []);
 
   // ---- Public actions ------------------------------------------------
 
   const unlock = useCallback(async (): Promise<boolean> => {
-    if (state === 'unlocked') return true;
-    if (state === 'cleared') return false; // nothing to unlock
-    if (state === 'hydrating') return false; // caller should retry
+    if (state === "unlocked") return true;
+    if (state === "cleared") return false; // nothing to unlock
+    if (state === "hydrating") return false; // caller should retry
 
     if (!mountedRef.current) return false;
     setIsUnlocking(true);
     try {
-      const success = await authenticate('Unlock IndigoPay to continue');
+      const success = await authenticate("Unlock IndigoPay to continue");
       if (!mountedRef.current) return false;
       if (!success) return false;
 
       const stored = await secureStore.get<WalletSession>(SESSION_KEY);
       if (!mountedRef.current) return false;
       if (stored === null) {
-        setState('cleared');
+        setState("cleared");
         setSession(null);
         return false;
       }
       setSession(stored);
-      setState('unlocked');
+      setState("unlocked");
       return true;
     } finally {
       if (mountedRef.current) setIsUnlocking(false);
@@ -176,7 +173,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [state, authenticate]);
 
   const lock = useCallback(() => {
-    setState((prev) => (prev === 'unlocked' ? 'locked' : prev));
+    setState((prev) => (prev === "unlocked" ? "locked" : prev));
     setSession(null);
   }, []);
 
@@ -184,7 +181,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     await secureStore.remove(SESSION_KEY);
     if (!mountedRef.current) return;
     setSession(null);
-    setState('cleared');
+    setState("cleared");
   }, []);
 
   const storeSession = useCallback(
@@ -193,16 +190,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (!ok) return false;
       if (!mountedRef.current) return false;
       setSession(next);
-      setState('unlocked');
+      setState("unlocked");
       return true;
     },
-    []
+    [],
   );
 
   const value = useMemo<AuthContextValue>(
     () => ({
       state,
-      isAuthenticated: state === 'unlocked',
+      isAuthenticated: state === "unlocked",
       isUnlocking,
       session,
       unlock,
@@ -210,12 +207,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       clear,
       storeSession,
     }),
-    [state, isUnlocking, session, unlock, lock, clear, storeSession]
+    [state, isUnlocking, session, unlock, lock, clear, storeSession],
   );
 
-  return (
-    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 /** Subscribe to the AuthProvider state. Returns the no-op fallback

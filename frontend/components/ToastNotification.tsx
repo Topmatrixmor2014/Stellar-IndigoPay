@@ -11,7 +11,10 @@ export type ToastItem = {
   createdAt: number;
 };
 
-export default function ToastNotification({ toasts, onDismiss }: {
+export default function ToastNotification({
+  toasts,
+  onDismiss,
+}: {
   toasts: ToastItem[];
   onDismiss: (id: string) => void;
 }) {
@@ -28,21 +31,27 @@ export default function ToastNotification({ toasts, onDismiss }: {
 
     for (const toast of sorted) {
       // Begin exit a bit before removal so the slide-down animation plays.
-      timers.push(window.setTimeout(() => {
-        setExiting((prev) => new Set(prev).add(toast.id));
-      }, 3600));
+      timers.push(
+        window.setTimeout(() => {
+          setExiting((prev) => new Set(prev).add(toast.id));
+        }, 3600),
+      );
 
-      timers.push(window.setTimeout(() => {
-        onDismiss(toast.id);
-        setExiting((prev) => {
-          const next = new Set(prev);
-          next.delete(toast.id);
-          return next;
-        });
-      }, 4000));
+      timers.push(
+        window.setTimeout(() => {
+          onDismiss(toast.id);
+          setExiting((prev) => {
+            const next = new Set(prev);
+            next.delete(toast.id);
+            return next;
+          });
+        }, 4000),
+      );
     }
 
-    return () => { timers.forEach((t) => window.clearTimeout(t)); };
+    return () => {
+      timers.forEach((t) => window.clearTimeout(t));
+    };
   }, [sorted, onDismiss]);
 
   if (sorted.length === 0) return null;
@@ -55,7 +64,9 @@ export default function ToastNotification({ toasts, onDismiss }: {
           <div
             key={t.id}
             className={`pointer-events-auto rounded-2xl border border-[rgba(99,102,241,0.12)] dark:border-[rgba(129,140,248,0.15)] bg-white/95 dark:bg-[#14142D]/95 backdrop-blur shadow-lg px-4 py-3 transition-all duration-300 ${
-              isExiting ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"
+              isExiting
+                ? "opacity-0 translate-y-2"
+                : "opacity-100 translate-y-0"
             }`}
           >
             <div className="flex items-start gap-3">
@@ -87,4 +98,3 @@ export default function ToastNotification({ toasts, onDismiss }: {
     </div>
   );
 }
-

@@ -3,6 +3,7 @@
 This guide enables third-party developers to integrate with the **Stellar-IndigoPay Donation Contract** on Stellar Soroban. You can record donations from your own contracts, query donor statistics, and leverage badge tiers in your dApps.
 
 **Table of Contents**
+
 - [Overview](#overview)
 - [Contract Addresses](#contract-addresses)
 - [Core Concepts](#core-concepts)
@@ -26,6 +27,7 @@ The Stellar-IndigoPay contract is a **climate donation tracking system** on Stel
 - **Enables cross-contract calls** so your contracts can integrate with Stellar-IndigoPay
 
 Your contract can:
+
 1. Call `donate()` to record a climate donation on behalf of your users
 2. Query `get_donor_stats()` to show a donor's impact and badge tier
 3. Emit events when donations are recorded
@@ -41,12 +43,13 @@ Unlike off-chain databases, all donation data is **cryptographically verified** 
 
 Replace these with values from your `.env` or deployment manifest:
 
-| Network | Environment Variable | Example |
-|---------|----------------------|---------|
+| Network     | Environment Variable      | Example                       |
+| ----------- | ------------------------- | ----------------------------- |
 | **Testnet** | `NEXT_PUBLIC_CONTRACT_ID` | `CDMLFMKMMD...` (from `.env`) |
-| **Mainnet** | `NEXT_PUBLIC_CONTRACT_ID` | *(deploy your own; link TBD)* |
+| **Mainnet** | `NEXT_PUBLIC_CONTRACT_ID` | _(deploy your own; link TBD)_ |
 
 Also needed:
+
 - **Stellar Network Passphrase**: `Test SDF Network ; September 2015` (testnet) or `Public Global Stellar Network ; September 2015` (mainnet)
 - **Soroban RPC URL**: `https://soroban-testnet.stellar.org` (testnet)
 - **Token Contract** (typically XLM wrapped as a Soroban token): `CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABSC4`
@@ -58,6 +61,7 @@ Also needed:
 ### Data Structures
 
 #### **DonorStats**
+
 Returned by `get_donor_stats(donor: Address)`.
 
 ```rust
@@ -70,6 +74,7 @@ pub struct DonorStats {
 ```
 
 #### **Project**
+
 Returned by `get_project(id: String)`.
 
 ```rust
@@ -86,15 +91,16 @@ pub struct Project {
 ```
 
 #### **BadgeTier** (Enum)
+
 Represents donor impact level based on cumulative donations.
 
-| Tier | Min XLM | Interpretation |
-|------|---------|-----------------|
-| `None` | 0 | No donations yet |
-| `Seedling` | 10 | Emerging donor |
-| `Tree` | 100 | Committed donor |
-| `Forest` | 500 | Major donor |
-| `EarthGuardian` | 2,000 | Impact champion |
+| Tier            | Min XLM | Interpretation   |
+| --------------- | ------- | ---------------- |
+| `None`          | 0       | No donations yet |
+| `Seedling`      | 10      | Emerging donor   |
+| `Tree`          | 100     | Committed donor  |
+| `Forest`        | 500     | Major donor      |
+| `EarthGuardian` | 2,000   | Impact champion  |
 
 ---
 
@@ -105,6 +111,7 @@ Represents donor impact level based on cumulative donations.
 The Stellar-IndigoPay contract's `donate()` function records a donation and transfers XLM to the project wallet.
 
 **Signature:**
+
 ```rust
 pub fn donate(
     env:        Env,
@@ -117,11 +124,13 @@ pub fn donate(
 ```
 
 **Authorization Requirements:**
+
 - The `donor` must have signed the transaction (via `require_auth()`)
 - The `donor` must have sufficient XLM balance
 - The project must be `active`
 
 **What it does:**
+
 1. Transfers `amount` XLM from `donor` to the project's wallet
 2. Updates donor's cumulative stats (`total_donated`, `donation_count`)
 3. Recalculates and updates the donor's badge tier
@@ -149,7 +158,7 @@ impl YourContract {
     ) {
         // Create a client to the Stellar-IndigoPay contract
         let indigopay_client = ContractClient::new(&env, &indigopay_contract_id);
-        
+
         // Call donate() on Stellar-IndigoPay
         // The donor must have authorized this transaction
         indigopay_client.donate(
@@ -180,6 +189,7 @@ See [TypeScript Client Examples](#typescript-client-examples) below for a comple
 Returns the donor's cumulative statistics, including their current badge tier.
 
 **TypeScript Example:**
+
 ```typescript
 import { rpc, Contract, Address } from "@stellar/stellar-sdk";
 
@@ -188,31 +198,29 @@ const contractId = "CABC..."; // Your Stellar-IndigoPay contract ID
 
 async function getDonorStats(donorPublicKey: string): Promise<any> {
   const contract = new Contract(contractId);
-  
+
   // Prepare the read-only contract invocation
   const tx = new TransactionBuilder(/* ... */)
     .addOperation(
-      contract.call(
-        "get_donor_stats",
-        new Address(donorPublicKey).toScVal()
-      )
+      contract.call("get_donor_stats", new Address(donorPublicKey).toScVal()),
     )
     .build();
 
   // Submit to Soroban RPC
   const response = await rpcServer.getTransaction(/* hash */);
   const result = response.result_meta_xdr; // Parse result
-  
+
   // Returns: { total_donated, donation_count, badge, co2_offset_grams }
 }
 ```
 
 **Response Format:**
+
 ```json
 {
-  "total_donated": 50000000,  // 5 XLM in stroops
-  "donation_count": 3,        // 3 donations
-  "badge": "Tree",            // Badge tier enum (serialized as string in JSON)
+  "total_donated": 50000000, // 5 XLM in stroops
+  "donation_count": 3, // 3 donations
+  "badge": "Tree", // Badge tier enum (serialized as string in JSON)
   "co2_offset_grams": 1500000 // ~1500 kg CO₂
 }
 ```
@@ -239,14 +247,14 @@ Query a project's totals and donor metrics.
 ```typescript
 async function getProjectStats(projectId: string): Promise<any> {
   const contract = new Contract(contractId);
-  
+
   // Prepare the read-only call
   const tx = new TransactionBuilder(/* ... */)
     .addOperation(
       contract.call(
         "get_project",
-        nativeToScVal(projectId, { type: "string" })
-      )
+        nativeToScVal(projectId, { type: "string" }),
+      ),
     )
     .build();
 
@@ -257,6 +265,7 @@ async function getProjectStats(projectId: string): Promise<any> {
 ### Query 4: Global Impact
 
 **Functions:**
+
 - `get_global_total() -> i128` — Total XLM raised platform-wide
 - `get_global_co2() -> i128` — Total CO₂ offset (grams) platform-wide
 - `get_donation_count() -> u32` — Total number of donations recorded
@@ -265,7 +274,7 @@ async function getProjectStats(projectId: string): Promise<any> {
 ```typescript
 async function getGlobalStats(): Promise<any> {
   const contract = new Contract(contractId);
-  
+
   // Build multiple calls in one transaction
   const ops = [
     contract.call("get_global_total"),
@@ -273,7 +282,7 @@ async function getGlobalStats(): Promise<any> {
     contract.call("get_donation_count"),
     contract.call("get_project_count"),
   ];
-  
+
   // Submit to RPC and parse results
 }
 ```
@@ -286,13 +295,13 @@ Badge tiers are **automatically calculated** when a donor's cumulative total exc
 
 ### Tier Progression
 
-| Tier | Threshold | XLM Range | Interpretation |
-|------|-----------|-----------|-----------------|
-| **None** | < 10 | 0–9.99 | Inactive or new donor |
-| **Seedling** | ≥ 10 | 10–99.99 | First impact milestone |
-| **Tree** | ≥ 100 | 100–499.99 | Consistent donor |
-| **Forest** | ≥ 500 | 500–1,999.99 | Major contributor |
-| **EarthGuardian** | ≥ 2,000 | 2,000+ | Impact champion |
+| Tier              | Threshold | XLM Range    | Interpretation         |
+| ----------------- | --------- | ------------ | ---------------------- |
+| **None**          | < 10      | 0–9.99       | Inactive or new donor  |
+| **Seedling**      | ≥ 10      | 10–99.99     | First impact milestone |
+| **Tree**          | ≥ 100     | 100–499.99   | Consistent donor       |
+| **Forest**        | ≥ 500     | 500–1,999.99 | Major contributor      |
+| **EarthGuardian** | ≥ 2,000   | 2,000+       | Impact champion        |
 
 ### Key Points
 
@@ -306,11 +315,11 @@ Badge tiers are **automatically calculated** when a donor's cumulative total exc
 ```typescript
 function renderBadge(badge: string): string {
   const badges: Record<string, string> = {
-    "None": "🌱 No badge yet",
-    "Seedling": "🌱 Seedling ($10+)",
-    "Tree": "🌳 Tree ($100+)",
-    "Forest": "🌲 Forest ($500+)",
-    "EarthGuardian": "🌍 Earth Guardian ($2,000+)",
+    None: "🌱 No badge yet",
+    Seedling: "🌱 Seedling ($10+)",
+    Tree: "🌳 Tree ($100+)",
+    Forest: "🌲 Forest ($500+)",
+    EarthGuardian: "🌍 Earth Guardian ($2,000+)",
   };
   return badges[badge] || "Unknown";
 }
@@ -319,7 +328,7 @@ async function displayDonorImpact(donorPublicKey: string) {
   const stats = await getDonorStats(donorPublicKey);
   const xlm = stats.total_donated / 10_000_000;
   const co2Kg = stats.co2_offset_grams / 1_000_000;
-  
+
   console.log(`
     💰 Total Donated: ${xlm.toFixed(2)} XLM
     🎁 Badge: ${renderBadge(stats.badge)}
@@ -354,14 +363,15 @@ const RPC_URL = "https://soroban-testnet.stellar.org";
 const HORIZON_URL = "https://horizon-testnet.stellar.org";
 
 const CONTRACT_ID = "CABC..."; // Your Stellar-IndigoPay contract ID
-const TOKEN_ADDRESS = "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABSC4"; // Native XLM token
+const TOKEN_ADDRESS =
+  "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABSC4"; // Native XLM token
 
 const horizonServer = new Horizon.Server(HORIZON_URL);
 const rpcServer = new rpc.Server(RPC_URL);
 
 /**
  * Record a donation from a donor to a project via the Stellar-IndigoPay contract.
- * 
+ *
  * @param donorPublicKey - Donor's public key (must have funds)
  * @param projectId - Target project ID (e.g., "amazon-reforestation")
  * @param amountXLM - Donation amount in XLM (will be converted to stroops)
@@ -372,17 +382,17 @@ async function recordDonation(
   donorPublicKey: string,
   projectId: string,
   amountXLM: number,
-  msgHash: number = 0
+  msgHash: number = 0,
 ): Promise<string> {
   // Step 1: Load the donor's account to build the transaction
   const donorAccount = await horizonServer.loadAccount(donorPublicKey);
-  
+
   // Step 2: Convert XLM to stroops (1 XLM = 10,000,000 stroops)
   const amountInStroops = Math.floor(amountXLM * 10_000_000);
-  
+
   // Step 3: Create a contract client and prepare the donate() call
   const contract = new Contract(CONTRACT_ID);
-  
+
   const builder = new TransactionBuilder(donorAccount, {
     fee: "1000000", // Soroban calls require higher fees (1 million stroops = 0.1 XLM)
     networkPassphrase: NETWORK_PASSPHRASE,
@@ -394,15 +404,15 @@ async function recordDonation(
         new SorobanAddress(donorPublicKey).toScVal(),
         nativeToScVal(projectId, { type: "string" }),
         nativeToScVal(amountInStroops, { type: "i128" }),
-        nativeToScVal(msgHash, { type: "u32" })
-      )
+        nativeToScVal(msgHash, { type: "u32" }),
+      ),
     )
     .setTimeout(60)
     .build();
 
   // Step 4: Simulate the transaction to get resource fees
   const simulated = await rpcServer.simulateTransaction(builder);
-  
+
   if (!rpc.Api.isSimulationSuccess(simulated)) {
     throw new Error(`Simulation failed: ${JSON.stringify(simulated.error)}`);
   }
@@ -416,10 +426,10 @@ async function recordDonation(
 
   // Step 7: Submit to Soroban RPC
   const response = await rpcServer.sendTransaction(assembled);
-  
+
   console.log(`Transaction submitted: ${response.hash}`);
   console.log(`Status: ${response.status}`);
-  
+
   // Step 8: Wait for finality
   if (response.status === "PENDING") {
     let result;
@@ -427,7 +437,7 @@ async function recordDonation(
     while (attempts < 30) {
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second
       result = await rpcServer.getTransaction(response.hash);
-      
+
       if (result.status === "SUCCESS") {
         console.log("Donation recorded successfully!");
         return response.hash;
@@ -438,7 +448,7 @@ async function recordDonation(
     }
     throw new Error("Transaction timed out");
   }
-  
+
   return response.hash;
 }
 
@@ -458,7 +468,7 @@ Retrieve and display a donor's statistics and badge tier.
 ```typescript
 /**
  * Query the Stellar-IndigoPay contract for a donor's stats.
- * 
+ *
  * @param donorPublicKey - Donor's public key
  * @returns Donor stats including badge tier
  */
@@ -470,14 +480,14 @@ async function queryDonorStats(donorPublicKey: string): Promise<{
 }> {
   // Create a read-only contract call
   const contract = new Contract(CONTRACT_ID);
-  
+
   // Build a dummy account to submit the read-only call
   // (No funds needed for read-only queries)
   const dummyAccount = new Horizon.Account(
     "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF",
-    "0"
+    "0",
   );
-  
+
   const builder = new TransactionBuilder(dummyAccount, {
     fee: "100",
     networkPassphrase: NETWORK_PASSPHRASE,
@@ -485,15 +495,15 @@ async function queryDonorStats(donorPublicKey: string): Promise<{
     .addOperation(
       contract.call(
         "get_donor_stats",
-        new SorobanAddress(donorPublicKey).toScVal()
-      )
+        new SorobanAddress(donorPublicKey).toScVal(),
+      ),
     )
     .setTimeout(60)
     .build();
 
   // Simulate to get the result
   const simulated = await rpcServer.simulateTransaction(builder);
-  
+
   if (!rpc.Api.isSimulationSuccess(simulated)) {
     throw new Error(`Query failed: ${JSON.stringify(simulated.error)}`);
   }
@@ -529,10 +539,10 @@ Verify that a donor holds a specific badge tier (useful for gating features).
 
 ```typescript
 const BADGE_THRESHOLDS = {
-  "Seedling": 10,
-  "Tree": 100,
-  "Forest": 500,
-  "EarthGuardian": 2000,
+  Seedling: 10,
+  Tree: 100,
+  Forest: 500,
+  EarthGuardian: 2000,
 };
 
 /**
@@ -540,13 +550,13 @@ const BADGE_THRESHOLDS = {
  */
 async function hasBadgeTier(
   donorPublicKey: string,
-  requiredTier: string
+  requiredTier: string,
 ): Promise<boolean> {
   const stats = await queryDonorStats(donorPublicKey);
   const badges = ["Seedling", "Tree", "Forest", "EarthGuardian"];
   const currentIndex = badges.indexOf(stats.badge);
   const requiredIndex = badges.indexOf(requiredTier);
-  
+
   return currentIndex >= requiredIndex;
 }
 
@@ -573,7 +583,7 @@ async function getGlobalImpact(): Promise<{
   const contract = new Contract(CONTRACT_ID);
   const dummyAccount = new Horizon.Account(
     "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF",
-    "0"
+    "0",
   );
 
   // Query each metric
@@ -594,7 +604,7 @@ async function getGlobalImpact(): Promise<{
 
 async function simulateContractCall(
   account: Horizon.Account,
-  functionName: string
+  functionName: string,
 ): Promise<number> {
   const contract = new Contract(CONTRACT_ID);
   const builder = new TransactionBuilder(account, {
@@ -702,7 +712,7 @@ impl PartnerContract {
         let offer: MatchOffer = env.storage().instance()
             .get(&DataKey::Offer(offer_id.clone()))
             .expect("Offer not found");
-        
+
         if !offer.active {
             panic!("Offer is not active");
         }
@@ -712,7 +722,7 @@ impl PartnerContract {
 
         // Record user's donation to Stellar-IndigoPay
         let indigopay_client = token::Client::new(&env, &indigopay_contract);
-        
+
         // Invoke Stellar-IndigoPay's donate() function
         // In a real contract, you'd use the contract client:
         let contract = soroban_sdk::Contract::new(&env, &indigopay_contract);
@@ -772,18 +782,19 @@ stellar contract invoke \
 
 ### Common Errors and Recovery
 
-| Error | Cause | Solution |
-|-------|-------|----------|
-| `Project not found` | Invalid `project_id` | Verify project ID exists; query `get_project()` first |
+| Error                                | Cause                      | Solution                                                 |
+| ------------------------------------ | -------------------------- | -------------------------------------------------------- |
+| `Project not found`                  | Invalid `project_id`       | Verify project ID exists; query `get_project()` first    |
 | `Project is not accepting donations` | Project is `active: false` | Contact project admin; can't donate to inactive projects |
-| `Donation amount must be positive` | `amount <= 0` | Ensure donation amount is > 0 |
-| `Only badge holders can vote` | Voter has no badge | Donor must have donated ≥ 10 XLM first |
-| `Simulation failed` | Contract logic error | Check contract logs; verify gas is sufficient |
-| `Transaction timed out` | RPC server slow | Retry or increase timeout; check network status |
+| `Donation amount must be positive`   | `amount <= 0`              | Ensure donation amount is > 0                            |
+| `Only badge holders can vote`        | Voter has no badge         | Donor must have donated ≥ 10 XLM first                   |
+| `Simulation failed`                  | Contract logic error       | Check contract logs; verify gas is sufficient            |
+| `Transaction timed out`              | RPC server slow            | Retry or increase timeout; check network status          |
 
 ### Best Practices
 
 1. **Validate project IDs** before submitting:
+
    ```typescript
    async function validateProject(projectId: string): Promise<boolean> {
      try {
@@ -796,11 +807,13 @@ stellar contract invoke \
    ```
 
 2. **Use higher fees** for contract calls (0.1–1.0 XLM) vs. payments (0.00001 XLM):
+
    ```typescript
    const fee = "1000000"; // 0.1 XLM for Soroban calls
    ```
 
 3. **Check badge tiers** before gating features:
+
    ```typescript
    if (stats.badge === "Forest" || stats.badge === "EarthGuardian") {
      // Show exclusive feature
@@ -808,18 +821,21 @@ stellar contract invoke \
    ```
 
 4. **Display CO₂ impact accurately**:
+
    ```typescript
    const co2Kg = stats.co2_offset_grams / 1_000_000;
    console.log(`${co2Kg.toFixed(1)} kg CO₂ offset`);
    ```
 
 5. **Handle stroops carefully** (1 XLM = 10,000,000 stroops):
+
    ```typescript
    const xlm = stroops / 10_000_000;
    const stroops = xlm * 10_000_000;
    ```
 
 6. **Poll transaction status** with exponential backoff:
+
    ```typescript
    let attempts = 0;
    while (attempts < 30) {
@@ -833,10 +849,10 @@ stellar contract invoke \
 7. **Cache badge thresholds** locally to avoid repeated queries:
    ```typescript
    const BADGE_TIERS = {
-     "Seedling": 10 * 10_000_000,      // 10 XLM in stroops
-     "Tree": 100 * 10_000_000,         // 100 XLM
-     "Forest": 500 * 10_000_000,       // 500 XLM
-     "EarthGuardian": 2000 * 10_000_000, // 2000 XLM
+     Seedling: 10 * 10_000_000, // 10 XLM in stroops
+     Tree: 100 * 10_000_000, // 100 XLM
+     Forest: 500 * 10_000_000, // 500 XLM
+     EarthGuardian: 2000 * 10_000_000, // 2000 XLM
    };
    ```
 
@@ -857,13 +873,13 @@ mod tests {
         let env = Env::default();
         let id = env.register_contract(None, IndigoPayContract);
         let client = IndigoPayContractClient::new(&env, &id);
-        
+
         let admin = Address::generate(&env);
         let donor = Address::generate(&env);
-        
+
         // Initialize
         client.initialize(&admin);
-        
+
         // Register a project
         client.register_project(
             &admin,
@@ -872,7 +888,7 @@ mod tests {
             &admin, // Project wallet
             &100,   // 100 grams CO₂ per XLM
         );
-        
+
         // Donate 100 XLM
         let amount = 100 * 10_000_000; // stroops
         client.donate(
@@ -882,7 +898,7 @@ mod tests {
             &amount,
             &0,
         );
-        
+
         // Check stats
         let stats = client.get_donor_stats(&donor);
         assert_eq!(stats.total_donated, amount);
@@ -899,19 +915,20 @@ import { test, expect } from "@jest/globals";
 import { recordDonation, queryDonorStats } from "./stellar-client";
 
 test("Record donation and verify stats", async () => {
-  const donorPublicKey = "GBUQWP3BOUZX34ULNQG23RQ6F4YUSXHTNYQGSHESVXNIUR3VTOLW473";
-  
+  const donorPublicKey =
+    "GBUQWP3BOUZX34ULNQG23RQ6F4YUSXHTNYQGSHESVXNIUR3VTOLW473";
+
   // Record 50 XLM donation
   const txHash = await recordDonation(
     donorPublicKey,
     "amazon-reforestation",
-    50
+    50,
   );
   expect(txHash).toMatch(/^[0-9a-f]{64}$/); // Valid hex hash
-  
+
   // Wait a moment for finality
   await new Promise((resolve) => setTimeout(resolve, 5000));
-  
+
   // Query updated stats
   const stats = await queryDonorStats(donorPublicKey);
   expect(stats.totalDonatedXLM).toBeGreaterThanOrEqual(50);

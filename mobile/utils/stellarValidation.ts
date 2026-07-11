@@ -6,6 +6,6 @@
 
 /** Returns true when `address` is a valid Stellar Ed25519 public key (G…). */
 export function isValidStellarAddress(address: unknown): address is string {
-  if (typeof address !== 'string') return false;
+  if (typeof address !== "string") return false;
   return /^G[A-Z0-9]{55}$/.test(address);
 }

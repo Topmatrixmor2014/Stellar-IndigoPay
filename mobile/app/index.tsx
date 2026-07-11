@@ -9,21 +9,21 @@ import {
   StyleSheet,
   TouchableOpacity,
   RefreshControl,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
-import axios from 'axios';
-import * as Notifications from 'expo-notifications';
-import { useTheme } from './theme';
-import { getCachedData, setCachedData } from '../utils/cache';
+} from "react-native";
+import { useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import axios from "axios";
+import * as Notifications from "expo-notifications";
+import { useTheme } from "./theme";
+import { getCachedData, setCachedData } from "../utils/cache";
 import {
   getPushToken,
   getUnreadNotificationCount,
   setupNotificationListener,
-} from '../utils/notifications';
+} from "../utils/notifications";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:4000';
-const CACHE_KEY_PROJECTS = 'home:projects_list';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:4000";
+const CACHE_KEY_PROJECTS = "home:projects_list";
 
 interface ClimateProject {
   id: string;
@@ -37,14 +37,53 @@ interface ClimateProject {
   status: string;
 }
 
-function SkeletonCard({ colors }: { colors: ReturnType<typeof useTheme>['colors'] }) {
+function SkeletonCard({
+  colors,
+}: {
+  colors: ReturnType<typeof useTheme>["colors"];
+}) {
   return (
-    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.cardBorder }]}>
-      <View style={[styles.skeletonLine, { width: '40%', backgroundColor: colors.border }]} />
-      <View style={[styles.skeletonLine, { width: '70%', marginTop: 8, height: 18, backgroundColor: colors.border }]} />
-      <View style={[styles.skeletonLine, { width: '90%', marginTop: 6, backgroundColor: colors.border }]} />
-      <View style={[styles.skeletonLine, { width: '60%', marginTop: 6, backgroundColor: colors.border }]} />
-      <View style={[styles.skeletonProgress, { backgroundColor: colors.border, marginTop: 14 }]} />
+    <View
+      style={[
+        styles.card,
+        { backgroundColor: colors.surface, borderColor: colors.cardBorder },
+      ]}
+    >
+      <View
+        style={[
+          styles.skeletonLine,
+          { width: "40%", backgroundColor: colors.border },
+        ]}
+      />
+      <View
+        style={[
+          styles.skeletonLine,
+          {
+            width: "70%",
+            marginTop: 8,
+            height: 18,
+            backgroundColor: colors.border,
+          },
+        ]}
+      />
+      <View
+        style={[
+          styles.skeletonLine,
+          { width: "90%", marginTop: 6, backgroundColor: colors.border },
+        ]}
+      />
+      <View
+        style={[
+          styles.skeletonLine,
+          { width: "60%", marginTop: 6, backgroundColor: colors.border },
+        ]}
+      />
+      <View
+        style={[
+          styles.skeletonProgress,
+          { backgroundColor: colors.border, marginTop: 14 },
+        ]}
+      />
     </View>
   );
 }
@@ -55,7 +94,7 @@ function ProjectCard({
   onPress,
 }: {
   project: ClimateProject;
-  colors: ReturnType<typeof useTheme>['colors'];
+  colors: ReturnType<typeof useTheme>["colors"];
   onPress: () => void;
 }) {
   const progress = (() => {
@@ -67,39 +106,67 @@ function ProjectCard({
 
   return (
     <TouchableOpacity
-      style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.cardBorder, shadowColor: colors.cardShadow }]}
+      style={[
+        styles.card,
+        {
+          backgroundColor: colors.surface,
+          borderColor: colors.cardBorder,
+          shadowColor: colors.cardShadow,
+        },
+      ]}
       onPress={onPress}
       activeOpacity={0.8}
       accessibilityLabel={`View ${project.name} project`}
       accessibilityRole="button"
     >
       <View style={styles.cardHeader}>
-        <Text style={[styles.category, { color: colors.primary }]}>{project.category}</Text>
+        <Text style={[styles.category, { color: colors.primary }]}>
+          {project.category}
+        </Text>
         <View style={styles.badgeRow}>
           {project.verified && (
-            <View style={[styles.verifiedBadge, { backgroundColor: colors.primary }]}>
+            <View
+              style={[
+                styles.verifiedBadge,
+                { backgroundColor: colors.primary },
+              ]}
+            >
               <Text style={styles.verifiedText}>✓ Verified</Text>
             </View>
           )}
         </View>
       </View>
 
-      <Text style={[styles.projectName, { color: colors.primaryText }]} numberOfLines={1}>
+      <Text
+        style={[styles.projectName, { color: colors.primaryText }]}
+        numberOfLines={1}
+      >
         {project.name}
       </Text>
-      <Text style={[styles.projectDescription, { color: colors.secondaryText }]} numberOfLines={2}>
+      <Text
+        style={[styles.projectDescription, { color: colors.secondaryText }]}
+        numberOfLines={2}
+      >
         {project.description}
       </Text>
 
       <View style={styles.progressContainer}>
         <View style={[styles.progressBar, { backgroundColor: colors.border }]}>
-          <View style={[styles.progressFill, { width: `${progress}%`, backgroundColor: colors.primary }]} />
+          <View
+            style={[
+              styles.progressFill,
+              { width: `${progress}%`, backgroundColor: colors.primary },
+            ]}
+          />
         </View>
         <View style={styles.progressRow}>
           <Text style={[styles.progressText, { color: colors.secondaryText }]}>
-            {parseFloat(project.raisedXLM).toFixed(0)} / {parseFloat(project.goalXLM).toFixed(0)} XLM
+            {parseFloat(project.raisedXLM).toFixed(0)} /{" "}
+            {parseFloat(project.goalXLM).toFixed(0)} XLM
           </Text>
-          <Text style={[styles.donorCount, { color: colors.muted }]}>{project.donorCount} donors</Text>
+          <Text style={[styles.donorCount, { color: colors.muted }]}>
+            {project.donorCount} donors
+          </Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -109,7 +176,7 @@ function ProjectCard({
 export default function HomeScreen() {
   const router = useRouter();
   const { colors } = useTheme();
-  const handleScan = () => router.push('/scan' as `${string}`);
+  const handleScan = () => router.push("/scan" as `${string}`);
   const [projects, setProjects] = useState<ClimateProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -197,7 +264,9 @@ export default function HomeScreen() {
           />
         )}
         contentContainerStyle={styles.listContent}
-        ListHeaderComponent={<Header colors={colors} unreadCount={unreadCount} />}
+        ListHeaderComponent={
+          <Header colors={colors} unreadCount={unreadCount} />
+        }
         ListEmptyComponent={
           networkError ? (
             <View style={styles.errorContainer}>
@@ -205,16 +274,26 @@ export default function HomeScreen() {
                 Unable to load projects. Check your connection.
               </Text>
               <TouchableOpacity
-                style={[styles.retryButton, { backgroundColor: colors.primary }]}
-                onPress={() => { setLoading(true); loadProjects(); }}
+                style={[
+                  styles.retryButton,
+                  { backgroundColor: colors.primary },
+                ]}
+                onPress={() => {
+                  setLoading(true);
+                  loadProjects();
+                }}
                 accessibilityLabel="Retry loading projects"
                 accessibilityRole="button"
               >
-                <Text style={[styles.retryText, { color: colors.buttonText }]}>Retry</Text>
+                <Text style={[styles.retryText, { color: colors.buttonText }]}>
+                  Retry
+                </Text>
               </TouchableOpacity>
             </View>
           ) : (
-            <Text style={[styles.emptyText, { color: colors.muted }]}>No projects found.</Text>
+            <Text style={[styles.emptyText, { color: colors.muted }]}>
+              No projects found.
+            </Text>
           )
         }
         refreshControl={
@@ -235,20 +314,26 @@ function Header({
   colors,
   unreadCount,
 }: {
-  colors: ReturnType<typeof useTheme>['colors'];
+  colors: ReturnType<typeof useTheme>["colors"];
   unreadCount: number;
 }) {
   return (
     <View style={[styles.header, { backgroundColor: colors.primary }]}>
       <View style={styles.headerTitleRow}>
-        <Text style={[styles.title, { color: colors.headerText }]}>Stellar IndigoPay</Text>
+        <Text style={[styles.title, { color: colors.headerText }]}>
+          Stellar IndigoPay
+        </Text>
         {unreadCount > 0 && (
           <View style={styles.unreadBadge}>
-            <Text style={styles.unreadBadgeText}>{unreadCount > 99 ? '99+' : unreadCount}</Text>
+            <Text style={styles.unreadBadgeText}>
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </Text>
           </View>
         )}
       </View>
-      <Text style={[styles.subtitle, { color: colors.headerText }]}>Climate donations on Stellar</Text>
+      <Text style={[styles.subtitle, { color: colors.headerText }]}>
+        Climate donations on Stellar
+      </Text>
     </View>
   );
 }
@@ -265,9 +350,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   headerTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     gap: 12,
   },
   unreadBadge: {
@@ -275,18 +360,18 @@ const styles = StyleSheet.create({
     height: 26,
     borderRadius: 13,
     paddingHorizontal: 7,
-    backgroundColor: '#ef4444',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#ef4444",
+    alignItems: "center",
+    justifyContent: "center",
   },
   unreadBadgeText: {
-    color: '#ffffff',
+    color: "#ffffff",
     fontSize: 12,
-    fontWeight: '800',
+    fontWeight: "800",
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   subtitle: {
     fontSize: 16,
@@ -304,19 +389,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 6,
   },
   category: {
     fontSize: 11,
-    fontWeight: '700',
-    textTransform: 'uppercase',
+    fontWeight: "700",
+    textTransform: "uppercase",
     letterSpacing: 0.5,
   },
   badgeRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 4,
   },
   verifiedBadge: {
@@ -326,12 +411,12 @@ const styles = StyleSheet.create({
   },
   verifiedText: {
     fontSize: 10,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: "700",
+    color: "#fff",
   },
   projectName: {
     fontSize: 17,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 4,
   },
   projectDescription: {
@@ -344,15 +429,15 @@ const styles = StyleSheet.create({
   progressBar: {
     height: 6,
     borderRadius: 3,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progressFill: {
-    height: '100%',
+    height: "100%",
     borderRadius: 3,
   },
   progressRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 4,
   },
   progressText: {
@@ -362,13 +447,13 @@ const styles = StyleSheet.create({
     fontSize: 11,
   },
   errorContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingTop: 48,
     paddingHorizontal: 32,
   },
   errorText: {
     fontSize: 15,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 20,
     lineHeight: 22,
   },
@@ -379,10 +464,10 @@ const styles = StyleSheet.create({
   },
   retryText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   emptyText: {
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 48,
     fontSize: 15,
   },
@@ -393,6 +478,6 @@ const styles = StyleSheet.create({
   skeletonProgress: {
     height: 6,
     borderRadius: 3,
-    width: '100%',
+    width: "100%",
   },
 });

@@ -6,22 +6,22 @@ verification flow are designed to be easy to consume in any language.
 
 ## Delivery Headers
 
-| Header | Description |
-|--------|-------------|
-| `X-Webhook-Id`        | Stable event id (sha256 of canonical milestone fields). Use for **idempotent dedup**. |
-| `X-Webhook-Event-Type`| Currently always `milestone.reached`. |
-| `X-Webhook-Delivery-Id` | Internal `webhook_deliveries` row uuid. |
-| `X-Webhook-Timestamp` | Unix seconds at sign time. |
-| `X-Webhook-Signature` | `t=<unix>,v1=<hex hmac-sha256(secret, "<ts>.<body>")>` |
-| `X-Webhook-Attempt`   | 1-based attempt counter. |
-| `User-Agent`          | `Stellar-IndigoPay-Webhook/1.0` |
-| `Content-Type`        | `application/json` |
+| Header                  | Description                                                                           |
+| ----------------------- | ------------------------------------------------------------------------------------- |
+| `X-Webhook-Id`          | Stable event id (sha256 of canonical milestone fields). Use for **idempotent dedup**. |
+| `X-Webhook-Event-Type`  | Currently always `milestone.reached`.                                                 |
+| `X-Webhook-Delivery-Id` | Internal `webhook_deliveries` row uuid.                                               |
+| `X-Webhook-Timestamp`   | Unix seconds at sign time.                                                            |
+| `X-Webhook-Signature`   | `t=<unix>,v1=<hex hmac-sha256(secret, "<ts>.<body>")>`                                |
+| `X-Webhook-Attempt`     | 1-based attempt counter.                                                              |
+| `User-Agent`            | `Stellar-IndigoPay-Webhook/1.0`                                                       |
+| `Content-Type`          | `application/json`                                                                    |
 
 ## Body
 
 ```json
 {
-  "id": "8e1b…",                       // mirrors X-Webhook-Id
+  "id": "8e1b…", // mirrors X-Webhook-Id
   "type": "milestone.reached",
   "event": "milestone.reached",
   "projectId": "f0c9…",
@@ -47,7 +47,7 @@ function verify(body, secret, header) {
     header.split(",").map((kv) => {
       const [k, v] = kv.split("=");
       return [k.trim(), v.trim()];
-    })
+    }),
   );
   const t = Number.parseInt(parts.t, 10);
   const v1 = parts.v1;
@@ -59,7 +59,8 @@ function verify(body, secret, header) {
     .digest();
   const got = Buffer.from(v1, "hex");
   if (got.length !== expected.length) return { ok: false, reason: "length" };
-  if (!crypto.timingSafeEqual(got, expected)) return { ok: false, reason: "mismatch" };
+  if (!crypto.timingSafeEqual(got, expected))
+    return { ok: false, reason: "mismatch" };
 
   // Replay window: reject events whose timestamp is more than 5 minutes
   // away from local clock.
@@ -95,13 +96,21 @@ the processing result so retries are safe.
 ### Node (Express)
 
 ```js
-app.post("/indigopay/webhook", express.raw({ type: "application/json" }), (req, res) => {
-  const result = verify(req.body, process.env.WEBHOOK_SECRET, req.get("X-Webhook-Signature"));
-  if (!result.ok) return res.status(401).json({ error: result.reason });
-  const event = JSON.parse(req.body.toString("utf8"));
-  // process event.id idempotently
-  res.status(204).end();
-});
+app.post(
+  "/indigopay/webhook",
+  express.raw({ type: "application/json" }),
+  (req, res) => {
+    const result = verify(
+      req.body,
+      process.env.WEBHOOK_SECRET,
+      req.get("X-Webhook-Signature"),
+    );
+    if (!result.ok) return res.status(401).json({ error: result.reason });
+    const event = JSON.parse(req.body.toString("utf8"));
+    // process event.id idempotently
+    res.status(204).end();
+  },
+);
 ```
 
 ### Go (net/http)
