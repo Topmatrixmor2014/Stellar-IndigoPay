@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Webhook signing** — `webhookSign` helper implementing GitHub-style
   `t=…,v1=…` HMAC-SHA256 with a 5-minute replay window and constant-time
   comparison. Idempotency enforced by `INSERT … ON CONFLICT DO UPDATE
-  RETURNING id, (xmax=0) AS inserted` on `webhook_deliveries`.
+RETURNING id, (xmax=0) AS inserted` on `webhook_deliveries`.
 - **Webhook Prometheus metrics** — `webhook_deliveries_total`,
   `webhook_delivery_attempts_total`, `webhook_delivery_duration_seconds`,
   plus `ai_summary_tokens_total`, `ai_summary_cost_usd_total`,

@@ -53,7 +53,8 @@ router.get("/project/:id", async (req, res, next) => {
        WHERE id = $1`,
       [req.params.id],
     );
-    if (!projectResult.rows[0]) return res.status(404).json({ error: "Project not found" });
+    if (!projectResult.rows[0])
+      return res.status(404).json({ error: "Project not found" });
 
     const aggResult = await pool.query(
       `SELECT
@@ -66,11 +67,15 @@ router.get("/project/:id", async (req, res, next) => {
     );
 
     const p = projectResult.rows[0];
-    const totalDonationsXLM = Number.parseFloat(aggResult.rows[0].totalDonationsXLM || "0");
+    const totalDonationsXLM = Number.parseFloat(
+      aggResult.rows[0].totalDonationsXLM || "0",
+    );
     const donorCount = aggResult.rows[0].donorCount || 0;
 
     const raisedXlm = Number.parseFloat(p.raised_xlm?.toString() || "0");
-    const projectCo2OffsetKg = Number.parseFloat(p.co2_offset_kg?.toString() || "0");
+    const projectCo2OffsetKg = Number.parseFloat(
+      p.co2_offset_kg?.toString() || "0",
+    );
     const kgPerXlm = raisedXlm > 0 ? projectCo2OffsetKg / raisedXlm : 0;
     const co2OffsetKg = Math.round(totalDonationsXLM * kgPerXlm);
 
@@ -135,13 +140,19 @@ router.get("/global", async (req, res, next) => {
     );
 
     const totalsRow = totalsResult.rows[0] || {};
-    const totalDonationsXLM = Number.parseFloat(totalsRow.totalDonationsXLM || "0");
+    const totalDonationsXLM = Number.parseFloat(
+      totalsRow.totalDonationsXLM || "0",
+    );
     const donorCount = totalsRow.donorCount || 0;
-    const co2OffsetKg = Math.round(Number.parseFloat(totalsRow.co2OffsetKg || "0"));
+    const co2OffsetKg = Math.round(
+      Number.parseFloat(totalsRow.co2OffsetKg || "0"),
+    );
 
     const breakdownByCategory = breakdownResult.rows.map((row) => ({
       category: row.category,
-      totalDonationsXLM: Number.parseFloat(row.totalDonationsXLM || "0").toFixed(7),
+      totalDonationsXLM: Number.parseFloat(
+        row.totalDonationsXLM || "0",
+      ).toFixed(7),
       donorCount: row.donorCount || 0,
       co2OffsetKg: Math.round(Number.parseFloat(row.co2OffsetKg || "0")),
     }));
@@ -225,4 +236,3 @@ router.get("/donor/:publicKey", async (req, res, next) => {
 });
 
 module.exports = router;
-

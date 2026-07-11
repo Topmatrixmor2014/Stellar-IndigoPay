@@ -3,30 +3,52 @@
  */
 "use strict";
 const express = require("express");
-const router  = express.Router();
+const router = express.Router();
 const pool = require("../db/pool");
 const { mapProfileRow } = require("../services/store");
 const { createRateLimiter } = require("../middleware/rateLimiter");
-const { sanitizedStringField, validateBody } = require("../middleware/validation");
+const {
+  sanitizedStringField,
+  validateBody,
+} = require("../middleware/validation");
 const { z } = require("zod");
 
 function validateKey(k) {
-  if (!k || !/^G[A-Z0-9]{55}$/.test(k)) { const e = new Error("Invalid public key"); e.status = 400; throw e; }
+  if (!k || !/^G[A-Z0-9]{55}$/.test(k)) {
+    const e = new Error("Invalid public key");
+    e.status = 400;
+    throw e;
+  }
 }
 
 const profilePostLimiter = createRateLimiter(20, 1);
 
 const profileSchema = z.object({
   publicKey: z.string().min(1, "publicKey is required"),
-  displayName: sanitizedStringField({ required: false, maxLength: 30, message: "must not contain HTML" }).optional(),
-  bio: sanitizedStringField({ required: false, maxLength: 300, message: "must not contain HTML" }).optional(),
+  displayName: sanitizedStringField({
+    required: false,
+    maxLength: 30,
+    message: "must not contain HTML",
+  }).optional(),
+  bio: sanitizedStringField({
+    required: false,
+    maxLength: 300,
+    message: "must not contain HTML",
+  }).optional(),
 });
 
 router.get("/:publicKey", async (req, res, next) => {
   try {
     validateKey(req.params.publicKey);
-    const result = await pool.query("SELECT * FROM profiles WHERE public_key = $1", [req.params.publicKey]);
-    if (!result.rows[0]) { const e = new Error("Profile not found"); e.status = 404; throw e; }
+    const result = await pool.query(
+      "SELECT * FROM profiles WHERE public_key = $1",
+      [req.params.publicKey],
+    );
+    if (!result.rows[0]) {
+      const e = new Error("Profile not found");
+      e.status = 404;
+      throw e;
+    }
 
     const co2Result = await pool.query(
       `SELECT COALESCE(
@@ -52,18 +74,24 @@ router.get("/:publicKey", async (req, res, next) => {
       success: true,
       data: { ...mapProfileRow(result.rows[0]), totalCo2OffsetKg },
     });
-  } catch (e) { next(e); }
+  } catch (e) {
+    next(e);
+  }
 });
 
-router.post("/", profilePostLimiter, validateBody(profileSchema), async (req, res, next) => {
-  try {
-    const { publicKey, displayName, bio } = req.body;
-    validateKey(publicKey);
-    const trimmedDisplayName = displayName?.trim().slice(0, 30) || null;
-    const trimmedBio = bio?.trim().slice(0, 300) || null;
+router.post(
+  "/",
+  profilePostLimiter,
+  validateBody(profileSchema),
+  async (req, res, next) => {
+    try {
+      const { publicKey, displayName, bio } = req.body;
+      validateKey(publicKey);
+      const trimmedDisplayName = displayName?.trim().slice(0, 30) || null;
+      const trimmedBio = bio?.trim().slice(0, 300) || null;
 
-    const result = await pool.query(
-      `INSERT INTO profiles (
+      const result = await pool.query(
+        `INSERT INTO profiles (
         public_key, display_name, bio, total_donated_xlm, projects_supported, badges, created_at, updated_at
       )
       VALUES ($1, $2, $3, 0, 0, '[]'::jsonb, NOW(), NOW())
@@ -72,11 +100,14 @@ router.post("/", profilePostLimiter, validateBody(profileSchema), async (req, re
         bio = COALESCE($3, profiles.bio),
         updated_at = NOW()
       RETURNING *`,
-      [publicKey, trimmedDisplayName, trimmedBio],
-    );
+        [publicKey, trimmedDisplayName, trimmedBio],
+      );
 
-    res.json({ success: true, data: mapProfileRow(result.rows[0]) });
-  } catch (e) { next(e); }
-});
+      res.json({ success: true, data: mapProfileRow(result.rows[0]) });
+    } catch (e) {
+      next(e);
+    }
+  },
+);
 
 module.exports = router;

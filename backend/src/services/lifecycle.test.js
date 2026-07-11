@@ -25,9 +25,18 @@ describe("lifecycle service", () => {
 
   test("runShutdownHandlers invokes handlers in registration order", async () => {
     const order = [];
-    lifecycle.onShutdown(() => { order.push("a"); return Promise.resolve(); });
-    lifecycle.onShutdown(() => { order.push("b"); return Promise.resolve(); });
-    lifecycle.onShutdown(() => { order.push("c"); return Promise.resolve(); });
+    lifecycle.onShutdown(() => {
+      order.push("a");
+      return Promise.resolve();
+    });
+    lifecycle.onShutdown(() => {
+      order.push("b");
+      return Promise.resolve();
+    });
+    lifecycle.onShutdown(() => {
+      order.push("c");
+      return Promise.resolve();
+    });
     await lifecycle.runShutdownHandlers();
     expect(order).toEqual(["a", "b", "c"]);
   });
@@ -37,9 +46,16 @@ describe("lifecycle service", () => {
     const origError = console.error;
     console.error = jest.fn();
     try {
-      lifecycle.onShutdown(() => { order.push("a"); });
-      lifecycle.onShutdown(() => { order.push("b"); throw new Error("boom"); });
-      lifecycle.onShutdown(() => { order.push("c"); });
+      lifecycle.onShutdown(() => {
+        order.push("a");
+      });
+      lifecycle.onShutdown(() => {
+        order.push("b");
+        throw new Error("boom");
+      });
+      lifecycle.onShutdown(() => {
+        order.push("c");
+      });
       await lifecycle.runShutdownHandlers();
       expect(order).toEqual(["a", "b", "c"]);
     } finally {

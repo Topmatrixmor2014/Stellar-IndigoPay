@@ -3,28 +3,28 @@ name: Database Backup
 on:
   schedule:
     # Run nightly at 2 AM UTC
-    - cron: '0 2 * * *'
+    - cron: "0 2 * * *"
   workflow_dispatch:
     inputs:
       storage_type:
-        description: 'Storage type (s3 or gcs)'
+        description: "Storage type (s3 or gcs)"
         required: false
-        default: 's3'
+        default: "s3"
 
 jobs:
   backup-database:
     name: Backup PostgreSQL Database
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Install PostgreSQL client
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
-      
+
       - name: Configure AWS credentials
         if: github.event.inputs.storage_type != 'gcs' && secrets.AWS_ACCESS_KEY_ID != ''
         uses: aws-actions/configure-aws-credentials@v4
@@ -32,14 +32,14 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
-      
+
       - name: Setup Google Cloud SDK
         if: github.event.inputs.storage_type == 'gcs'
         uses: google-github-actions/setup-gcloud@v1
         with:
           service_account_key: ${{ secrets.GCS_SA_KEY }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-      
+
       - name: Run database backup
         env:
           DB_HOST: ${{ secrets.DB_HOST }}
@@ -56,13 +56,13 @@ jobs:
           BACKUP_DIR: /tmp/backups
         run: |
           bash scripts/backup-db.sh
-      
+
       - name: Backup status check
         if: failure()
         run: |
           echo "::error::Database backup failed. Check the logs above."
           exit 1
-      
+
       - name: Upload backup status
         if: always()
         uses: actions/github-script@v7
@@ -82,7 +82,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: backup-database
     if: failure()
-    
+
     steps:
       - name: Create issue on backup failure
         uses: actions/github-script@v7
@@ -90,7 +90,7 @@ jobs:
           script: |
             const title = '🚨 Database Backup Failed';
             const body = `Database backup failed on ${new Date().toISOString()}.\n\nCheck the workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
-            
+
             github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,

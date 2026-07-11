@@ -38,20 +38,26 @@ describe("GET /metrics (scrape endpoint)", () => {
 
   test("returns 401 when the bearer token does not match", async () => {
     process.env.METRICS_BEARER_TOKEN = "supersecret";
-    const res = await request(buildApp()).get("/").set("Authorization", "Bearer wrong");
+    const res = await request(buildApp())
+      .get("/")
+      .set("Authorization", "Bearer wrong");
     expect(res.status).toBe(401);
   });
 
   test("returns 200 with the metrics body when the bearer token matches", async () => {
     process.env.METRICS_BEARER_TOKEN = "supersecret";
-    const res = await request(buildApp()).get("/").set("Authorization", "Bearer supersecret");
+    const res = await request(buildApp())
+      .get("/")
+      .set("Authorization", "Bearer supersecret");
     expect(res.status).toBe(200);
     expect(res.text).toMatch(/^# HELP nodejs_/m);
   });
 
   test("bearer match is case-insensitive on the scheme prefix", async () => {
     process.env.METRICS_BEARER_TOKEN = "supersecret";
-    const res = await request(buildApp()).get("/").set("Authorization", "bearer supersecret");
+    const res = await request(buildApp())
+      .get("/")
+      .set("Authorization", "bearer supersecret");
     expect(res.status).toBe(200);
   });
 });

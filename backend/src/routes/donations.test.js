@@ -73,7 +73,9 @@ async function invokeRecordDonation(body) {
   const res = createMockResponse();
   const next = jest.fn((err) => {
     if (err) {
-      res.status(err.status || 500).json({ error: err.message || "Internal server error" });
+      res
+        .status(err.status || 500)
+        .json({ error: err.message || "Internal server error" });
     }
   });
 
@@ -164,13 +166,13 @@ describe("POST /api/donations", () => {
     };
 
     const client = createMockClient(
-      queryResult([{ id: "project-1" }]),   // SELECT project
-      queryResult([]),                         // dedup check
-      queryResult(),                           // BEGIN
-      queryResult([donationRow]),              // INSERT donation
-      queryResult([]),                         // SELECT donation_matches (empty)
-      queryResult(),                           // UPDATE projects
-      queryResult(),                           // COMMIT
+      queryResult([{ id: "project-1" }]), // SELECT project
+      queryResult([]), // dedup check
+      queryResult(), // BEGIN
+      queryResult([donationRow]), // INSERT donation
+      queryResult([]), // SELECT donation_matches (empty)
+      queryResult(), // UPDATE projects
+      queryResult(), // COMMIT
     );
 
     const { res, next } = await invokeRecordDonation({
@@ -283,23 +285,25 @@ describe("POST /api/donations", () => {
 
   test("updates project totals after a donation", async () => {
     const client = createMockClient(
-      queryResult([{ id: "project-2" }]),    // SELECT project
-      queryResult([]),                          // dedup check
-      queryResult(),                            // BEGIN
-      queryResult([{
-        id: "donation-2",
-        project_id: "project-2",
-        donor_address: makePublicKey("E"),
-        amount_xlm: "5.5",
-        amount: "5.5",
-        currency: "XLM",
-        message: null,
-        transaction_hash: makeTxHash("e"),
-        created_at: "2026-03-29T10:00:00.000Z",
-      }]),                                      // INSERT donation
-      queryResult([]),                          // SELECT donation_matches (empty)
-      queryResult(),                            // UPDATE projects
-      queryResult(),                            // COMMIT
+      queryResult([{ id: "project-2" }]), // SELECT project
+      queryResult([]), // dedup check
+      queryResult(), // BEGIN
+      queryResult([
+        {
+          id: "donation-2",
+          project_id: "project-2",
+          donor_address: makePublicKey("E"),
+          amount_xlm: "5.5",
+          amount: "5.5",
+          currency: "XLM",
+          message: null,
+          transaction_hash: makeTxHash("e"),
+          created_at: "2026-03-29T10:00:00.000Z",
+        },
+      ]), // INSERT donation
+      queryResult([]), // SELECT donation_matches (empty)
+      queryResult(), // UPDATE projects
+      queryResult(), // COMMIT
     );
 
     const { res, next } = await invokeRecordDonation({
@@ -320,23 +324,25 @@ describe("POST /api/donations", () => {
   test("calculates badges from cumulative donations across multiple requests", async () => {
     const donorAddress = makePublicKey("F");
     const client = createMockClient(
-      queryResult([{ id: "project-3" }]),    // SELECT project
-      queryResult([]),                          // dedup check
-      queryResult(),                            // BEGIN
-      queryResult([{
-        id: "donation-3",
-        project_id: "project-3",
-        donor_address: donorAddress,
-        amount_xlm: "1",
-        amount: "1",
-        currency: "XLM",
-        message: null,
-        transaction_hash: makeTxHash("f"),
-        created_at: "2026-03-29T10:00:00.000Z",
-      }]),                                      // INSERT donation
-      queryResult([]),                          // SELECT donation_matches (empty)
-      queryResult(),                            // UPDATE projects
-      queryResult(),                            // COMMIT
+      queryResult([{ id: "project-3" }]), // SELECT project
+      queryResult([]), // dedup check
+      queryResult(), // BEGIN
+      queryResult([
+        {
+          id: "donation-3",
+          project_id: "project-3",
+          donor_address: donorAddress,
+          amount_xlm: "1",
+          amount: "1",
+          currency: "XLM",
+          message: null,
+          transaction_hash: makeTxHash("f"),
+          created_at: "2026-03-29T10:00:00.000Z",
+        },
+      ]), // INSERT donation
+      queryResult([]), // SELECT donation_matches (empty)
+      queryResult(), // UPDATE projects
+      queryResult(), // COMMIT
     );
 
     const { res, next } = await invokeRecordDonation({
@@ -354,8 +360,8 @@ describe("POST /api/donations", () => {
   test("rejects a transaction that is not confirmed on Stellar", async () => {
     server.getTransaction.mockResolvedValueOnce({ successful: false });
     const client = createMockClient(
-      queryResult([{ id: "project-1" }]),   // SELECT project
-      queryResult([]),                         // dedup check
+      queryResult([{ id: "project-1" }]), // SELECT project
+      queryResult([]), // dedup check
     );
 
     const { res, next } = await invokeRecordDonation({
@@ -376,8 +382,8 @@ describe("POST /api/donations", () => {
   test("rejects a transaction hash that cannot be found on Stellar", async () => {
     server.getTransaction.mockRejectedValueOnce(new Error("404 Not Found"));
     const client = createMockClient(
-      queryResult([{ id: "project-1" }]),   // SELECT project
-      queryResult([]),                         // dedup check
+      queryResult([{ id: "project-1" }]), // SELECT project
+      queryResult([]), // dedup check
     );
 
     const { res, next } = await invokeRecordDonation({
@@ -440,17 +446,19 @@ describe("POST /api/donations", () => {
       queryResult([{ id: "project-4" }]),
       queryResult([]),
       queryResult(),
-      queryResult([{
-        id: "donation-4",
-        project_id: "project-4",
-        donor_address: makePublicKey("G"),
-        amount_xlm: "12",
-        amount: "12",
-        currency: "XLM",
-        message: null,
-        transaction_hash: makeTxHash("a"),
-        created_at: "2026-03-29T10:00:00.000Z",
-      }]),
+      queryResult([
+        {
+          id: "donation-4",
+          project_id: "project-4",
+          donor_address: makePublicKey("G"),
+          amount_xlm: "12",
+          amount: "12",
+          currency: "XLM",
+          message: null,
+          transaction_hash: makeTxHash("a"),
+          created_at: "2026-03-29T10:00:00.000Z",
+        },
+      ]),
       queryResult([]),
       queryResult(),
       queryResult(),
@@ -539,12 +547,15 @@ describe("profile upsert on first donation", () => {
       queryResult([donationRow]),
       queryResult([]),
       queryResult(),
-      queryResult([{                          // existing profile with display_name + bio
-        public_key: donorAddress,
-        display_name: "Green Donor",
-        bio: "I care about the planet.",
-        total_donated_xlm: "90.0000000",
-      }]),
+      queryResult([
+        {
+          // existing profile with display_name + bio
+          public_key: donorAddress,
+          display_name: "Green Donor",
+          bio: "I care about the planet.",
+          total_donated_xlm: "90.0000000",
+        },
+      ]),
       queryResult([{ count: "2" }]),
       queryResult(),
     );
@@ -582,8 +593,8 @@ describe("profile upsert on first donation", () => {
       queryResult(),
       queryResult([donationRow]),
       // no donation_matches query for non-XLM
-      queryResult(),                          // UPDATE projects (raises_xlm += 0)
-      queryResult(),                          // COMMIT
+      queryResult(), // UPDATE projects (raises_xlm += 0)
+      queryResult(), // COMMIT
     );
 
     const { res, next } = await invokeRecordDonation({

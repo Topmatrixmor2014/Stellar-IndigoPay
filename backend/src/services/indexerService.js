@@ -22,12 +22,17 @@ let horizonStream = null; // tracked so stop() can close the SSE stream
  */
 async function updateProjectWallets() {
   try {
-    const result = await pool.query("SELECT id, wallet_address FROM projects WHERE status = 'active'");
+    const result = await pool.query(
+      "SELECT id, wallet_address FROM projects WHERE status = 'active'",
+    );
     projectWallets.clear();
     for (const row of result.rows) {
       projectWallets.set(row.wallet_address, row.id);
     }
-    logger.debug({ event: "indexer_wallets_refreshed", count: projectWallets.size }, "Project wallet cache updated");
+    logger.debug(
+      { event: "indexer_wallets_refreshed", count: projectWallets.size },
+      "Project wallet cache updated",
+    );
   } catch (err) {
     logger.error({ event: "indexer_wallets_refresh_error", err }, err.message);
   }
@@ -55,15 +60,20 @@ async function startIndexer(socketIo) {
   // event loop alive past server.close().
   projectWalletsInterval = setInterval(updateProjectWallets, 10 * 60 * 1000);
   // Unref so this timer alone doesn't keep the process alive.
-  if (typeof projectWalletsInterval.unref === "function") projectWalletsInterval.unref();
+  if (typeof projectWalletsInterval.unref === "function")
+    projectWalletsInterval.unref();
 
-  logger.info({ event: "indexer_started" }, "Starting Horizon operations stream");
+  logger.info(
+    { event: "indexer_started" },
+    "Starting Horizon operations stream",
+  );
 
   // Start streaming operations from 'now'. The returned EventSource
   // supports .close() (the @stellar/stellar-sdk wraps fetch's
   // ReadableStream), which we call from stop() to release the SSE
   // connection during shutdown.
-  horizonStream = stellarServer.operations()
+  horizonStream = stellarServer
+    .operations()
     .cursor("now")
     .stream({
       onmessage: async (op) => {
@@ -82,8 +92,11 @@ async function startIndexer(socketIo) {
         }
       },
       onerror: (err) => {
-        logger.error({ event: "indexer_horizon_stream_error", err }, "Horizon stream error");
-      }
+        logger.error(
+          { event: "indexer_horizon_stream_error", err },
+          "Horizon stream error",
+        );
+      },
     });
 }
 
@@ -111,7 +124,7 @@ async function handleDonation(projectId, op) {
     // 1. Deduplicate by transaction hash
     const existingResult = await client.query(
       "SELECT id FROM donations WHERE transaction_hash = $1",
-      [txHash]
+      [txHash],
     );
     if (existingResult.rows.length > 0) {
       return;
@@ -125,7 +138,7 @@ async function handleDonation(projectId, op) {
     await client.query(
       `INSERT INTO donations (id, project_id, donor_address, amount_xlm, amount, currency, transaction_hash, created_at)
        VALUES ($1, $2, $3, $4, $5, 'XLM', $6, NOW())`,
-      [donationId, projectId, donorAddress, amountXLM, amountXLM, txHash]
+      [donationId, projectId, donorAddress, amountXLM, amountXLM, txHash],
     );
 
     // 3. Update project raised amount and donor count
@@ -135,23 +148,26 @@ async function handleDonation(projectId, op) {
            donor_count = (SELECT COUNT(DISTINCT donor_address) FROM donations WHERE project_id = $2),
            updated_at = NOW()
        WHERE id = $2`,
-      [amountXLM, projectId]
+      [amountXLM, projectId],
     );
 
     // 4. Update donor profile (total donated, projects supported, badges)
     const existingProfileResult = await client.query(
       "SELECT total_donated_xlm FROM profiles WHERE public_key = $1",
-      [donorAddress]
+      [donorAddress],
     );
     const existingProfile = existingProfileResult.rows[0];
-    const previousTotal = existingProfile ? parseFloat(existingProfile.total_donated_xlm || "0") : 0;
+    const previousTotal = existingProfile
+      ? parseFloat(existingProfile.total_donated_xlm || "0")
+      : 0;
     const newTotal = previousTotal + amountXLM;
-    
+
     const projectsSupportedResult = await client.query(
       "SELECT COUNT(DISTINCT project_id) AS count FROM donations WHERE donor_address = $1",
-      [donorAddress]
+      [donorAddress],
     );
-    const projectsSupported = parseInt(projectsSupportedResult.rows[0].count, 10) || 1;
+    const projectsSupported =
+      parseInt(projectsSupportedResult.rows[0].count, 10) || 1;
     const badges = computeBadges(newTotal);
 
     await client.query(
@@ -162,20 +178,28 @@ async function handleDonation(projectId, op) {
          projects_supported = EXCLUDED.projects_supported,
          badges = EXCLUDED.badges,
          updated_at = NOW()`,
-      [donorAddress, newTotal.toFixed(7), projectsSupported, JSON.stringify(badges)]
+      [
+        donorAddress,
+        newTotal.toFixed(7),
+        projectsSupported,
+        JSON.stringify(badges),
+      ],
     );
 
     await client.query("COMMIT");
     inTransaction = false;
 
-    logger.info({
-      event: "indexer_donation_recorded",
-      amount: amountXLM,
-      currency: "XLM",
-      project: projectId,
-      donor: donorAddress,
-      txHash,
-    }, "Indexer donation recorded");
+    logger.info(
+      {
+        event: "indexer_donation_recorded",
+        amount: amountXLM,
+        currency: "XLM",
+        project: projectId,
+        donor: donorAddress,
+        txHash,
+      },
+      "Indexer donation recorded",
+    );
 
     // 5. Emit WebSocket event
     if (io) {
@@ -184,7 +208,7 @@ async function handleDonation(projectId, op) {
         donorAddress,
         amountXLM,
         txHash,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
 
@@ -192,7 +216,10 @@ async function handleDonation(projectId, op) {
     checkAndDeliverMilestones(projectId).catch(() => {});
   } catch (err) {
     if (inTransaction) await client.query("ROLLBACK");
-    logger.error({ event: "indexer_donation_error", project: projectId, txHash, err }, err.message);
+    logger.error(
+      { event: "indexer_donation_error", project: projectId, txHash, err },
+      err.message,
+    );
   } finally {
     client.release();
   }
@@ -215,7 +242,7 @@ function getStatus() {
     isRunning,
     lastProcessedLedger,
     projectWalletsCount: projectWallets.size,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 }
 

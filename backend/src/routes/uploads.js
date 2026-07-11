@@ -26,7 +26,10 @@ const { createRateLimiter } = require("../middleware/rateLimiter");
 
 const uploadRateLimiter = createRateLimiter(20, 15); // 20 uploads per 15 min
 
-const MAX_BYTES = parseInt(process.env.UPLOAD_MAX_BYTES || String(10 * 1024 * 1024), 10);
+const MAX_BYTES = parseInt(
+  process.env.UPLOAD_MAX_BYTES || String(10 * 1024 * 1024),
+  10,
+);
 
 const ALLOWED_MIME = new Set([
   "application/pdf",
@@ -61,7 +64,9 @@ router.post("/", uploadRateLimiter, (req, res, next) => {
     if (err) return next(err);
 
     if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded. Use the 'file' multipart field." });
+      return res
+        .status(400)
+        .json({ error: "No file uploaded. Use the 'file' multipart field." });
     }
     if (req.file.mimetype && !ALLOWED_MIME.has(req.file.mimetype)) {
       return res.status(400).json({
@@ -70,7 +75,11 @@ router.post("/", uploadRateLimiter, (req, res, next) => {
     }
 
     try {
-      const stored = await uploadFile(req.file.buffer, req.file.originalname, req.file.mimetype);
+      const stored = await uploadFile(
+        req.file.buffer,
+        req.file.originalname,
+        req.file.mimetype,
+      );
       res.status(201).json({
         success: true,
         data: {
@@ -91,7 +100,9 @@ router.post("/", uploadRateLimiter, (req, res, next) => {
  */
 router.get("/:key", (req, res) => {
   if (backendName() !== "local") {
-    return res.status(404).json({ error: "Static serving disabled for this storage backend" });
+    return res
+      .status(404)
+      .json({ error: "Static serving disabled for this storage backend" });
   }
   const key = req.params.key;
   // Defence-in-depth: never let a path traversal escape the uploads dir.

@@ -53,11 +53,13 @@ function buildApp() {
   app.set("io", io);
 
   app.use("/api/donations", donationsRouter);
-  
+
   app.use("/api/projects", projectsRouter);
 
   app.use((err, _req, res, _next) => {
-    res.status(err.status || 500).json({ error: err.message || "Internal server error" });
+    res
+      .status(err.status || 500)
+      .json({ error: err.message || "Internal server error" });
   });
   return app;
 }
@@ -89,7 +91,6 @@ describe("GET /api/projects", () => {
     redis.get.mockResolvedValue(null);
     jest.clearAllMocks();
   });
-
 
   test("filters by category", async () => {
     pool.query.mockResolvedValue({ rows: [MOCK_PROJECT_ROW] });
@@ -162,7 +163,9 @@ describe("GET /api/projects/:id", () => {
   test("returns a single project", async () => {
     pool.query.mockResolvedValueOnce({ rows: [MOCK_PROJECT_ROW] }); // SELECT project
     pool.query.mockResolvedValueOnce({ rows: [] }); // campaigns (fetchCampaignsForProject)
-    pool.query.mockResolvedValueOnce({ rows: [{ avg_rating: "4.5", count: "10" }] }); // ratings
+    pool.query.mockResolvedValueOnce({
+      rows: [{ avg_rating: "4.5", count: "10" }],
+    }); // ratings
     pool.query.mockResolvedValueOnce({ rows: [] }); // milestones
     pool.query.mockResolvedValueOnce({ rows: [{ count: "0" }] }); // follow count
 
@@ -265,9 +268,7 @@ describe("GET /api/donations/:id", () => {
     });
 
     const validId = "8d9ac19b-52eb-42f7-80d9-19a88ba59e43";
-    const res = await request(app)
-      .get(`/api/donations/${validId}`)
-      .expect(200);
+    const res = await request(app).get(`/api/donations/${validId}`).expect(200);
 
     expect(res.body.success).toBe(true);
     expect(res.body.data.projectName).toBe("Amazon Reforestation");
@@ -279,17 +280,13 @@ describe("GET /api/donations/:id", () => {
     pool.query.mockResolvedValue({ rows: [] });
 
     const validId = "8d9ac19b-52eb-42f7-80d9-19a88ba59e43";
-    const res = await request(app)
-      .get(`/api/donations/${validId}`)
-      .expect(404);
+    const res = await request(app).get(`/api/donations/${validId}`).expect(404);
 
     expect(res.body.error).toBe("Donation not found");
   });
 
   test("returns 400 for invalid UUID", async () => {
-    const res = await request(app)
-      .get("/api/donations/invalid-id")
-      .expect(400);
+    const res = await request(app).get("/api/donations/invalid-id").expect(400);
 
     expect(res.body.error).toBe("Invalid donation ID");
   });

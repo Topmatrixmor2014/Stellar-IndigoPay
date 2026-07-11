@@ -73,18 +73,41 @@ describe("webhookSign", () => {
 
   describe("computeEventId", () => {
     test("is deterministic for the same canonical fields", () => {
-      const a = computeEventId({ projectId: "p1", milestoneId: "m1", percentage: 25, raisedXlm: "1.5" });
-      const b = computeEventId({ projectId: "p1", milestoneId: "m1", percentage: 25, raisedXlm: "1.5" });
+      const a = computeEventId({
+        projectId: "p1",
+        milestoneId: "m1",
+        percentage: 25,
+        raisedXlm: "1.5",
+      });
+      const b = computeEventId({
+        projectId: "p1",
+        milestoneId: "m1",
+        percentage: 25,
+        raisedXlm: "1.5",
+      });
       expect(a).toBe(b);
       expect(a).toMatch(/^[a-f0-9]{64}$/);
     });
 
     test("changes when any field changes", () => {
-      const base = { projectId: "p1", milestoneId: "m1", percentage: 25, raisedXlm: "1.5" };
-      expect(computeEventId(base)).not.toBe(computeEventId({ ...base, percentage: 26 }));
-      expect(computeEventId(base)).not.toBe(computeEventId({ ...base, projectId: "p2" }));
-      expect(computeEventId(base)).not.toBe(computeEventId({ ...base, milestoneId: "m2" }));
-      expect(computeEventId(base)).not.toBe(computeEventId({ ...base, raisedXlm: "1.6" }));
+      const base = {
+        projectId: "p1",
+        milestoneId: "m1",
+        percentage: 25,
+        raisedXlm: "1.5",
+      };
+      expect(computeEventId(base)).not.toBe(
+        computeEventId({ ...base, percentage: 26 }),
+      );
+      expect(computeEventId(base)).not.toBe(
+        computeEventId({ ...base, projectId: "p2" }),
+      );
+      expect(computeEventId(base)).not.toBe(
+        computeEventId({ ...base, milestoneId: "m2" }),
+      );
+      expect(computeEventId(base)).not.toBe(
+        computeEventId({ ...base, raisedXlm: "1.6" }),
+      );
     });
   });
 });

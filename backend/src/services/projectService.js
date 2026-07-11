@@ -8,9 +8,15 @@ const { mapProjectRow } = require("./store");
 
 const VALID_STATUSES = ["active", "completed", "paused"];
 const VALID_CATEGORIES = [
-  "Reforestation", "Solar Energy", "Ocean Conservation", "Clean Water",
-  "Wildlife Protection", "Carbon Capture", "Wind Energy",
-  "Sustainable Agriculture", "Other",
+  "Reforestation",
+  "Solar Energy",
+  "Ocean Conservation",
+  "Clean Water",
+  "Wildlife Protection",
+  "Carbon Capture",
+  "Wind Energy",
+  "Sustainable Agriculture",
+  "Other",
 ];
 
 async function getAllProjects({ category, status, limit = 20 } = {}) {
@@ -40,12 +46,23 @@ async function getProjectById(id) {
   return mapProjectRow(result.rows[0]);
 }
 
-async function createProject({ id, name, description, category, location, walletAddress, goalXLM, co2PerXLM } = {}) {
+async function createProject({
+  id,
+  name,
+  description,
+  category,
+  location,
+  walletAddress,
+  goalXLM,
+  co2PerXLM,
+} = {}) {
   if (!name || !category || !walletAddress) {
     throw new Error("name, category, and walletAddress are required");
   }
   if (!VALID_CATEGORIES.includes(category)) {
-    throw new Error(`Invalid category. Must be one of: ${VALID_CATEGORIES.join(", ")}`);
+    throw new Error(
+      `Invalid category. Must be one of: ${VALID_CATEGORIES.join(", ")}`,
+    );
   }
   const result = await pool.query(
     `INSERT INTO projects
@@ -54,8 +71,16 @@ async function createProject({ id, name, description, category, location, wallet
         raised_xlm, donor_count, tags, created_at, updated_at)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'active',false,false,0,0,'{}',NOW(),NOW())
      RETURNING *`,
-    [id, name, description || "", category, location || "", walletAddress,
-      goalXLM || "0", Number(co2PerXLM) || 0],
+    [
+      id,
+      name,
+      description || "",
+      category,
+      location || "",
+      walletAddress,
+      goalXLM || "0",
+      Number(co2PerXLM) || 0,
+    ],
   );
   return mapProjectRow(result.rows[0]);
 }
@@ -67,7 +92,9 @@ async function updateProject(id, updates = {}) {
 
   if (status !== undefined) {
     if (!VALID_STATUSES.includes(status)) {
-      throw new Error(`Invalid status. Must be one of: ${VALID_STATUSES.join(", ")}`);
+      throw new Error(
+        `Invalid status. Must be one of: ${VALID_STATUSES.join(", ")}`,
+      );
     }
     values.push(status);
     setClauses.push(`status = $${values.length}`);
@@ -91,4 +118,9 @@ async function updateProject(id, updates = {}) {
   return mapProjectRow(result.rows[0]);
 }
 
-module.exports = { getAllProjects, getProjectById, createProject, updateProject };
+module.exports = {
+  getAllProjects,
+  getProjectById,
+  createProject,
+  updateProject,
+};

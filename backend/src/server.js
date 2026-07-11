@@ -44,12 +44,18 @@ const logger = require("./logger");
 const requestLogger = require("./middleware/requestLogger");
 const requestId = require("./middleware/requestId");
 const metricsMiddleware = require("./middleware/metrics");
-const { createCorsMiddleware, getAllowedOrigins } = require("./middleware/corsPolicy");
+const {
+  createCorsMiddleware,
+  getAllowedOrigins,
+} = require("./middleware/corsPolicy");
 const { runMigrations } = require("./db/migrate");
 const { startTurretsServer } = require("./services/turrets");
 const { start: startSummaryQueue } = require("./services/summaryQueue");
 const { start: startProfileQueue } = require("./services/profileQueue");
-const { start: startWebhookQueue, stop: stopWebhookQueue } = require("./services/webhookQueue");
+const {
+  start: startWebhookQueue,
+  stop: stopWebhookQueue,
+} = require("./services/webhookQueue");
 const { startIndexer } = require("./services/indexerService");
 const lifecycle = require("./services/lifecycle");
 
@@ -88,10 +94,13 @@ app.use("/api/readyz", require("./routes/readiness"));
 app.use(
   helmet({
     contentSecurityPolicy: false, // we set our own CSP below
-  })
+  }),
 );
 app.use((req, res, next) => {
-  res.setHeader("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'");
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'none'; frame-ancestors 'none'",
+  );
   next();
 });
 app.use(express.json({ limit: "20kb" }));
@@ -143,7 +152,7 @@ app.use(
     max: Number(process.env.RATE_LIMIT_MAX || 150),
     standardHeaders: true,
     legacyHeaders: false,
-  })
+  }),
 );
 
 // Per-request HTTP metrics (BEFORE routes so it captures the full request).
@@ -162,7 +171,10 @@ if (process.env.NODE_ENV !== "production") {
       app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
     }
   } catch (err) {
-    logger.warn({ event: "swagger_ui_disabled", err: err.message }, "Swagger UI could not be mounted");
+    logger.warn(
+      { event: "swagger_ui_disabled", err: err.message },
+      "Swagger UI could not be mounted",
+    );
   }
 }
 
@@ -192,12 +204,17 @@ for (const name of routeMounts) {
     app.use(`/api/${name}`, router);
     app.use(`/api/v1/${name}`, router);
   } catch (err) {
-    logger.error({ event: "route_load_failed", route: name, err: err.message }, "Failed to load route module");
+    logger.error(
+      { event: "route_load_failed", route: name, err: err.message },
+      "Failed to load route module",
+    );
   }
 }
 
 // ── 404 + error handling ────────────────────────────────────────────────────
-app.use((req, res) => res.status(404).json({ error: `${req.method} ${req.path} not found` }));
+app.use((req, res) =>
+  res.status(404).json({ error: `${req.method} ${req.path} not found` }),
+);
 
 // Sentry error handler captures the exception and emits a transaction.
 app.use(Sentry.Handlers.errorHandler());
@@ -208,8 +225,18 @@ app.use((err, req, res, _next) => {
   } catch {
     // Sentry may be uninitialised in tests — never let it block the response.
   }
-  logger.error({ event: "request_error", err: err.message, path: req.path, method: req.method }, err.message);
-  res.status(err.status || 500).json({ error: err.message || "Internal server error" });
+  logger.error(
+    {
+      event: "request_error",
+      err: err.message,
+      path: req.path,
+      method: req.method,
+    },
+    err.message,
+  );
+  res
+    .status(err.status || 500)
+    .json({ error: err.message || "Internal server error" });
 });
 
 // ── Socket.IO ──────────────────────────────────────────────────────────────
@@ -234,11 +261,17 @@ async function startServer() {
     const { start: startDigestQueue } = require("./services/digestQueue");
     await startDigestQueue();
   } catch (err) {
-    logger.warn({ event: "digest_queue_disabled", err: err.message }, "digestQueue could not be started");
+    logger.warn(
+      { event: "digest_queue_disabled", err: err.message },
+      "digestQueue could not be started",
+    );
   }
 
   startIndexer(io).catch((err) =>
-    logger.error({ event: "indexer_startup_error", err: err.message }, "Indexer failed to start")
+    logger.error(
+      { event: "indexer_startup_error", err: err.message },
+      "Indexer failed to start",
+    ),
   );
 
   // The Stellar Horizon stream in the indexer holds the event loop open.
@@ -282,7 +315,10 @@ async function startServer() {
       const pool = require("./db/pool");
       await pool.end();
     } catch (err) {
-      logger.warn({ event: "pool_close_error", err: err.message }, "pool.end() failed during shutdown");
+      logger.warn(
+        { event: "pool_close_error", err: err.message },
+        "pool.end() failed during shutdown",
+      );
     }
   });
 
@@ -307,7 +343,10 @@ async function startServer() {
   });
 
   server.listen(PORT, () => {
-    logger.info({ event: "server_listening", port: PORT }, `Server listening on :${PORT}`);
+    logger.info(
+      { event: "server_listening", port: PORT },
+      `Server listening on :${PORT}`,
+    );
   });
 
   if (process.env.ENABLE_TURRETS === "true") {
@@ -323,11 +362,17 @@ async function gracefulShutdown(signal) {
   if (shuttingDown) return;
   shuttingDown = true;
   lifecycle.beginShutdown();
-  logger.warn({ event: "shutdown_started", signal }, `Received ${signal}, beginning graceful shutdown`);
+  logger.warn(
+    { event: "shutdown_started", signal },
+    `Received ${signal}, beginning graceful shutdown`,
+  );
 
   // Hard deadline — if the in-flight drain takes too long, exit anyway.
   const deadline = setTimeout(() => {
-    logger.error({ event: "shutdown_timeout", timeoutMs: SHUTDOWN_TIMEOUT_MS }, "Forced exit after timeout");
+    logger.error(
+      { event: "shutdown_timeout", timeoutMs: SHUTDOWN_TIMEOUT_MS },
+      "Forced exit after timeout",
+    );
     process.exit(1);
   }, SHUTDOWN_TIMEOUT_MS);
   deadline.unref();
@@ -343,7 +388,10 @@ async function gracefulShutdown(signal) {
     clearTimeout(deadline);
     process.exit(0);
   } catch (err) {
-    logger.error({ event: "shutdown_error", err: err.message }, "Error during shutdown");
+    logger.error(
+      { event: "shutdown_error", err: err.message },
+      "Error during shutdown",
+    );
     clearTimeout(deadline);
     process.exit(1);
   }
@@ -359,7 +407,10 @@ process.on("uncaughtException", (err) => {
   gracefulShutdown("uncaughtException");
 });
 process.on("unhandledRejection", (reason) => {
-  logger.error({ event: "unhandled_rejection", reason: String(reason) }, "Unhandled promise rejection");
+  logger.error(
+    { event: "unhandled_rejection", reason: String(reason) },
+    "Unhandled promise rejection",
+  );
 });
 
 if (require.main === module) {

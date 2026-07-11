@@ -20,7 +20,7 @@ async function sendUpdatePushNotifications({ project, update }) {
        FROM project_follows pf
        JOIN device_tokens dt ON pf.device_token_id = dt.id
        WHERE pf.project_id = $1`,
-      [project.id]
+      [project.id],
     );
 
     if (result.rows.length === 0) {
@@ -55,7 +55,9 @@ async function sendUpdatePushNotifications({ project, update }) {
     for (const chunk of chunks) {
       try {
         const tickets = await expo.sendPushNotificationsAsync(chunk);
-        console.log(`[Push] Sent ${tickets.length} notifications for project ${project.id}`);
+        console.log(
+          `[Push] Sent ${tickets.length} notifications for project ${project.id}`,
+        );
       } catch (error) {
         console.error("[Push] Error sending chunk:", error);
       }

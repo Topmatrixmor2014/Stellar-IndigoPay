@@ -3,7 +3,11 @@
 const fs = require("fs");
 const path = require("path");
 const pool = require("./pool");
-const { seedProjects, seedProjectUpdates, seedJobs } = require("../services/store");
+const {
+  seedProjects,
+  seedProjectUpdates,
+  seedJobs,
+} = require("../services/store");
 
 const MIGRATIONS_DIR = path.join(__dirname, "migrations");
 
@@ -31,7 +35,7 @@ function loadMigrationFiles() {
 
 async function getAppliedVersions(client) {
   const result = await client.query(
-    "SELECT version FROM schema_migrations ORDER BY version ASC"
+    "SELECT version FROM schema_migrations ORDER BY version ASC",
   );
   return result.rows.map((r) => r.version);
 }
@@ -53,7 +57,7 @@ async function runMigrations() {
       await migration.up(client);
       await client.query(
         "INSERT INTO schema_migrations (version, name) VALUES ($1, $2)",
-        [version, migration.name ?? version]
+        [version, migration.name ?? version],
       );
       ran++;
     }
@@ -88,7 +92,7 @@ async function rollbackMigrations(steps = 1) {
 
     const result = await client.query(
       "SELECT version FROM schema_migrations ORDER BY version DESC LIMIT $1",
-      [steps]
+      [steps],
     );
 
     if (result.rows.length === 0) {
@@ -104,14 +108,15 @@ async function rollbackMigrations(steps = 1) {
       }
       const migration = require(file);
       if (typeof migration.down !== "function") {
-        throw new Error(`Migration ${row.version} does not export a down() function`);
+        throw new Error(
+          `Migration ${row.version} does not export a down() function`,
+        );
       }
       console.log(`[DB] Rolling back migration: ${row.version}`);
       await migration.down(client);
-      await client.query(
-        "DELETE FROM schema_migrations WHERE version = $1",
-        [row.version]
-      );
+      await client.query("DELETE FROM schema_migrations WHERE version = $1", [
+        row.version,
+      ]);
     }
 
     await client.query("COMMIT");
@@ -158,7 +163,7 @@ async function seedDatabase() {
           project.tags,
           project.createdAt,
           project.updatedAt,
-        ]
+        ],
       );
     }
 
@@ -167,7 +172,13 @@ async function seedDatabase() {
         `INSERT INTO project_updates (id, project_id, title, body, created_at)
          VALUES ($1, $2, $3, $4, $5)
          ON CONFLICT (id) DO NOTHING`,
-        [update.id, update.projectId, update.title, update.body, update.createdAt]
+        [
+          update.id,
+          update.projectId,
+          update.title,
+          update.body,
+          update.createdAt,
+        ],
       );
     }
 
@@ -188,7 +199,7 @@ async function seedDatabase() {
           job.status,
           job.createdAt,
           job.updatedAt,
-        ]
+        ],
       );
     }
 
@@ -210,7 +221,8 @@ if (require.main === module) {
 
   if (rollbackIdx !== -1) {
     const stepsArg = args[rollbackIdx + 1];
-    const steps = stepsArg && !stepsArg.startsWith("--") ? parseInt(stepsArg, 10) : 1;
+    const steps =
+      stepsArg && !stepsArg.startsWith("--") ? parseInt(stepsArg, 10) : 1;
     rollbackMigrations(steps)
       .then(() => process.exit(0))
       .catch((err) => {

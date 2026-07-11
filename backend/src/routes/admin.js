@@ -25,7 +25,9 @@ router.post("/login", loginLimiter, (req, res) => {
   const adminPass = process.env.ADMIN_PASSWORD;
 
   if (!adminPass) {
-    return res.status(503).json({ error: "Admin authentication not configured on this server" });
+    return res
+      .status(503)
+      .json({ error: "Admin authentication not configured on this server" });
   }
 
   if (username !== adminUser || password !== adminPass) {
@@ -33,8 +35,14 @@ router.post("/login", loginLimiter, (req, res) => {
   }
 
   const token = signToken({ role: "admin", sub: username }, TOKEN_EXPIRY);
-  const refreshToken = signToken({ role: "admin", sub: username, type: "refresh" }, REFRESH_EXPIRY);
-  return res.json({ success: true, data: { token, refreshToken, expiresIn: 3600 } });
+  const refreshToken = signToken(
+    { role: "admin", sub: username, type: "refresh" },
+    REFRESH_EXPIRY,
+  );
+  return res.json({
+    success: true,
+    data: { token, refreshToken, expiresIn: 3600 },
+  });
 });
 
 /**
@@ -116,7 +124,8 @@ router.get("/audit-log", adminRequired, async (req, res, next) => {
     values.push(limit, offset);
 
     // eslint-disable-next-line sql-injection/no-sql-injection
-    let query = "SELECT id, actor, action, target_type, target_id, metadata, ip_address, created_at FROM admin_audit_log";
+    let query =
+      "SELECT id, actor, action, target_type, target_id, metadata, ip_address, created_at FROM admin_audit_log";
     if (where.length) {
       // eslint-disable-next-line sql-injection/no-sql-injection
       query += " WHERE " + where.join(" AND ");

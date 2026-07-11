@@ -44,4 +44,3 @@ function set(key, value, ttlMs) {
 // exported as `set`
 
 module.exports = { get, set };
-

@@ -1,20 +1,28 @@
 /**
  * services/turrets.js
  * Stellar Turrets txFunction server for automatic donation matching
- * 
+ *
  * This service implements a Turrets-compatible txFunction that:
  * 1. Listens for payments to project wallets
  * 2. Checks for active matching offers
  * 3. Submits pre-signed matching transactions from the matcher account
  */
 
-const { Server, TransactionBuilder, Networks, Operation, Asset } = require("@stellar/stellar-sdk");
+const {
+  Server,
+  TransactionBuilder,
+  Networks,
+  Operation,
+  Asset,
+} = require("@stellar/stellar-sdk");
 const pool = require("../db/pool");
 
 // Network configuration
 const NETWORK = process.env.STELLAR_NETWORK || "testnet";
-const NETWORK_PASSPHRASE = NETWORK === "mainnet" ? Networks.PUBLIC : Networks.TESTNET;
-const HORIZON_URL = process.env.HORIZON_URL || "https://horizon-testnet.stellar.org";
+const NETWORK_PASSPHRASE =
+  NETWORK === "mainnet" ? Networks.PUBLIC : Networks.TESTNET;
+const HORIZON_URL =
+  process.env.HORIZON_URL || "https://horizon-testnet.stellar.org";
 let server;
 function getServer() {
   if (!server) {
@@ -29,14 +37,8 @@ function getServer() {
  */
 async function matchDonationTxFunction(payment) {
   try {
-    const { 
-      transaction_hash, 
-      from, 
-      to, 
-      amount, 
-      asset_code, 
-      asset_type
-    } = payment;
+    const { transaction_hash, from, to, amount, asset_code, asset_type } =
+      payment;
 
     // Only match XLM donations
     if (asset_type !== "native" && asset_code !== "XLM") {
@@ -47,7 +49,7 @@ async function matchDonationTxFunction(payment) {
     // Find the project by wallet address
     const projectResult = await pool.query(
       "SELECT id, name FROM projects WHERE wallet_address = $1",
-      [to]
+      [to],
     );
 
     if (!projectResult.rows[0]) {
@@ -64,7 +66,7 @@ async function matchDonationTxFunction(payment) {
        FROM donation_matches
        WHERE project_id = $1 AND expires_at > NOW()
        ORDER BY created_at ASC`,
-      [project.id]
+      [project.id],
     );
 
     if (matchesResult.rows.length === 0) {
@@ -83,7 +85,10 @@ async function matchDonationTxFunction(payment) {
 
       if (remaining <= 0) continue;
 
-      const matchAmount = Math.min(donationAmount * match.multiplier, remaining);
+      const matchAmount = Math.min(
+        donationAmount * match.multiplier,
+        remaining,
+      );
 
       if (matchAmount <= 0) continue;
 
@@ -93,7 +98,7 @@ async function matchDonationTxFunction(payment) {
         projectWallet: to,
         amount: matchAmount,
         originalTxHash: transaction_hash,
-        matchId: match.id
+        matchId: match.id,
       });
 
       if (matchResult.success) {
@@ -102,7 +107,7 @@ async function matchDonationTxFunction(payment) {
           `UPDATE donation_matches 
            SET matched_xlm = matched_xlm + $1 
            WHERE id = $2`,
-          [matchAmount, match.id]
+          [matchAmount, match.id],
         );
 
         // Record the matched donation
@@ -120,15 +125,15 @@ async function matchDonationTxFunction(payment) {
             matchAmount,
             "XLM",
             `Matching donation for ${from}`,
-            matchResult.txHash
-          ]
+            matchResult.txHash,
+          ],
         );
 
         totalMatched += matchAmount;
         matchResults.push({
           matcherAddress: match.matcher_address,
           amount: matchAmount,
-          txHash: matchResult.txHash
+          txHash: matchResult.txHash,
         });
       }
     }
@@ -138,9 +143,8 @@ async function matchDonationTxFunction(payment) {
       totalMatched,
       matches: matchResults,
       projectId: project.id,
-      projectName: project.name
+      projectName: project.name,
     };
-
   } catch (error) {
     console.error("Error in matchDonationTxFunction:", error);
     return { matched: false, error: error.message };
@@ -165,7 +169,7 @@ async function submitMatchingPayment({
   projectWallet,
   amount,
   originalTxHash,
-  matchId
+  matchId,
 }) {
   try {
     // Load the matcher account
@@ -174,20 +178,20 @@ async function submitMatchingPayment({
     // Build the payment transaction
     const transaction = new TransactionBuilder(matcherAccount, {
       fee: "100",
-      networkPassphrase: NETWORK_PASSPHRASE
+      networkPassphrase: NETWORK_PASSPHRASE,
     })
       .addOperation(
         Operation.payment({
           destination: projectWallet,
           asset: Asset.native(),
-          amount: amount.toFixed(7)
-        })
+          amount: amount.toFixed(7),
+        }),
       )
       .addMemo(
         Operation.memo({
           type: "text",
-          value: `Match:${originalTxHash.slice(0, 20)}`
-        })
+          value: `Match:${originalTxHash.slice(0, 20)}`,
+        }),
       )
       .setTimeout(60)
       .build();
@@ -196,14 +200,18 @@ async function submitMatchingPayment({
     // For now, we'll need the matcher's secret key to sign
     // This should be stored securely (e.g., in environment variables or a secret manager)
     const matcherSecret = process.env.MATCHER_SECRET_KEY;
-    
+
     if (!matcherSecret) {
-      console.warn("MATCHER_SECRET_KEY not configured. Cannot submit matching payment.");
+      console.warn(
+        "MATCHER_SECRET_KEY not configured. Cannot submit matching payment.",
+      );
       return { success: false, reason: "Matcher secret not configured" };
     }
 
     // Sign the transaction
-    transaction.sign(require("@stellar/stellar-sdk").Keypair.fromSecret(matcherSecret));
+    transaction.sign(
+      require("@stellar/stellar-sdk").Keypair.fromSecret(matcherSecret),
+    );
 
     // Submit to Horizon
     const result = await getServer().submitTransaction(transaction);
@@ -212,9 +220,8 @@ async function submitMatchingPayment({
 
     return {
       success: true,
-      txHash: result.hash
+      txHash: result.hash,
     };
-
   } catch (error) {
     console.error("Error submitting matching payment:", error);
     return { success: false, error: error.message };
@@ -238,45 +245,50 @@ async function generatePreSignedTransactions({
   matcherSecret,
   projectWallet,
   capXlm,
-  multiplier
+  multiplier,
 }) {
   const transactions = [];
-  const matcherKeypair = require("@stellar/stellar-sdk").Keypair.fromSecret(matcherSecret);
-  
+  const matcherKeypair = require("@stellar/stellar-sdk").Keypair.fromSecret(
+    matcherSecret,
+  );
+
   // Generate transactions for different donation amounts
   const donationAmounts = [10, 25, 50, 100, 250];
-  
+
   for (const donationAmount of donationAmounts) {
     const matchAmount = Math.min(donationAmount * multiplier, capXlm);
-    
+
     if (matchAmount <= 0) continue;
 
     try {
       const account = await getServer().loadAccount(matcherAddress);
-      
+
       const tx = new TransactionBuilder(account, {
         fee: "100",
-        networkPassphrase: NETWORK_PASSPHRASE
+        networkPassphrase: NETWORK_PASSPHRASE,
       })
         .addOperation(
           Operation.payment({
             destination: projectWallet,
             asset: Asset.native(),
-            amount: matchAmount.toFixed(7)
-          })
+            amount: matchAmount.toFixed(7),
+          }),
         )
         .setTimeout(60)
         .build();
 
       tx.sign(matcherKeypair);
-      
+
       transactions.push({
         donationAmount,
         matchAmount,
-        xdr: tx.toXDR()
+        xdr: tx.toXDR(),
       });
     } catch (error) {
-      console.error(`Error generating transaction for ${donationAmount} XLM:`, error);
+      console.error(
+        `Error generating transaction for ${donationAmount} XLM:`,
+        error,
+      );
     }
   }
 
@@ -328,7 +340,7 @@ function startTurretsServer(port = 3001) {
         projectWallet,
         capXlm,
         multiplier,
-        projectId
+        projectId,
       } = req.body;
 
       if (!matcherAddress || !matcherSecret || !projectWallet) {
@@ -369,5 +381,5 @@ module.exports = {
   matchDonationTxFunction,
   submitMatchingPayment,
   generatePreSignedTransactions,
-  startTurretsServer
+  startTurretsServer,
 };

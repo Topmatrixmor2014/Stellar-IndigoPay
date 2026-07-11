@@ -103,7 +103,8 @@ const seedJobs = [
     description:
       "Build a responsive analytics dashboard for our NGO. Funds are held in escrow until you approve the delivered work.",
     clientPublicKey: "GBVNQON4MFVGJXK5WT7VQJJZXFVHZJB6BHFWJCW7OF5BLNGOLZJQHIY",
-    freelancerPublicKey: "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGLEWZE5BGYTG2XTGQBC3VP",
+    freelancerPublicKey:
+      "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGLEWZE5BGYTG2XTGQBC3VP",
     amountEscrowXlm: "50.0000000",
     status: "in_escrow",
     createdAt: new Date(now - 3 * 86400000).toISOString(),
@@ -165,10 +166,12 @@ function mapProjectRow(row) {
     verified: row.verified,
     onChainVerified: row.on_chain_verified,
     tags: row.tags || [],
-    aiSummary:            row.ai_summary || null,
-    aiSummaryGeneratedAt: row.ai_summary_generated_at ? toIso(row.ai_summary_generated_at) : null,
-    aiSummaryModel:       row.ai_summary_model || null,
-    aiSummarySourceHash:  row.ai_summary_source_hash || null,
+    aiSummary: row.ai_summary || null,
+    aiSummaryGeneratedAt: row.ai_summary_generated_at
+      ? toIso(row.ai_summary_generated_at)
+      : null,
+    aiSummaryModel: row.ai_summary_model || null,
+    aiSummarySourceHash: row.ai_summary_source_hash || null,
     webhookUrl: row.webhook_url || null,
     createdAt: toIso(row.created_at),
     updatedAt: toIso(row.updated_at),

@@ -4,7 +4,7 @@
 "use strict";
 const EventEmitter = require("events");
 const express = require("express");
-const router  = express.Router();
+const router = express.Router();
 const { v4: uuid } = require("uuid");
 const logger = require("../logger");
 const pool = require("../db/pool");
@@ -20,11 +20,19 @@ const donationLimiter = createRateLimiter(10, 1); // 10 requests per minute
 const donationEvents = new EventEmitter();
 
 function validateKey(k) {
-  if (!k || !/^G[A-Z0-9]{55}$/.test(k)) { const e = new Error("Invalid Stellar public key"); e.status = 400; throw e; }
+  if (!k || !/^G[A-Z0-9]{55}$/.test(k)) {
+    const e = new Error("Invalid Stellar public key");
+    e.status = 400;
+    throw e;
+  }
 }
 
 function validateTxHash(h) {
-  if (!h || !/^[a-fA-F0-9]{64}$/.test(h)) { const e = new Error("Invalid transaction hash"); e.status = 400; throw e; }
+  if (!h || !/^[a-fA-F0-9]{64}$/.test(h)) {
+    const e = new Error("Invalid transaction hash");
+    e.status = 400;
+    throw e;
+  }
 }
 
 /**
@@ -42,25 +50,50 @@ async function recordDonation(req, res, next) {
   let inTransaction = false;
 
   try {
-    const { projectId, donorAddress, amountXLM, amount, currency = "XLM", message, transactionHash } = req.body;
+    const {
+      projectId,
+      donorAddress,
+      amountXLM,
+      amount,
+      currency = "XLM",
+      message,
+      transactionHash,
+    } = req.body;
     validateKey(donorAddress);
     validateTxHash(transactionHash);
 
     client = await pool.connect();
 
-    const projectResult = await client.query("SELECT id FROM projects WHERE id = $1", [projectId]);
-    if (!projectResult.rows[0]) { const e = new Error("Project not found"); e.status = 404; throw e; }
+    const projectResult = await client.query(
+      "SELECT id FROM projects WHERE id = $1",
+      [projectId],
+    );
+    if (!projectResult.rows[0]) {
+      const e = new Error("Project not found");
+      e.status = 404;
+      throw e;
+    }
 
     // Determine numeric amount depending on currency
-    const parsedAmount = parseFloat(currency === "XLM" ? amountXLM ?? amount : amount);
-    if (isNaN(parsedAmount) || parsedAmount <= 0) { const e = new Error("Invalid amount"); e.status = 400; throw e; }
+    const parsedAmount = parseFloat(
+      currency === "XLM" ? (amountXLM ?? amount) : amount,
+    );
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      const e = new Error("Invalid amount");
+      e.status = 400;
+      throw e;
+    }
 
     // Deduplicate by tx hash
     const existingResult = await client.query(
       "SELECT * FROM donations WHERE transaction_hash = $1",
       [transactionHash],
     );
-    if (existingResult.rows[0]) return res.json({ success: true, data: mapDonationRow(existingResult.rows[0]) });
+    if (existingResult.rows[0])
+      return res.json({
+        success: true,
+        data: mapDonationRow(existingResult.rows[0]),
+      });
 
     // Verify the transaction is confirmed on-chain before recording it.
     // Prevents a caller from inflating raised_xlm with a fake or unconfirmed tx hash.
@@ -68,10 +101,14 @@ async function recordDonation(req, res, next) {
     try {
       onChainTx = await server.getTransaction(transactionHash);
     } catch {
-      const e = new Error("Transaction not found on Stellar"); e.status = 400; throw e;
+      const e = new Error("Transaction not found on Stellar");
+      e.status = 400;
+      throw e;
     }
     if (!onChainTx || onChainTx.successful !== true) {
-      const e = new Error("Transaction not confirmed on Stellar"); e.status = 400; throw e;
+      const e = new Error("Transaction not confirmed on Stellar");
+      e.status = 400;
+      throw e;
     }
 
     await client.query("BEGIN");
@@ -122,7 +159,10 @@ async function recordDonation(req, res, next) {
         const remaining = capXlm - matchedXlm;
 
         if (remaining > 0) {
-          const matchAmount = Math.min(parsedAmount * match.multiplier, remaining);
+          const matchAmount = Math.min(
+            parsedAmount * match.multiplier,
+            remaining,
+          );
 
           await client.query(
             `INSERT INTO donations (
@@ -167,17 +207,23 @@ async function recordDonation(req, res, next) {
     inTransaction = false;
 
     enqueueProfileUpdate(donorAddress).catch((err) => {
-      logger.error({ event: "profile_update_enqueue_failed", err, donorAddress }, "Failed to enqueue profile update job");
+      logger.error(
+        { event: "profile_update_enqueue_failed", err, donorAddress },
+        "Failed to enqueue profile update job",
+      );
     });
 
-    (req.log || logger).info({
-      event: "donation_recorded",
-      amount: parsedAmount,
-      currency,
-      project: projectId,
-      donor: donorAddress,
-      txHash: transactionHash,
-    }, "Donation recorded");
+    (req.log || logger).info(
+      {
+        event: "donation_recorded",
+        amount: parsedAmount,
+        currency,
+        project: projectId,
+        donor: donorAddress,
+        txHash: transactionHash,
+      },
+      "Donation recorded",
+    );
 
     const io = req.app?.get("io");
     if (io && typeof io.emit === "function") {
@@ -286,7 +332,9 @@ router.get("/project/:projectId", async (req, res, next) => {
          ORDER BY created_at DESC
          LIMIT $2`;
 
-    const donations = (await pool.query(query, values)).rows.map(mapDonationRow);
+    const donations = (await pool.query(query, values)).rows.map(
+      mapDonationRow,
+    );
     const hasMore = donations.length > limit;
     const result = hasMore ? donations.slice(0, limit) : donations;
     const nextCursor = hasMore ? result[result.length - 1].createdAt : null;
@@ -317,7 +365,9 @@ router.get("/donor/:publicKey", async (req, res, next) => {
       [req.params.publicKey],
     );
     res.json({ success: true, data: result.rows.map(mapDonationRow) });
-  } catch (e) { next(e); }
+  } catch (e) {
+    next(e);
+  }
 });
 
 // GET /api/donations/:id - single donation fetch endpoint
@@ -325,7 +375,11 @@ router.get("/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
     // Basic UUID validation
-    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+    if (
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+        id,
+      )
+    ) {
       const e = new Error("Invalid donation ID");
       e.status = 400;
       throw e;
@@ -357,7 +411,9 @@ router.get("/:id", async (req, res, next) => {
     const donationData = mapDonationRow(row);
     donationData.projectName = row.project_name;
     donationData.donorDisplayName = row.donor_display_name || null;
-    donationData.co2OffsetKg = Math.round(Number.parseFloat(row.co2_offset_kg || "0"));
+    donationData.co2OffsetKg = Math.round(
+      Number.parseFloat(row.co2_offset_kg || "0"),
+    );
 
     res.json({ success: true, data: donationData });
   } catch (e) {
@@ -367,4 +423,3 @@ router.get("/:id", async (req, res, next) => {
 
 module.exports = router;
 module.exports.recordDonation = recordDonation;
-

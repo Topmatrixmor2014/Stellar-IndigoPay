@@ -53,7 +53,9 @@ function adminKeyRequired(req, res, next) {
   }
 
   if (configuredKeys.length === 0) {
-    return res.status(503).json({ error: "Admin key authentication not configured on this server" });
+    return res.status(503).json({
+      error: "Admin key authentication not configured on this server",
+    });
   }
 
   if (!isValidAdminKey(adminKey)) {
@@ -73,7 +75,9 @@ function adminRequired(req, res, next) {
 
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Missing or malformed Authorization header" });
+    return res
+      .status(401)
+      .json({ error: "Missing or malformed Authorization header" });
   }
   const token = authHeader.slice(7);
   try {
@@ -88,4 +92,10 @@ function adminRequired(req, res, next) {
   }
 }
 
-module.exports = { signToken, verifyToken, adminRequired, adminKeyRequired, isValidAdminKey };
+module.exports = {
+  signToken,
+  verifyToken,
+  adminRequired,
+  adminKeyRequired,
+  isValidAdminKey,
+};

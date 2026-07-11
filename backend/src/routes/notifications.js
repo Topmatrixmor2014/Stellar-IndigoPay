@@ -32,17 +32,21 @@ router.get("/unread-count", async (req, res, next) => {
     const { token, lastSeen } = req.query;
 
     if (!token || typeof token !== "string") {
-      return res.status(400).json({ error: "token query parameter is required" });
+      return res
+        .status(400)
+        .json({ error: "token query parameter is required" });
     }
 
     const lastSeenAt = parseLastSeen(lastSeen);
     if (lastSeen !== undefined && !lastSeenAt) {
-      return res.status(400).json({ error: "lastSeen must be a valid ISO-8601 timestamp" });
+      return res
+        .status(400)
+        .json({ error: "lastSeen must be a valid ISO-8601 timestamp" });
     }
 
     const tokenResult = await pool.query(
       "SELECT id FROM device_tokens WHERE token = $1",
-      [token]
+      [token],
     );
 
     if (!tokenResult.rows[0]) {
@@ -63,7 +67,7 @@ router.get("/unread-count", async (req, res, next) => {
        JOIN project_follows pf ON pf.project_id = pu.project_id
        WHERE pf.device_token_id = $1
        ${unreadSinceClause}`,
-      params
+      params,
     );
 
     res.json({ unreadCount: parseUnreadCount(countResult.rows[0]) });
@@ -82,10 +86,14 @@ router.post("/register", async (req, res, next) => {
       return res.status(400).json({ error: "token is required" });
     }
     if (!platform || typeof platform !== "string") {
-      return res.status(400).json({ error: "platform is required (ios/android)" });
+      return res
+        .status(400)
+        .json({ error: "platform is required (ios/android)" });
     }
     if (!["ios", "android"].includes(platform.toLowerCase())) {
-      return res.status(400).json({ error: "platform must be either ios or android" });
+      return res
+        .status(400)
+        .json({ error: "platform must be either ios or android" });
     }
 
     const normalizedPlatform = platform.toLowerCase();
@@ -93,7 +101,7 @@ router.post("/register", async (req, res, next) => {
     // Check if token exists
     const existingResult = await pool.query(
       "SELECT * FROM device_tokens WHERE token = $1",
-      [token]
+      [token],
     );
 
     if (existingResult.rows[0]) {
@@ -102,7 +110,7 @@ router.post("/register", async (req, res, next) => {
         `UPDATE device_tokens 
          SET platform = $1, wallet_address = $2, updated_at = NOW()
          WHERE token = $3`,
-        [normalizedPlatform, walletAddress || null, token]
+        [normalizedPlatform, walletAddress || null, token],
       );
       res.json({ success: true, data: { tokenId: existingResult.rows[0].id } });
     } else {
@@ -111,7 +119,7 @@ router.post("/register", async (req, res, next) => {
       await pool.query(
         `INSERT INTO device_tokens (id, token, platform, wallet_address)
          VALUES ($1, $2, $3, $4)`,
-        [id, token, normalizedPlatform, walletAddress || null]
+        [id, token, normalizedPlatform, walletAddress || null],
       );
       res.json({ success: true, data: { tokenId: id } });
     }
@@ -136,11 +144,13 @@ router.post("/follow", async (req, res, next) => {
     // Get device token ID
     const tokenResult = await pool.query(
       "SELECT id FROM device_tokens WHERE token = $1",
-      [token]
+      [token],
     );
 
     if (!tokenResult.rows[0]) {
-      return res.status(404).json({ error: "Device token not found. Please register first." });
+      return res
+        .status(404)
+        .json({ error: "Device token not found. Please register first." });
     }
 
     const deviceId = tokenResult.rows[0].id;
@@ -148,7 +158,7 @@ router.post("/follow", async (req, res, next) => {
     // Check if project exists
     const projectResult = await pool.query(
       "SELECT id FROM projects WHERE id = $1",
-      [projectId]
+      [projectId],
     );
 
     if (!projectResult.rows[0]) {
@@ -158,11 +168,14 @@ router.post("/follow", async (req, res, next) => {
     // Check if already following
     const existingFollow = await pool.query(
       "SELECT * FROM project_follows WHERE project_id = $1 AND device_token_id = $2",
-      [projectId, deviceId]
+      [projectId, deviceId],
     );
 
     if (existingFollow.rows[0]) {
-      return res.json({ success: true, message: "Already following this project" });
+      return res.json({
+        success: true,
+        message: "Already following this project",
+      });
     }
 
     // Create follow relationship
@@ -170,7 +183,7 @@ router.post("/follow", async (req, res, next) => {
     await pool.query(
       `INSERT INTO project_follows (id, project_id, device_token_id, wallet_address)
        VALUES ($1, $2, $3, $4)`,
-      [followId, projectId, deviceId, walletAddress || null]
+      [followId, projectId, deviceId, walletAddress || null],
     );
 
     res.status(201).json({ success: true, data: { followId } });
@@ -195,7 +208,7 @@ router.post("/unfollow", async (req, res, next) => {
     // Get device token ID
     const tokenResult = await pool.query(
       "SELECT id FROM device_tokens WHERE token = $1",
-      [token]
+      [token],
     );
 
     if (!tokenResult.rows[0]) {
@@ -207,7 +220,7 @@ router.post("/unfollow", async (req, res, next) => {
     // Delete follow relationship
     const result = await pool.query(
       "DELETE FROM project_follows WHERE project_id = $1 AND device_token_id = $2",
-      [projectId, deviceId]
+      [projectId, deviceId],
     );
 
     res.json({ success: true, deleted: result.rowCount > 0 });
@@ -223,13 +236,15 @@ router.get("/follows", async (req, res, next) => {
     const { token } = req.query;
 
     if (!token || typeof token !== "string") {
-      return res.status(400).json({ error: "token query parameter is required" });
+      return res
+        .status(400)
+        .json({ error: "token query parameter is required" });
     }
 
     // Get device token ID
     const tokenResult = await pool.query(
       "SELECT id FROM device_tokens WHERE token = $1",
-      [token]
+      [token],
     );
 
     if (!tokenResult.rows[0]) {
@@ -245,7 +260,7 @@ router.get("/follows", async (req, res, next) => {
        JOIN projects p ON pf.project_id = p.id
        WHERE pf.device_token_id = $1
        ORDER BY pf.created_at DESC`,
-      [deviceId]
+      [deviceId],
     );
 
     res.json({ success: true, data: result.rows });

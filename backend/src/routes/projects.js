@@ -10,7 +10,11 @@ const { z } = require("zod");
 const QRCode = require("qrcode");
 const pool = require("../db/pool");
 const { logAdminAction } = require("../services/audit");
-const { mapProjectRow, mapProjectMilestoneRow, mapDonationRow } = require("../services/store");
+const {
+  mapProjectRow,
+  mapProjectMilestoneRow,
+  mapDonationRow,
+} = require("../services/store");
 const {
   getOnChainProject,
   getProjectDonationEvents,
@@ -45,7 +49,6 @@ const VALID_CATEGORIES = [
   "Sustainable Agriculture",
   "Other",
 ];
-
 
 /**
  * GET /api/projects/featured
@@ -321,11 +324,9 @@ router.post("/", async (req, res, next) => {
         .json({ error: "location must be between 2 and 200 characters" });
     }
     if (!category || !VALID_CATEGORIES.includes(category)) {
-      return res
-        .status(400)
-        .json({
-          error: `category must be one of: ${VALID_CATEGORIES.join(", ")}`,
-        });
+      return res.status(400).json({
+        error: `category must be one of: ${VALID_CATEGORIES.join(", ")}`,
+      });
     }
     if (!wallet_address || typeof wallet_address !== "string") {
       return res.status(400).json({ error: "wallet_address is required" });
@@ -658,7 +659,7 @@ router.get("/admin/pending", async (req, res, next) => {
     const offset = parseInt(req.query.offset, 10) || 0;
 
     const countResult = await pool.query(
-      "SELECT COUNT(*)::int AS total FROM projects WHERE verified = false AND status = 'active'"
+      "SELECT COUNT(*)::int AS total FROM projects WHERE verified = false AND status = 'active'",
     );
     const total = countResult.rows[0].total;
 
@@ -667,13 +668,13 @@ router.get("/admin/pending", async (req, res, next) => {
        WHERE verified = false AND status = 'active'
        ORDER BY created_at ASC
        LIMIT $1 OFFSET $2`,
-      [limit, offset]
+      [limit, offset],
     );
 
     res.json({
       success: true,
       data: result.rows.map(mapProjectRow),
-      total
+      total,
     });
   } catch (e) {
     next(e);
@@ -690,7 +691,10 @@ router.post("/admin/register", adminRequired, async (req, res) => {
     const { projectId, name, wallet, co2PerXLM, adminAddress } = req.body;
 
     if (!CONTRACT_ID) throw new Error("CONTRACT_ID not configured");
-    if (!adminAddress) return res.status(401).json({ success: false, error: "adminAddress is required" });
+    if (!adminAddress)
+      return res
+        .status(401)
+        .json({ success: false, error: "adminAddress is required" });
 
     const contract = new Contract(CONTRACT_ID);
     const sourceAccount = await server.loadAccount(adminAddress);
@@ -882,7 +886,10 @@ router.post("/:id/follow", async (req, res, next) => {
       return res.status(400).json({ error: "walletAddress is required" });
     }
 
-    const projectResult = await pool.query("SELECT id FROM projects WHERE id = $1", [req.params.id]);
+    const projectResult = await pool.query(
+      "SELECT id FROM projects WHERE id = $1",
+      [req.params.id],
+    );
     if (!projectResult.rows[0]) {
       return res.status(404).json({ error: "Project not found" });
     }
@@ -924,7 +931,10 @@ router.delete("/:id/follow", async (req, res, next) => {
       return res.status(400).json({ error: "walletAddress is required" });
     }
 
-    const projectResult = await pool.query("SELECT id FROM projects WHERE id = $1", [req.params.id]);
+    const projectResult = await pool.query(
+      "SELECT id FROM projects WHERE id = $1",
+      [req.params.id],
+    );
     if (!projectResult.rows[0]) {
       return res.status(404).json({ error: "Project not found" });
     }
@@ -1196,8 +1206,10 @@ router.patch("/:id/status", async (req, res, next) => {
       ipAddress: req.ip,
     });
 
-    if (typeof redis.deletePattern === "function") await redis.deletePattern(PROJECTS_LIST_CACHE_PREFIX + "*");
-    if (typeof redis.deletePattern === "function") await redis.deletePattern("stats:*");
+    if (typeof redis.deletePattern === "function")
+      await redis.deletePattern(PROJECTS_LIST_CACHE_PREFIX + "*");
+    if (typeof redis.deletePattern === "function")
+      await redis.deletePattern("stats:*");
 
     res.json({ success: true, data: mapProjectRow(result.rows[0]) });
   } catch (e) {
@@ -1213,7 +1225,9 @@ router.get("/:id/impact-certificate", async (req, res, next) => {
   try {
     const { donorAddress } = req.query;
     if (!donorAddress || typeof donorAddress !== "string") {
-      return res.status(400).json({ error: "donorAddress query parameter is required" });
+      return res
+        .status(400)
+        .json({ error: "donorAddress query parameter is required" });
     }
     if (!/^G[A-Z0-9]{55}$/.test(donorAddress)) {
       return res.status(400).json({ error: "Invalid donorAddress format" });
@@ -1243,20 +1257,22 @@ router.get("/:id/impact-certificate", async (req, res, next) => {
       [req.params.id, donorAddress],
     );
     if (donationsResult.rows.length === 0) {
-      return res.status(404).json({ error: "No donations found for this donor on this project" });
+      return res
+        .status(404)
+        .json({ error: "No donations found for this donor on this project" });
     }
 
     const donations = donationsResult.rows.map(mapDonationRow);
 
     // Calculate totals
-    const totalDonatedXLM = donationsResult.rows.reduce(
-      (sum, row) => sum + parseFloat(row.amount_xlm || "0"),
-      0,
-    ).toFixed(7);
+    const totalDonatedXLM = donationsResult.rows
+      .reduce((sum, row) => sum + parseFloat(row.amount_xlm || "0"), 0)
+      .toFixed(7);
 
     const projectRaisedXLM = parseFloat(project.raised_xlm || "0");
     const projectCO2Kg = parseFloat(project.co2_offset_kg || "0");
-    const donorShare = projectRaisedXLM > 0 ? totalDonatedXLM / projectRaisedXLM : 0;
+    const donorShare =
+      projectRaisedXLM > 0 ? totalDonatedXLM / projectRaisedXLM : 0;
     const co2OffsetKg = Math.round(donorShare * projectCO2Kg);
     const treesEquivalent = Math.round(co2OffsetKg / 22);
 
@@ -1270,10 +1286,10 @@ router.get("/:id/impact-certificate", async (req, res, next) => {
     // Generate QR code for project wallet (null if no wallet address)
     const qrCode = project.wallet_address
       ? await QRCode.toDataURL(project.wallet_address, {
-        width: 256,
-        margin: 2,
-        color: { dark: "#227239", light: "#ffffff" },
-      })
+          width: 256,
+          margin: 2,
+          color: { dark: "#227239", light: "#ffffff" },
+        })
       : null;
 
     res.json({
@@ -1282,7 +1298,8 @@ router.get("/:id/impact-certificate", async (req, res, next) => {
         projectId: project.id,
         projectName: project.name,
         projectCategory: project.category,
-        projectVerified: Boolean(project.verified) || Boolean(project.on_chain_verified),
+        projectVerified:
+          Boolean(project.verified) || Boolean(project.on_chain_verified),
         donorAddress,
         donorName,
         totalDonatedXLM,
@@ -1323,7 +1340,10 @@ router.get("/:id/on-chain-donations", async (req, res, next) => {
     const limit = Math.min(parseInt(req.query.limit, 10) || 20, 100);
     const cursor = req.query.cursor;
 
-    const events = await getProjectDonationEvents(req.params.id, { limit, cursor });
+    const events = await getProjectDonationEvents(req.params.id, {
+      limit,
+      cursor,
+    });
 
     const data = events.map((evt) => ({
       donor: evt.donor,
@@ -1333,7 +1353,8 @@ router.get("/:id/on-chain-donations", async (req, res, next) => {
       msgHash: evt.msgHash,
     }));
 
-    const nextCursor = events.length > 0 ? events[events.length - 1].pagingToken : null;
+    const nextCursor =
+      events.length > 0 ? events[events.length - 1].pagingToken : null;
 
     res.json({ success: true, data, nextCursor });
   } catch (e) {
@@ -1348,12 +1369,16 @@ router.get("/:id/on-chain-donations", async (req, res, next) => {
 router.get("/:id/badge-holders", async (req, res, next) => {
   try {
     const projectId = req.params.id;
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(projectId)) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    const projectResult = await pool.query("SELECT id FROM projects WHERE id = $1", [projectId]);
+    const projectResult = await pool.query(
+      "SELECT id FROM projects WHERE id = $1",
+      [projectId],
+    );
     if (!projectResult.rows[0]) {
       return res.status(404).json({ error: "Project not found" });
     }
@@ -1368,10 +1393,10 @@ router.get("/:id/badge-holders", async (req, res, next) => {
        WHERE d.project_id = $1 AND p.badges != '[]'::jsonb
        GROUP BY d.donor_address, p.badges
        ORDER BY total_donated DESC`,
-      [projectId]
+      [projectId],
     );
 
-    const badgeHolders = result.rows.map(row => ({
+    const badgeHolders = result.rows.map((row) => ({
       donorAddress: row.donor_address,
       badgeTier: row.badge_tier || null,
       totalDonated: Number.parseFloat(row.total_donated || "0").toFixed(7),

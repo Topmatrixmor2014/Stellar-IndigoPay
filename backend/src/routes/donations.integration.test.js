@@ -57,7 +57,12 @@ describe("Donation flow integration (testcontainers)", () => {
           POSTGRES_DB: "indigopay_test",
         })
         .withExposedPorts(5432)
-        .withWaitStrategy(Wait.forLogMessage("database system is ready to accept connections", 2))
+        .withWaitStrategy(
+          Wait.forLogMessage(
+            "database system is ready to accept connections",
+            2,
+          ),
+        )
         .withStartupTimeout(60000)
         .start();
 
@@ -91,7 +96,10 @@ describe("Donation flow integration (testcontainers)", () => {
       serverContainerReady = true;
       console.log(`Testcontainers PostgreSQL ready at ${host}:${port}`);
     } catch (err) {
-      console.warn("Testcontainers startup failed – integration tests will be skipped:", err.message);
+      console.warn(
+        "Testcontainers startup failed – integration tests will be skipped:",
+        err.message,
+      );
       serverContainerReady = false;
       // Ensure cleanup
       try {
@@ -129,7 +137,9 @@ describe("Donation flow integration (testcontainers)", () => {
 
   async function cleanDb() {
     if (!testPool) return;
-    await testPool.query("TRUNCATE donations, profiles, projects RESTART IDENTITY CASCADE");
+    await testPool.query(
+      "TRUNCATE donations, profiles, projects RESTART IDENTITY CASCADE",
+    );
   }
 
   test("complete donation flow updates all aggregates correctly", async () => {
@@ -158,7 +168,7 @@ describe("Donation flow integration (testcontainers)", () => {
         "50000",
         "0",
         0,
-      ]
+      ],
     );
 
     const donorAddress = makePublicKey("A");
@@ -170,8 +180,14 @@ describe("Donation flow integration (testcontainers)", () => {
       const res = {
         statusCode: 200,
         body: null,
-        status(code) { this.statusCode = code; return this; },
-        json(payload) { this.body = payload; return this; },
+        status(code) {
+          this.statusCode = code;
+          return this;
+        },
+        json(payload) {
+          this.body = payload;
+          return this;
+        },
       };
       const next = (err) => {
         if (err) {
@@ -198,7 +214,10 @@ describe("Donation flow integration (testcontainers)", () => {
     expect(res1.body.data.amountXLM).toBe("10.0000000");
 
     // Verify DB state after first donation
-    const donationCheck = await testPool.query("SELECT * FROM donations WHERE transaction_hash = $1", [txHash1]);
+    const donationCheck = await testPool.query(
+      "SELECT * FROM donations WHERE transaction_hash = $1",
+      [txHash1],
+    );
     expect(donationCheck.rows).toHaveLength(1);
     expect(donationCheck.rows[0].project_id).toBe(projectId);
     expect(donationCheck.rows[0].donor_address).toBe(donorAddress);
@@ -206,7 +225,10 @@ describe("Donation flow integration (testcontainers)", () => {
 
     // Profile updates are now handled asynchronously by profileQueue,
     // so we only verify the donation was recorded and project totals updated.
-    const project1 = await testPool.query("SELECT raised_xlm, donor_count FROM projects WHERE id = $1", [projectId]);
+    const project1 = await testPool.query(
+      "SELECT raised_xlm, donor_count FROM projects WHERE id = $1",
+      [projectId],
+    );
     expect(parseFloat(project1.rows[0].raised_xlm)).toBeCloseTo(10, 5);
     expect(project1.rows[0].donor_count).toBe(1);
 
@@ -221,7 +243,10 @@ describe("Donation flow integration (testcontainers)", () => {
     });
     expect(res2.statusCode).toBe(201);
 
-    const project2 = await testPool.query("SELECT raised_xlm, donor_count FROM projects WHERE id = $1", [projectId]);
+    const project2 = await testPool.query(
+      "SELECT raised_xlm, donor_count FROM projects WHERE id = $1",
+      [projectId],
+    );
     // raised_xlm should be 100 now, donor_count still 1 (same donor)
     expect(parseFloat(project2.rows[0].raised_xlm)).toBeCloseTo(100, 5);
     expect(project2.rows[0].donor_count).toBe(1);
@@ -238,12 +263,18 @@ describe("Donation flow integration (testcontainers)", () => {
     });
     expect(res3.statusCode).toBe(201);
 
-    const project3 = await testPool.query("SELECT raised_xlm, donor_count FROM projects WHERE id = $1", [projectId]);
+    const project3 = await testPool.query(
+      "SELECT raised_xlm, donor_count FROM projects WHERE id = $1",
+      [projectId],
+    );
     expect(parseFloat(project3.rows[0].raised_xlm)).toBeCloseTo(125, 5);
     expect(project3.rows[0].donor_count).toBe(2);
 
     // Verify donations table count
-    const allDonations = await testPool.query("SELECT COUNT(*) FROM donations WHERE project_id = $1", [projectId]);
+    const allDonations = await testPool.query(
+      "SELECT COUNT(*) FROM donations WHERE project_id = $1",
+      [projectId],
+    );
     expect(parseInt(allDonations.rows[0].count, 10)).toBe(3);
   });
 
@@ -259,7 +290,14 @@ describe("Donation flow integration (testcontainers)", () => {
     const projectId = "22222222-2222-2222-2222-222222222222";
     await testPool.query(
       "INSERT INTO projects (id, name, description, category, location, wallet_address) VALUES ($1,$2,$3,$4,$5,$6)",
-      [projectId, "Dedupe Test", "x", "Solar Energy", "Kenya", makePublicKey("X")]
+      [
+        projectId,
+        "Dedupe Test",
+        "x",
+        "Solar Energy",
+        "Kenya",
+        makePublicKey("X"),
+      ],
     );
 
     const donor = makePublicKey("D");
@@ -270,30 +308,59 @@ describe("Donation flow integration (testcontainers)", () => {
       const res = {
         statusCode: 200,
         body: null,
-        status(c) { this.statusCode = c; return this; },
-        json(p) { this.body = p; return this; },
+        status(c) {
+          this.statusCode = c;
+          return this;
+        },
+        json(p) {
+          this.body = p;
+          return this;
+        },
       };
-      const next = (err) => { if (err) { res.status(err.status||500).json({error:err.message}); throw err; } };
+      const next = (err) => {
+        if (err) {
+          res.status(err.status || 500).json({ error: err.message });
+          throw err;
+        }
+      };
       await recordDonation(req, res, next);
       return res;
     }
 
-    const first = await invoke({ projectId, donorAddress: donor, amountXLM: "15", currency: "XLM", transactionHash: txHash });
-    expect([200,201]).toContain(first.statusCode);
+    const first = await invoke({
+      projectId,
+      donorAddress: donor,
+      amountXLM: "15",
+      currency: "XLM",
+      transactionHash: txHash,
+    });
+    expect([200, 201]).toContain(first.statusCode);
 
-    const second = await invoke({ projectId, donorAddress: donor, amountXLM: "15", currency: "XLM", transactionHash: txHash });
+    const second = await invoke({
+      projectId,
+      donorAddress: donor,
+      amountXLM: "15",
+      currency: "XLM",
+      transactionHash: txHash,
+    });
     // dedup returns 200 with existing record
     expect(second.statusCode).toBe(200);
     expect(second.body.success).toBe(true);
 
-    const project = await testPool.query("SELECT raised_xlm, donor_count FROM projects WHERE id=$1", [projectId]);
+    const project = await testPool.query(
+      "SELECT raised_xlm, donor_count FROM projects WHERE id=$1",
+      [projectId],
+    );
     // should only count once
     expect(parseFloat(project.rows[0].raised_xlm)).toBeCloseTo(15, 5);
     expect(project.rows[0].donor_count).toBe(1);
 
     // Profile updates are handled asynchronously by profileQueue
-    const donationsCount = await testPool.query("SELECT COUNT(*) FROM donations WHERE transaction_hash=$1", [txHash]);
-    expect(parseInt(donationsCount.rows[0].count,10)).toBe(1);
+    const donationsCount = await testPool.query(
+      "SELECT COUNT(*) FROM donations WHERE transaction_hash=$1",
+      [txHash],
+    );
+    expect(parseInt(donationsCount.rows[0].count, 10)).toBe(1);
   });
 
   test("non-XLM donations do not affect profiles.total_donated_xlm or projects.raised_xlm", async () => {
@@ -309,7 +376,7 @@ describe("Donation flow integration (testcontainers)", () => {
     await testPool.query(
       `INSERT INTO projects (id, name, description, category, location, wallet_address, raised_xlm, donor_count)
        VALUES ($1,$2,$3,$4,$5,$6,0,0)`,
-      [projectId, "Fiat Test", "x", "Clean Water", "Mali", makePublicKey("Y")]
+      [projectId, "Fiat Test", "x", "Clean Water", "Mali", makePublicKey("Y")],
     );
 
     const donor = makePublicKey("E");
@@ -317,13 +384,29 @@ describe("Donation flow integration (testcontainers)", () => {
     await testPool.query(
       `INSERT INTO profiles (public_key, total_donated_xlm, projects_supported, badges)
        VALUES ($1, $2, 1, '[]'::jsonb)`,
-      [donor, "200.0000000"]
+      [donor, "200.0000000"],
     );
 
     async function invoke(body) {
       const req = { body, app: { get: () => null }, log: { info: () => {} } };
-      const res = { statusCode: 200, body: null, status(c){this.statusCode=c;return this;}, json(p){this.body=p;return this;} };
-      const next = (err)=>{ if(err){ res.status(err.status||500).json({error: err.message}); throw err; } };
+      const res = {
+        statusCode: 200,
+        body: null,
+        status(c) {
+          this.statusCode = c;
+          return this;
+        },
+        json(p) {
+          this.body = p;
+          return this;
+        },
+      };
+      const next = (err) => {
+        if (err) {
+          res.status(err.status || 500).json({ error: err.message });
+          throw err;
+        }
+      };
       await recordDonation(req, res, next);
       return res;
     }
@@ -338,7 +421,10 @@ describe("Donation flow integration (testcontainers)", () => {
     expect(res.statusCode).toBe(201);
 
     // Profile updates are handled asynchronously by profileQueue
-    const project = await testPool.query("SELECT raised_xlm, donor_count FROM projects WHERE id=$1", [projectId]);
+    const project = await testPool.query(
+      "SELECT raised_xlm, donor_count FROM projects WHERE id=$1",
+      [projectId],
+    );
     // raised_xlm unchanged, but donor_count increments because donation row exists (distinct donor)
     expect(parseFloat(project.rows[0].raised_xlm)).toBeCloseTo(0, 5);
     expect(project.rows[0].donor_count).toBe(1);

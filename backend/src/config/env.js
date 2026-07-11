@@ -6,15 +6,28 @@ const envSchema = z.object({
   // the codebase (notably db/pool.js) falls back to localhost when it's
   // unset. We mirror that here so that test environments can boot the
   // app without needing a real Postgres instance.
-  DATABASE_URL: z.string().optional().default("postgres://postgres:postgres@localhost:5432/indigopay"),
+  DATABASE_URL: z
+    .string()
+    .optional()
+    .default("postgres://postgres:postgres@localhost:5432/indigopay"),
   PORT: z.string().optional().default("4000"),
-  NODE_ENV: z.enum(["development", "production", "test"]).optional().default("development"),
+  NODE_ENV: z
+    .enum(["development", "production", "test"])
+    .optional()
+    .default("development"),
   STELLAR_NETWORK: z.enum(["testnet", "mainnet"]).optional().default("testnet"),
-  HORIZON_URL: z.string().url().optional().default("https://horizon-testnet.stellar.org"),
+  HORIZON_URL: z
+    .string()
+    .url()
+    .optional()
+    .default("https://horizon-testnet.stellar.org"),
   ALLOWED_ORIGINS: z.string().optional().default("http://localhost:3000"),
   CONTRACT_ID: z.string().optional().default(""),
   RESEND_API_KEY: z.string().optional().default(""),
-  EMAIL_FROM: z.string().optional().default("Stellar-IndigoPay <updates@stellarindigopay.app>"),
+  EMAIL_FROM: z
+    .string()
+    .optional()
+    .default("Stellar-IndigoPay <updates@stellarindigopay.app>"),
   APP_URL: z.string().optional().default("http://localhost:3000"),
   JWT_SECRET: z.string().optional().default(""),
   ADMIN_USERNAME: z.string().optional().default("admin"),
@@ -29,7 +42,10 @@ const envSchema = z.object({
   ADMIN_NOTIFICATION_EMAIL: z.string().optional().default(""),
   // Document storage backend for the /apply form (local|s3|ipfs)
   STORAGE_BACKEND: z.enum(["local", "s3", "ipfs"]).optional().default("local"),
-  UPLOAD_MAX_BYTES: z.string().optional().default(String(10 * 1024 * 1024)),
+  UPLOAD_MAX_BYTES: z
+    .string()
+    .optional()
+    .default(String(10 * 1024 * 1024)),
   // Optional S3 / IPFS knobs; only consulted when STORAGE_BACKEND matches.
   AWS_REGION: z.string().optional().default(""),
   AWS_ACCESS_KEY_ID: z.string().optional().default(""),
@@ -60,7 +76,10 @@ const envSchema = z.object({
   // ── Readiness probe ───────────────────────────────────────────────────────
   // READINESS_REQUIRE_REDIS=true makes /api/readyz fail when Redis is down.
   // Default false because Redis is an optional cache, not a hard dependency.
-  READINESS_REQUIRE_REDIS: z.enum(["true", "false"]).optional().default("false"),
+  READINESS_REQUIRE_REDIS: z
+    .enum(["true", "false"])
+    .optional()
+    .default("false"),
   // Per-subsystem check timeout. Coupled with DB_POOL_CONNECT_TIMEOUT and
   // DB_STATEMENT_TIMEOUT_MS: their sum must stay under this value so a
   // slow DB can never block the probe past its own deadline.
@@ -73,9 +92,9 @@ function validateEnv() {
   if (!result.success) {
     // zod v4 renamed `error.errors` to `error.issues`. Fall back to
     // `errors` for any v3 shim that still defines it.
-    const issues = (result.error.issues || result.error.errors || []).map(
-      (e) => `  - ${(e.path || []).join(".")}: ${e.message}`
-    ).join("\n");
+    const issues = (result.error.issues || result.error.errors || [])
+      .map((e) => `  - ${(e.path || []).join(".")}: ${e.message}`)
+      .join("\n");
     console.error(`\n[Startup] Environment validation failed:\n${issues}\n`);
     process.exit(1);
   }

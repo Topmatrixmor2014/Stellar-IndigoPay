@@ -5,7 +5,7 @@
  */
 "use strict";
 const express = require("express");
-const router  = express.Router();
+const router = express.Router();
 const { v4: uuidv4 } = require("uuid");
 const pool = require("../db/pool");
 
@@ -24,8 +24,11 @@ router.post("/", async (req, res, next) => {
     }
 
     // Verify project exists
-    const proj = await pool.query("SELECT id FROM projects WHERE id = $1", [projectId]);
-    if (!proj.rows[0]) return res.status(404).json({ error: "Project not found" });
+    const proj = await pool.query("SELECT id FROM projects WHERE id = $1", [
+      projectId,
+    ]);
+    if (!proj.rows[0])
+      return res.status(404).json({ error: "Project not found" });
 
     const insertResult = await pool.query(
       `INSERT INTO project_subscriptions (id, project_id, email, donor_address)
@@ -36,7 +39,9 @@ router.post("/", async (req, res, next) => {
     );
 
     if (insertResult.rowCount === 0) {
-      return res.status(409).json({ error: "Already subscribed with this email." });
+      return res
+        .status(409)
+        .json({ error: "Already subscribed with this email." });
     }
 
     res.status(201).json({ success: true, message: "Subscribed successfully" });
@@ -62,32 +67,41 @@ router.get("/:projectId/count", async (req, res, next) => {
 router.delete("/:id", async (req, res, next) => {
   try {
     const { email, donorAddress } = req.body;
-    
+
     if (!email && !donorAddress) {
-      return res.status(400).json({ error: "email or donorAddress is required to unsubscribe" });
+      return res
+        .status(400)
+        .json({ error: "email or donorAddress is required to unsubscribe" });
     }
 
-    const sub = await pool.query("SELECT email, donor_address FROM project_subscriptions WHERE id = $1", [req.params.id]);
-    
+    const sub = await pool.query(
+      "SELECT email, donor_address FROM project_subscriptions WHERE id = $1",
+      [req.params.id],
+    );
+
     if (!sub.rows[0]) {
       return res.status(404).json({ error: "Subscription not found" });
     }
-    
+
     const record = sub.rows[0];
-    
+
     let authorized = false;
     if (email && email.toLowerCase().trim() === record.email) {
       authorized = true;
     } else if (donorAddress && donorAddress === record.donor_address) {
       authorized = true;
     }
-    
+
     if (!authorized) {
-      return res.status(403).json({ error: "Unauthorized to delete this subscription" });
+      return res
+        .status(403)
+        .json({ error: "Unauthorized to delete this subscription" });
     }
-    
-    await pool.query("DELETE FROM project_subscriptions WHERE id = $1", [req.params.id]);
-    
+
+    await pool.query("DELETE FROM project_subscriptions WHERE id = $1", [
+      req.params.id,
+    ]);
+
     res.json({ success: true, message: "Unsubscribed successfully" });
   } catch (e) {
     next(e);

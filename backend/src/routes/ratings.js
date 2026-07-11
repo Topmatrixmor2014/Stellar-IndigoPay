@@ -16,7 +16,9 @@ router.post("/", async (req, res, next) => {
   try {
     const { projectId, donorAddress, rating, review } = req.body;
     if (!projectId || !donorAddress || !rating) {
-      return res.status(400).json({ error: "projectId, donorAddress, and rating are required" });
+      return res
+        .status(400)
+        .json({ error: "projectId, donorAddress, and rating are required" });
     }
     if (rating < 1 || rating > 5) {
       return res.status(400).json({ error: "rating must be between 1 and 5" });
@@ -31,7 +33,9 @@ router.post("/", async (req, res, next) => {
       [uuid(), projectId, donorAddress, rating, review || null],
     );
 
-    res.status(201).json({ success: true, data: mapProjectRatingRow(result.rows[0]) });
+    res
+      .status(201)
+      .json({ success: true, data: mapProjectRatingRow(result.rows[0]) });
   } catch (e) {
     next(e);
   }
@@ -93,7 +97,10 @@ async function listProjectRatings(req, res, next) {
       return res.status(400).json({ error: "projectId is required" });
     }
 
-    const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 20, 1), 100);
+    const limit = Math.min(
+      Math.max(parseInt(req.query.limit, 10) || 20, 1),
+      100,
+    );
     const offset = Math.max(parseInt(req.query.offset, 10) || 0, 0);
     const cursor = req.query.cursor;
 
@@ -101,7 +108,7 @@ async function listProjectRatings(req, res, next) {
     // We'll allow empty result, but check existence to return 404 for clarity.
     const projectCheck = await pool.query(
       "SELECT id FROM projects WHERE id = $1",
-      [projectId]
+      [projectId],
     );
     if (!projectCheck.rows[0]) {
       return res.status(404).json({ error: "Project not found" });
@@ -125,7 +132,7 @@ async function listProjectRatings(req, res, next) {
     // Get total count (for offset pagination metadata)
     const countResult = await pool.query(
       `SELECT COUNT(*) FROM project_ratings ${whereClause}`,
-      values.slice(0, cursor ? 2 : 1) // count query shouldn't include limit/offset, but keep same where
+      values.slice(0, cursor ? 2 : 1), // count query shouldn't include limit/offset, but keep same where
     );
     const total = parseInt(countResult.rows[0].count, 10);
 
@@ -165,9 +172,10 @@ async function listProjectRatings(req, res, next) {
       createdAt: new Date(row.created_at).toISOString(),
     }));
 
-    const nextCursor = hasMore && dataRows.length > 0
-      ? dataRows[dataRows.length - 1].createdAt
-      : null;
+    const nextCursor =
+      hasMore && dataRows.length > 0
+        ? dataRows[dataRows.length - 1].createdAt
+        : null;
 
     const currentOffset = cursor ? 0 : offset;
     const response = {

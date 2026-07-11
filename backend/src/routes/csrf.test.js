@@ -11,13 +11,20 @@ describe("CSRF protection", () => {
     expect(res.body).toEqual(expect.objectContaining({ success: true }));
     expect(typeof res.body.csrfToken).toBe("string");
     expect(res.body.csrfToken.length).toBeGreaterThan(0);
-    expect(res.headers["content-security-policy"]).toBe("default-src 'none'; frame-ancestors 'none'");
+    expect(res.headers["content-security-policy"]).toBe(
+      "default-src 'none'; frame-ancestors 'none'",
+    );
   });
 
   it("rejects mutating requests without an X-CSRF-Token header", async () => {
     const res = await agent
       .post("/api/v1/ratings")
-      .send({ projectId: "project-1", donorAddress: "GA123456789012345678901234567890123456789012345678901234", rating: 5 })
+      .send({
+        projectId: "project-1",
+        donorAddress:
+          "GA123456789012345678901234567890123456789012345678901234",
+        rating: 5,
+      })
       .expect(403);
 
     expect(res.body.error.toLowerCase()).toContain("csrf");
@@ -30,7 +37,12 @@ describe("CSRF protection", () => {
     const res = await agent
       .post("/api/v1/ratings")
       .set("X-CSRF-Token", token)
-      .send({ projectId: "project-1", donorAddress: "GA123456789012345678901234567890123456789012345678901234", rating: 5 });
+      .send({
+        projectId: "project-1",
+        donorAddress:
+          "GA123456789012345678901234567890123456789012345678901234",
+        rating: 5,
+      });
 
     expect(res.status).not.toBe(403);
   });

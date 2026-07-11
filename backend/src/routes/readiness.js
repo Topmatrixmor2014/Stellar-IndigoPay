@@ -41,7 +41,10 @@ function withTimeout(promise, ms, label) {
   // helper then only needs to race the resolution so a stuck query
   // doesn't block /api/readyz past the 4s window.
   return new Promise((resolve) => {
-    const t = setTimeout(() => resolve({ ok: false, reason: `${label} timeout` }), ms);
+    const t = setTimeout(
+      () => resolve({ ok: false, reason: `${label} timeout` }),
+      ms,
+    );
     promise
       .then((value) => {
         clearTimeout(t);
@@ -51,7 +54,14 @@ function withTimeout(promise, ms, label) {
         clearTimeout(t);
         // Log unexpected errors so silent failures are visible — a
         // bare {ok:false} would otherwise hide e.g. a permission error.
-        logger.warn({ event: "readiness_subsystem_error", subsystem: label, err: err.message }, label);
+        logger.warn(
+          {
+            event: "readiness_subsystem_error",
+            subsystem: label,
+            err: err.message,
+          },
+          label,
+        );
         resolve({ ok: false, reason: err.message });
       });
   });
@@ -75,7 +85,9 @@ router.get("/", async (_req, res) => {
 
   // Postgres
   const db = await withTimeout(pool.query("SELECT 1"), CHECK_TIMEOUT_MS, "db");
-  checks.db = db.ok ? { status: "ok" } : { status: "unreachable", reason: db.reason };
+  checks.db = db.ok
+    ? { status: "ok" }
+    : { status: "unreachable", reason: db.reason };
 
   // Redis (optional — only checked if REDIS_URL is set)
   if (process.env.REDIS_URL) {
@@ -83,9 +95,10 @@ router.get("/", async (_req, res) => {
       const redis = require("../services/redis");
       const c = redis.getClient();
       const pong = await withTimeout(c.ping(), CHECK_TIMEOUT_MS, "redis");
-      checks.redis = pong.ok && pong.value === "PONG"
-        ? { status: "ok" }
-        : { status: "unreachable", reason: pong.reason || "no PONG" };
+      checks.redis =
+        pong.ok && pong.value === "PONG"
+          ? { status: "ok" }
+          : { status: "unreachable", reason: pong.reason || "no PONG" };
     } catch (err) {
       checks.redis = { status: "unreachable", reason: err.message };
     }
@@ -97,11 +110,12 @@ router.get("/", async (_req, res) => {
       signal: AbortSignal.timeout(CHECK_TIMEOUT_MS),
     }),
     CHECK_TIMEOUT_MS + 100,
-    "horizon"
+    "horizon",
   );
-  checks.horizon = horizon.ok && horizon.value.ok
-    ? { status: "ok" }
-    : { status: "unreachable", reason: horizon.reason || "non-2xx" };
+  checks.horizon =
+    horizon.ok && horizon.value.ok
+      ? { status: "ok" }
+      : { status: "unreachable", reason: horizon.reason || "non-2xx" };
 
   // Indexer (process-local — does not block on the network)
   try {
@@ -120,7 +134,7 @@ router.get("/", async (_req, res) => {
     metrics.metrics.readinessCheckFailedTotal.inc({ reason });
     logger.warn(
       { event: "readiness_failed", checks },
-      "Readiness check failed; pod should be removed from rotation"
+      "Readiness check failed; pod should be removed from rotation",
     );
   }
 

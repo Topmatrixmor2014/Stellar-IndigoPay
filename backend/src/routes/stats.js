@@ -54,7 +54,11 @@ router.get("/global", async (req, res, next) => {
     `);
 
     const stats = mapGlobalStatsRow(result.rows[0]);
-    await redis.set(GLOBAL_STATS_CACHE_KEY, stats, GLOBAL_STATS_CACHE_TTL_SECONDS);
+    await redis.set(
+      GLOBAL_STATS_CACHE_KEY,
+      stats,
+      GLOBAL_STATS_CACHE_TTL_SECONDS,
+    );
 
     res.json(stats);
   } catch (e) {

@@ -20,7 +20,7 @@ on:
 permissions:
   contents: read
   packages: write
-  id-token: write   # required for keyless signing (OIDC)
+  id-token: write # required for keyless signing (OIDC)
 
 jobs:
   sign:

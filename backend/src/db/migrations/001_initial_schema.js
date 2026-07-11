@@ -25,10 +25,18 @@ module.exports = {
       )
     `);
 
-    await client.query(`ALTER TABLE projects ADD COLUMN IF NOT EXISTS ai_summary TEXT`);
-    await client.query(`ALTER TABLE projects ADD COLUMN IF NOT EXISTS ai_summary_generated_at TIMESTAMPTZ`);
-    await client.query(`ALTER TABLE projects ADD COLUMN IF NOT EXISTS ai_summary_model TEXT`);
-    await client.query(`ALTER TABLE projects ADD COLUMN IF NOT EXISTS ai_summary_source_hash TEXT`);
+    await client.query(
+      `ALTER TABLE projects ADD COLUMN IF NOT EXISTS ai_summary TEXT`,
+    );
+    await client.query(
+      `ALTER TABLE projects ADD COLUMN IF NOT EXISTS ai_summary_generated_at TIMESTAMPTZ`,
+    );
+    await client.query(
+      `ALTER TABLE projects ADD COLUMN IF NOT EXISTS ai_summary_model TEXT`,
+    );
+    await client.query(
+      `ALTER TABLE projects ADD COLUMN IF NOT EXISTS ai_summary_source_hash TEXT`,
+    );
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS donations (

@@ -1,6 +1,11 @@
 "use strict";
 
-const { registry, metrics, normaliseRoute, refreshDbPoolMetrics } = require("./metrics");
+const {
+  registry,
+  metrics,
+  normaliseRoute,
+  refreshDbPoolMetrics,
+} = require("./metrics");
 
 describe("metrics service", () => {
   test("registry exposes the standard process / nodejs metric prefix", async () => {
@@ -18,16 +23,26 @@ describe("metrics service", () => {
   });
 
   test("http_requests_total counter increments on labels", async () => {
-    metrics.httpRequestsTotal.inc({ method: "GET", route: "/api/projects", status_code: "200" }, 3);
+    metrics.httpRequestsTotal.inc(
+      { method: "GET", route: "/api/projects", status_code: "200" },
+      3,
+    );
     const text = await registry.metrics();
-    expect(text).toMatch(/http_requests_total\{[^}]*route="\/api\/projects"[^}]*status_code="200"[^}]*\} 3/);
+    expect(text).toMatch(
+      /http_requests_total\{[^}]*route="\/api\/projects"[^}]*status_code="200"[^}]*\} 3/,
+    );
   });
 
   test("http_request_duration_seconds histogram observes a value", async () => {
-    metrics.httpRequestDurationSeconds.observe({ method: "GET", route: "/api/health", status_code: "200" }, 0.123);
+    metrics.httpRequestDurationSeconds.observe(
+      { method: "GET", route: "/api/health", status_code: "200" },
+      0.123,
+    );
     const text = await registry.metrics();
     // The histogram exposes _count, _sum, and _bucket{le=...} series.
-    expect(text).toMatch(/http_request_duration_seconds_count\{[^}]*route="\/api\/health"[^}]*\}/);
+    expect(text).toMatch(
+      /http_request_duration_seconds_count\{[^}]*route="\/api\/health"[^}]*\}/,
+    );
   });
 
   test("normaliseRoute returns the matched route pattern when req.route is set", () => {

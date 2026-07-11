@@ -12,7 +12,9 @@ function buildApp() {
   app.use(express.json());
   app.use("/api/notifications", notificationsRouter);
   app.use((err, _req, res, _next) => {
-    res.status(err.status || 500).json({ error: err.message || "Internal server error" });
+    res
+      .status(err.status || 500)
+      .json({ error: err.message || "Internal server error" });
   });
   return app;
 }
@@ -40,12 +42,12 @@ describe("GET /api/notifications/unread-count", () => {
     expect(pool.query).toHaveBeenNthCalledWith(
       1,
       "SELECT id FROM device_tokens WHERE token = $1",
-      ["ExponentPushToken[abc]"]
+      ["ExponentPushToken[abc]"],
     );
     expect(pool.query).toHaveBeenNthCalledWith(
       2,
       expect.stringContaining("pu.created_at > $2"),
-      ["device-token-id", lastSeen]
+      ["device-token-id", lastSeen],
     );
   });
 
@@ -63,7 +65,7 @@ describe("GET /api/notifications/unread-count", () => {
     expect(pool.query).toHaveBeenNthCalledWith(
       2,
       expect.not.stringContaining("pu.created_at >"),
-      ["device-token-id"]
+      ["device-token-id"],
     );
   });
 

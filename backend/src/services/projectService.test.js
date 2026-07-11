@@ -26,7 +26,12 @@ jest.mock("./store", () => ({
 }));
 
 const pool = require("../db/pool");
-const { getAllProjects, getProjectById, createProject, updateProject } = require("./projectService");
+const {
+  getAllProjects,
+  getProjectById,
+  createProject,
+  updateProject,
+} = require("./projectService");
 
 const MOCK_ROW = {
   id: "proj-1",
@@ -185,13 +190,22 @@ describe("createProject", () => {
 
   test("throws on invalid category", async () => {
     await expect(
-      createProject({ name: "Test", category: "Unicorn Farming", walletAddress: "G..." }),
+      createProject({
+        name: "Test",
+        category: "Unicorn Farming",
+        walletAddress: "G...",
+      }),
     ).rejects.toThrow("Invalid category");
   });
 
   test("uses default description and location when omitted", async () => {
     pool.query.mockResolvedValueOnce({ rows: [MOCK_ROW] });
-    await createProject({ id: "p1", name: "Test", category: "Reforestation", walletAddress: "G..." });
+    await createProject({
+      id: "p1",
+      name: "Test",
+      category: "Reforestation",
+      walletAddress: "G...",
+    });
     const [, values] = pool.query.mock.calls[0];
     expect(values[2]).toBe("");
     expect(values[4]).toBe("");
@@ -220,7 +234,10 @@ describe("updateProject", () => {
   test("updates both status and verified", async () => {
     const updated = { ...MOCK_ROW, status: "completed", verified: true };
     pool.query.mockResolvedValueOnce({ rows: [updated] });
-    const result = await updateProject("proj-1", { status: "completed", verified: true });
+    const result = await updateProject("proj-1", {
+      status: "completed",
+      verified: true,
+    });
     const [query] = pool.query.mock.calls[0];
     expect(query).toContain("status = $1");
     expect(query).toContain("verified = $2");
@@ -228,11 +245,15 @@ describe("updateProject", () => {
   });
 
   test("throws on invalid status", async () => {
-    await expect(updateProject("proj-1", { status: "archived" })).rejects.toThrow("Invalid status");
+    await expect(
+      updateProject("proj-1", { status: "archived" }),
+    ).rejects.toThrow("Invalid status");
   });
 
   test("throws when no valid fields provided", async () => {
-    await expect(updateProject("proj-1", {})).rejects.toThrow("No valid fields to update");
+    await expect(updateProject("proj-1", {})).rejects.toThrow(
+      "No valid fields to update",
+    );
   });
 
   test("returns null when project not found", async () => {

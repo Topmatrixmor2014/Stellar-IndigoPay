@@ -32,7 +32,9 @@ describe("GET /api/readyz (readiness)", () => {
   test("returns 503 not ready when the DB is unreachable (no DATABASE_URL / pool fails)", async () => {
     // Simulate an unreachable database so the test is independent of the
     // surrounding environment (local unit tests vs. docker-compose CI).
-    jest.spyOn(pool, "query").mockRejectedValueOnce(new Error("connect ECONNREFUSED"));
+    jest
+      .spyOn(pool, "query")
+      .mockRejectedValueOnce(new Error("connect ECONNREFUSED"));
 
     const res = await request(buildApp()).get("/api/readyz");
     expect(res.status).toBe(503);

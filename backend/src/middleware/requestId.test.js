@@ -32,8 +32,14 @@ describe("requestId middleware", () => {
 
   test("does not overwrite an existing X-Request-Id header", async () => {
     const app = express();
-    app.use((req, res, next) => { req.id = "x"; next(); });
-    app.use((_req, res, next) => { res.setHeader("X-Request-Id", "pinned"); next(); });
+    app.use((req, res, next) => {
+      req.id = "x";
+      next();
+    });
+    app.use((_req, res, next) => {
+      res.setHeader("X-Request-Id", "pinned");
+      next();
+    });
     app.use(requestId);
     app.get("/", (_req, res) => res.json({ ok: true }));
     const res = await request(app).get("/");

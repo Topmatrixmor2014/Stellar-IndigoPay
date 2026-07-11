@@ -9,10 +9,13 @@ let boss = null;
 
 async function start(io) {
   const connectionString =
-    process.env.DATABASE_URL || "postgres://postgres:postgres@localhost:5432/indigopay";
+    process.env.DATABASE_URL ||
+    "postgres://postgres:postgres@localhost:5432/indigopay";
 
   boss = new PgBoss(connectionString);
-  boss.on("error", (err) => console.error("[profileQueue] pg-boss error:", err.message));
+  boss.on("error", (err) =>
+    console.error("[profileQueue] pg-boss error:", err.message),
+  );
 
   await boss.start();
 
@@ -36,7 +39,10 @@ async function start(io) {
       [donorAddress],
     );
 
-    const projectsSupported = Number.parseInt(projectsSupportedResult.rows[0]?.count || "0", 10);
+    const projectsSupported = Number.parseInt(
+      projectsSupportedResult.rows[0]?.count || "0",
+      10,
+    );
     const badges = computeBadges(totalDonatedXlm);
 
     const existingProfileResult = await pool.query(
@@ -83,7 +89,10 @@ async function start(io) {
     }
   });
 
-  console.log("[profileQueue] pg-boss started, worker registered on queue:", QUEUE);
+  console.log(
+    "[profileQueue] pg-boss started, worker registered on queue:",
+    QUEUE,
+  );
 }
 
 async function enqueueProfileUpdate(donorAddress) {

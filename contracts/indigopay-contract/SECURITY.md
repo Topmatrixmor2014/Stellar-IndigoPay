@@ -63,16 +63,16 @@ Helpers:
 
 Every state change in the new trust model emits an indexed event for indexer consumers:
 
-| Event topic        | Trigger                                              |
-|--------------------|------------------------------------------------------|
-| `ad_xfer`          | `transfer_admin` queued                              |
-| `ad_acc`           | `accept_admin` promoted                              |
-| `ad_xfc`           | `cancel_admin_transfer` cleared                      |
-| `paused`           | `pause_contract` set the pause flag                  |
-| `unpause`          | `unpause_contract` lifted the pause flag             |
-| `upg_prop`         | `propose_upgrade` queued (hash + effective_at)      |
-| `upg_exec`         | `execute_upgrade` swapped the WASM                   |
-| `upg_cancel`       | `cancel_upgrade` dropped the pending upgrade         |
+| Event topic  | Trigger                                        |
+| ------------ | ---------------------------------------------- |
+| `ad_xfer`    | `transfer_admin` queued                        |
+| `ad_acc`     | `accept_admin` promoted                        |
+| `ad_xfc`     | `cancel_admin_transfer` cleared                |
+| `paused`     | `pause_contract` set the pause flag            |
+| `unpause`    | `unpause_contract` lifted the pause flag       |
+| `upg_prop`   | `propose_upgrade` queued (hash + effective_at) |
+| `upg_exec`   | `execute_upgrade` swapped the WASM             |
+| `upg_cancel` | `cancel_upgrade` dropped the pending upgrade   |
 
 ---
 
@@ -83,6 +83,7 @@ This section records the security review of arithmetic operations in the IndigoP
 ### Scope
 
 Audit covers all arithmetic in `record_donation` and related functions that update global state:
+
 - `GlobalTotalRaised` (i128)
 - `GlobalCO2OffsetGrams` (i128)
 - Project and donor statistics
@@ -116,6 +117,7 @@ All critical arithmetic operations use Rust's checked_add to prevent silent over
 ### Extreme Input Analysis
 
 Max donation scenarios:
+
 - Single donation: i128::MAX stroops (9.22e18 XLM equivalent)
 - With CO2 factor: 100 grams/XLM max project setting
   - Overflow would occur at: i128::MAX / 100 = 9.22e16 XLM
@@ -129,4 +131,3 @@ Max donation scenarios:
 ### Conclusion
 
 No silent overflows possible. All operations that could exceed i128::MAX will panic with descriptive messages. The contract is safe for production use with any realistic donation volume.
-

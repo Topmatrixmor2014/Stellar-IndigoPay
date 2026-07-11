@@ -43,7 +43,9 @@ function metricsAuth(req, res, next) {
     ? auth.slice(7).trim()
     : null;
   if (!timingSafeStringEquals(provided || "", expected)) {
-    return res.status(401).json({ error: "Invalid or missing metrics bearer token" });
+    return res
+      .status(401)
+      .json({ error: "Invalid or missing metrics bearer token" });
   }
   return next();
 }
@@ -58,7 +60,10 @@ router.get("/", metricsAuth, async (_req, res, next) => {
     res.set("Content-Type", registry.contentType);
     res.send(body);
   } catch (err) {
-    logger.error({ event: "metrics_scrape_error", err: err.message }, "metrics scrape failed");
+    logger.error(
+      { event: "metrics_scrape_error", err: err.message },
+      "metrics scrape failed",
+    );
     next(err);
   }
 });

@@ -50,7 +50,7 @@ function getAwsS3() {
   } catch (err) {
     logger.warn(
       { event: "storage_s3_sdk_missing", err: err.message },
-      "STORAGE_BACKEND=s3 but aws-sdk is not installed — falling back to local"
+      "STORAGE_BACKEND=s3 but aws-sdk is not installed — falling back to local",
     );
     return null;
   }
@@ -89,12 +89,17 @@ async function uploadS3(buffer, originalName, contentType) {
   const AWS = getAwsS3();
   if (!AWS) return uploadLocal(buffer, originalName, contentType);
 
-  const required = ["AWS_REGION", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "S3_BUCKET"];
+  const required = [
+    "AWS_REGION",
+    "AWS_ACCESS_KEY_ID",
+    "AWS_SECRET_ACCESS_KEY",
+    "S3_BUCKET",
+  ];
   const missing = required.filter((k) => !process.env[k]);
   if (missing.length > 0) {
     logger.warn(
       { event: "storage_s3_env_missing", missing },
-      "STORAGE_BACKEND=s3 but required env vars are missing — falling back to local"
+      "STORAGE_BACKEND=s3 but required env vars are missing — falling back to local",
     );
     return uploadLocal(buffer, originalName, contentType);
   }
@@ -117,7 +122,13 @@ async function uploadS3(buffer, originalName, contentType) {
   const publicUrl = process.env.S3_PUBLIC_URL
     ? `${process.env.S3_PUBLIC_URL.replace(/\/$/, "")}/${key}`
     : `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
-  return { key, url: publicUrl, size: buffer.length, contentType: contentType || "application/octet-stream", backend: "s3" };
+  return {
+    key,
+    url: publicUrl,
+    size: buffer.length,
+    contentType: contentType || "application/octet-stream",
+    backend: "s3",
+  };
 }
 
 async function uploadIpfs(buffer, originalName, contentType) {
@@ -125,7 +136,7 @@ async function uploadIpfs(buffer, originalName, contentType) {
   if (!apiUrl) {
     logger.warn(
       { event: "storage_ipfs_env_missing" },
-      "STORAGE_BACKEND=ipfs but IPFS_API_URL is not set — falling back to local"
+      "STORAGE_BACKEND=ipfs but IPFS_API_URL is not set — falling back to local",
     );
     return uploadLocal(buffer, originalName, contentType);
   }
@@ -149,7 +160,7 @@ async function uploadIpfs(buffer, originalName, contentType) {
   if (!FormData || !BlobCtor) {
     logger.warn(
       { event: "storage_ipfs_no_multipart" },
-      "IPFS adapter requires Node 18+ global FormData/Blob — falling back to local"
+      "IPFS adapter requires Node 18+ global FormData/Blob — falling back to local",
     );
     return uploadLocal(buffer, originalName, contentType);
   }
@@ -157,11 +168,14 @@ async function uploadIpfs(buffer, originalName, contentType) {
   const form = new FormData();
   form.append("file", new BlobCtor([buffer]), originalName || "upload");
 
-  const res = await fetch(`${apiUrl.replace(/\/$/, "")}/api/v0/add?wrap-with-directory=false`, {
-    method: "POST",
-    body: form,
-    headers: form.headers ? form.headers : undefined,
-  });
+  const res = await fetch(
+    `${apiUrl.replace(/\/$/, "")}/api/v0/add?wrap-with-directory=false`,
+    {
+      method: "POST",
+      body: form,
+      headers: form.headers ? form.headers : undefined,
+    },
+  );
   if (!res.ok) {
     throw new Error(`IPFS upload failed: ${res.status} ${await res.text()}`);
   }
@@ -171,15 +185,20 @@ async function uploadIpfs(buffer, originalName, contentType) {
     .trim()
     .split(/\r?\n/)
     .map((line) => {
-      try { return JSON.parse(line); }
-      catch { return null; }
+      try {
+        return JSON.parse(line);
+      } catch {
+        return null;
+      }
     })
     .filter(Boolean)
     .pop();
   if (!last || !last.Hash) {
     throw new Error("IPFS upload succeeded but response did not include a CID");
   }
-  const gateway = (process.env.IPFS_GATEWAY_URL || "https://ipfs.io/ipfs").replace(/\/$/, "");
+  const gateway = (
+    process.env.IPFS_GATEWAY_URL || "https://ipfs.io/ipfs"
+  ).replace(/\/$/, "");
   return {
     key: last.Hash,
     url: `${gateway}/${last.Hash}`,

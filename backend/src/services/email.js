@@ -4,8 +4,9 @@
 "use strict";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
-const FROM_ADDRESS   = process.env.EMAIL_FROM || "Stellar-IndigoPay <updates@stellarindigopay.app>";
-const APP_URL        = process.env.APP_URL || "http://localhost:3000";
+const FROM_ADDRESS =
+  process.env.EMAIL_FROM || "Stellar-IndigoPay <updates@stellarindigopay.app>";
+const APP_URL = process.env.APP_URL || "http://localhost:3000";
 
 /**
  * Send a project update notification to a list of subscriber emails.
@@ -61,7 +62,9 @@ async function sendUpdateNotifications({ project, update, emails }) {
 // exported as `sendUpdateNotifications`
 
 const ADMIN_NOTIFICATION_EMAIL =
-  process.env.ADMIN_NOTIFICATION_EMAIL || process.env.EMAIL_FROM || "Stellar-IndigoPay <updates@stellarindigopay.app>";
+  process.env.ADMIN_NOTIFICATION_EMAIL ||
+  process.env.EMAIL_FROM ||
+  "Stellar-IndigoPay <updates@stellarindigopay.app>";
 
 /**
  * Notify platform admins that a new verification request has been submitted
@@ -87,7 +90,7 @@ async function sendAdminVerificationNotification(request) {
   // Strip CR/LF from user-controlled segments to prevent SMTP header
   // injection (e.g. `Org\r\nBcc: attacker@evil.com`). Resend rejects these
   // headers if it sees them, so sanitising is belt-and-braces.
-  const subject  = `New verification request: ${sanitizeHeader(request.projectName)} (${sanitizeHeader(request.organizationName)})`;
+  const subject = `New verification request: ${sanitizeHeader(request.projectName)} (${sanitizeHeader(request.organizationName)})`;
   const adminUrl = `${(APP_URL || "").replace(/\/$/, "")}/admin/verification/${request.id}`;
   const body = buildVerificationHtml({ request, adminUrl });
 
@@ -116,11 +119,11 @@ function buildVerificationHtml({ request, adminUrl }) {
   const docsList =
     request.supportingDocuments && request.supportingDocuments.length
       ? `<ul>${request.supportingDocuments
-        .map(
-          (d) =>
-            `<li><a href="${escHtml(d.url)}">${escHtml(d.name)}</a>${d.size ? ` (${(d.size / 1024).toFixed(1)} KB)` : ""}</li>`,
-        )
-        .join("")}</ul>`
+          .map(
+            (d) =>
+              `<li><a href="${escHtml(d.url)}">${escHtml(d.name)}</a>${d.size ? ` (${(d.size / 1024).toFixed(1)} KB)` : ""}</li>`,
+          )
+          .join("")}</ul>`
       : "<p><em>No documents attached.</em></p>";
 
   return `<!DOCTYPE html>
@@ -162,7 +165,9 @@ function buildVerificationHtml({ request, adminUrl }) {
 function buildVerificationText({ request, adminUrl }) {
   const docs =
     request.supportingDocuments && request.supportingDocuments.length
-      ? request.supportingDocuments.map((d) => `  - ${d.name}: ${d.url}`).join("\n")
+      ? request.supportingDocuments
+          .map((d) => `  - ${d.name}: ${d.url}`)
+          .join("\n")
       : "  (none)";
   return [
     `New verification request — ${request.projectName}`,
@@ -180,7 +185,9 @@ function buildVerificationText({ request, adminUrl }) {
     "Supporting documents:",
     docs,
     "",
-    request.projectDescription ? `Description:\n${request.projectDescription}\n` : "",
+    request.projectDescription
+      ? `Description:\n${request.projectDescription}\n`
+      : "",
     `Review in admin: ${adminUrl}`,
   ]
     .filter(Boolean)
@@ -235,7 +242,9 @@ function buildText({ project, update, projectUrl }) {
  * interpolate a requester's free-text input into a Subject line.
  */
 function sanitizeHeader(str) {
-  return String(str == null ? "" : str).replace(/[\r\n]+/g, " ").trim();
+  return String(str == null ? "" : str)
+    .replace(/[\r\n]+/g, " ")
+    .trim();
 }
 
 function escHtml(str) {

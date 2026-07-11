@@ -11,12 +11,17 @@
  */
 "use strict";
 
-const {
-  normaliseRoute,
-  metrics: m,
-} = require("../services/metrics");
+const { normaliseRoute, metrics: m } = require("../services/metrics");
 
-const ALLOWED_METHODS = new Set(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]);
+const ALLOWED_METHODS = new Set([
+  "GET",
+  "POST",
+  "PUT",
+  "PATCH",
+  "DELETE",
+  "HEAD",
+  "OPTIONS",
+]);
 
 function metricsMiddleware(req, res, next) {
   const method = ALLOWED_METHODS.has(req.method) ? req.method : "OTHER";
@@ -43,7 +48,7 @@ function metricsMiddleware(req, res, next) {
     m.httpRequestsTotal.inc({ method, route, status_code: statusCode });
     m.httpRequestDurationSeconds.observe(
       { method, route, status_code: statusCode },
-      durationSeconds
+      durationSeconds,
     );
   }
 

@@ -73,17 +73,27 @@ function sign(body, secret, timestamp) {
  * @param {number} replayWindowSeconds
  * @returns {boolean}
  */
-function verify(body, secret, signatureHeader, now = Math.floor(Date.now() / 1000), replayWindowSeconds = DEFAULT_REPLAY_WINDOW_SECONDS) {
-  if (typeof signatureHeader !== "string" || signatureHeader.length === 0) return false;
+function verify(
+  body,
+  secret,
+  signatureHeader,
+  now = Math.floor(Date.now() / 1000),
+  replayWindowSeconds = DEFAULT_REPLAY_WINDOW_SECONDS,
+) {
+  if (typeof signatureHeader !== "string" || signatureHeader.length === 0)
+    return false;
   const parts = Object.fromEntries(
     signatureHeader.split(",").map((kv) => {
       const idx = kv.indexOf("=");
-      return idx === -1 ? [kv.trim(), ""] : [kv.slice(0, idx).trim(), kv.slice(idx + 1).trim()];
-    })
+      return idx === -1
+        ? [kv.trim(), ""]
+        : [kv.slice(0, idx).trim(), kv.slice(idx + 1).trim()];
+    }),
   );
   const t = Number.parseInt(parts.t, 10);
   const v1 = parts.v1;
-  if (!Number.isFinite(t) || typeof v1 !== "string" || v1.length === 0) return false;
+  if (!Number.isFinite(t) || typeof v1 !== "string" || v1.length === 0)
+    return false;
   if (Math.abs(now - t) > replayWindowSeconds) return false;
 
   const expected = crypto

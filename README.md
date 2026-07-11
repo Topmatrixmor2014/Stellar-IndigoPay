@@ -7,10 +7,17 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-6366F1.svg)](CONTRIBUTING.md)
 [![Code of Conduct](https://img.shields.io/badge/Contributor%20Covenant-2.1-818CF8.svg)](CODE_OF_CONDUCT.md)
-[![Stellar](https://img.shields.io/badge/Powered%20by-Stellar-6366F1?logo=stellar)](https://stellar.org)
-[![Soroban](https://img.shields.io/badge/Built%20on-Soroban-7C3AED)](https://soroban.stellar.org)
+[![CI](https://github.com/your-org/stellar-indigopay/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/stellar-indigopay/actions/workflows/ci.yml)
+
+[![Stellar](https://img.shields.io/badge/Stellar-Powered-6366F1?logo=stellar)](https://stellar.org)
+[![Soroban](https://img.shields.io/badge/Soroban-Contracts-7C3AED)](https://soroban.stellar.org)
 [![Node 20](https://img.shields.io/badge/Node-20%20LTS-339933?logo=node.js)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript)](https://www.typescriptlang.org)
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://react.dev)
+[![Next.js](https://img.shields.io/badge/Next.js-14-000000?logo=next.js)](https://nextjs.org)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://docker.com)
+[![Rust](https://img.shields.io/badge/Rust-WASM-DEA584?logo=rust)](https://rust-lang.org)
+[![Tailwind](https://img.shields.io/badge/Tailwind-v3-06B6D4?logo=tailwindcss)](https://tailwindcss.com)
 
 [**🌐 Web App**](https://stellarindigopay.com) · [**📱 Mobile App**](https://expo.dev/) · [**🧩 Chrome Extension**](https://chrome.google.com/webstore/) · [**📚 Docs**](docs/README.md) · [**🚀 Quick Start**](#-quick-start)
 

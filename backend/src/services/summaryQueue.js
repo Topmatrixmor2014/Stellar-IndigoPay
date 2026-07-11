@@ -25,11 +25,14 @@ let boss = null;
  */
 async function start(io) {
   const connectionString =
-    process.env.DATABASE_URL || "postgres://postgres:postgres@localhost:5432/indigopay";
+    process.env.DATABASE_URL ||
+    "postgres://postgres:postgres@localhost:5432/indigopay";
 
   boss = new PgBoss(connectionString);
 
-  boss.on("error", (err) => console.error("[summaryQueue] pg-boss error:", err.message));
+  boss.on("error", (err) =>
+    console.error("[summaryQueue] pg-boss error:", err.message),
+  );
 
   await boss.start();
 
@@ -38,11 +41,18 @@ async function start(io) {
 
     let summaryResult;
     try {
-      summaryResult = await generateProjectSummary({ name, category, description });
+      summaryResult = await generateProjectSummary({
+        name,
+        category,
+        description,
+      });
     } catch (err) {
       if (err.code === "MISSING_API_KEY") {
         // Permanent misconfiguration — log and give up without retrying.
-        console.error("[summaryQueue] ANTHROPIC_API_KEY not set; skipping job", projectId);
+        console.error(
+          "[summaryQueue] ANTHROPIC_API_KEY not set; skipping job",
+          projectId,
+        );
         return;
       }
       throw err; // pg-boss will retry according to retryLimit
@@ -71,9 +81,11 @@ async function start(io) {
     if (io) {
       io.emit("ai_summary_ready", {
         projectId,
-        aiSummary:            row.ai_summary,
-        aiSummaryGeneratedAt: new Date(row.ai_summary_generated_at).toISOString(),
-        aiSummaryModel:       row.ai_summary_model,
+        aiSummary: row.ai_summary,
+        aiSummaryGeneratedAt: new Date(
+          row.ai_summary_generated_at,
+        ).toISOString(),
+        aiSummaryModel: row.ai_summary_model,
       });
     }
 
@@ -87,7 +99,10 @@ async function start(io) {
     });
   });
 
-  console.log("[summaryQueue] pg-boss started, worker registered on queue:", QUEUE);
+  console.log(
+    "[summaryQueue] pg-boss started, worker registered on queue:",
+    QUEUE,
+  );
 }
 
 /**
@@ -101,7 +116,11 @@ async function enqueueAISummary(projectId, projectData) {
   if (!boss) {
     throw new Error("summaryQueue not started — call start(io) first");
   }
-  const jobId = await boss.send(QUEUE, { projectId, ...projectData }, { retryLimit: 3, retryDelay: 10 });
+  const jobId = await boss.send(
+    QUEUE,
+    { projectId, ...projectData },
+    { retryLimit: 3, retryDelay: 10 },
+  );
   return jobId;
 }
 

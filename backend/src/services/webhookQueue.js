@@ -28,7 +28,11 @@ const PgBoss = require("pg-boss");
 const pool = require("../db/pool");
 const logger = require("../logger");
 const { metrics } = require("./metrics");
-const { computeEventId, sign, DEFAULT_REPLAY_WINDOW_SECONDS } = require("../lib/webhookSign");
+const {
+  computeEventId,
+  sign,
+  DEFAULT_REPLAY_WINDOW_SECONDS,
+} = require("../lib/webhookSign");
 
 const QUEUE = "webhook-deliveries";
 const RETRY_DELAYS_SECONDS = [30, 120, 600, 1800, 7200, 21600]; // 6 attempts
@@ -44,28 +48,42 @@ let boss = null;
 async function start() {
   if (boss) return;
   const connectionString =
-    process.env.DATABASE_URL || "postgres://postgres:postgres@localhost:5432/indigopay";
+    process.env.DATABASE_URL ||
+    "postgres://postgres:postgres@localhost:5432/indigopay";
   boss = new PgBoss(connectionString);
   boss.on("error", (err) =>
-    logger.error({ event: "webhook_queue_error", err: err.message }, "pg-boss error"),
+    logger.error(
+      { event: "webhook_queue_error", err: err.message },
+      "pg-boss error",
+    ),
   );
   await boss.start();
 
   await boss.work(
     QUEUE,
-    { teamSize: 2, teamConcurrency: 1, retryLimit: RETRY_DELAYS_SECONDS.length },
+    {
+      teamSize: 2,
+      teamConcurrency: 1,
+      retryLimit: RETRY_DELAYS_SECONDS.length,
+    },
     async (job) => {
       const { deliveryId } = job.data || {};
       if (!deliveryId) {
         // Defensive: malformed job. Don't retry.
-        logger.error({ event: "webhook_delivery_malformed", jobId: job.id }, "missing deliveryId");
+        logger.error(
+          { event: "webhook_delivery_malformed", jobId: job.id },
+          "missing deliveryId",
+        );
         return;
       }
       await processDelivery(deliveryId);
     },
   );
 
-  logger.info({ event: "webhook_queue_started", queue: QUEUE }, "webhook queue worker registered");
+  logger.info(
+    { event: "webhook_queue_started", queue: QUEUE },
+    "webhook queue worker registered",
+  );
 }
 
 /**
@@ -74,7 +92,12 @@ async function start() {
  * same canonical fields will collide on the UNIQUE constraint and the
  * caller can treat that as "already scheduled".
  */
-async function enqueueWebhookDelivery({ projectId, eventType, payload, secret }) {
+async function enqueueWebhookDelivery({
+  projectId,
+  eventType,
+  payload,
+  secret,
+}) {
   const eventId = computeEventId({
     projectId,
     milestoneId: payload.milestoneId ?? null,
@@ -103,7 +126,12 @@ async function enqueueWebhookDelivery({ projectId, eventType, payload, secret })
     wasInserted = result.rows[0].inserted;
   } catch (err) {
     logger.error(
-      { event: "webhook_enqueue_db_error", err: err.message, projectId, eventId },
+      {
+        event: "webhook_enqueue_db_error",
+        err: err.message,
+        projectId,
+        eventId,
+      },
       "failed to record delivery row",
     );
     throw err;
@@ -114,7 +142,13 @@ async function enqueueWebhookDelivery({ projectId, eventType, payload, secret })
     // Retries are unavailable in this mode; the row sits at status=pending
     // and a future enqueueWebhookDelivery for the same event_id will pick
     // it up via the ON CONFLICT branch above.
-    await processDelivery(deliveryId, { eventId, projectId, eventType, payload, secret });
+    await processDelivery(deliveryId, {
+      eventId,
+      projectId,
+      eventType,
+      payload,
+      secret,
+    });
     return eventId;
   }
 
@@ -122,11 +156,7 @@ async function enqueueWebhookDelivery({ projectId, eventType, payload, secret })
   // (see processDelivery) so the worker doesn't auto-retry on throw —
   // instead, on failure we reschedule a new job with `startAfter` set to
   // the appropriate backoff.
-  await boss.send(
-    QUEUE,
-    { deliveryId, secret },
-    { retryLimit: 0 },
-  );
+  await boss.send(QUEUE, { deliveryId, secret }, { retryLimit: 0 });
 
   if (!wasInserted) {
     logger.info(
@@ -152,17 +182,25 @@ async function processDelivery(deliveryId, inMemoryOverrides) {
   );
   const row = rows[0];
   if (!row) {
-    logger.warn({ event: "webhook_delivery_missing", deliveryId }, "delivery row vanished");
+    logger.warn(
+      { event: "webhook_delivery_missing", deliveryId },
+      "delivery row vanished",
+    );
     return;
   }
   if (row.status === "delivered") {
     return; // idempotent skip
   }
 
-  const secret = (inMemoryOverrides && inMemoryOverrides.secret) || row.webhook_secret;
+  const secret =
+    (inMemoryOverrides && inMemoryOverrides.secret) || row.webhook_secret;
   const url = row.webhook_url;
   if (!url || !secret) {
-    await markTerminal(deliveryId, "failed", "missing webhook_url or webhook_secret");
+    await markTerminal(
+      deliveryId,
+      "failed",
+      "missing webhook_url or webhook_secret",
+    );
     metrics.webhookDeliveriesTotal.inc({ outcome: "skipped" });
     return;
   }
@@ -199,7 +237,12 @@ async function processDelivery(deliveryId, inMemoryOverrides) {
     );
     metrics.webhookDeliveriesTotal.inc({ outcome: "delivered" });
     logger.info(
-      { event: "webhook_delivered", deliveryId, projectId: row.project_id, status: result.statusCode },
+      {
+        event: "webhook_delivered",
+        deliveryId,
+        projectId: row.project_id,
+        status: result.statusCode,
+      },
       "Webhook delivered",
     );
     return;
@@ -219,7 +262,12 @@ async function processDelivery(deliveryId, inMemoryOverrides) {
             next_attempt_at = $4,
             updated_at = NOW()
       WHERE id = $1`,
-    [deliveryId, result.error, nextStatus, willRetry ? new Date(Date.now() + nextDelay * 1000) : null],
+    [
+      deliveryId,
+      result.error,
+      nextStatus,
+      willRetry ? new Date(Date.now() + nextDelay * 1000) : null,
+    ],
   );
 
   if (!willRetry) {
@@ -248,7 +296,10 @@ async function processDelivery(deliveryId, inMemoryOverrides) {
         await boss.send(
           QUEUE,
           { deliveryId, secret: inMemoryOverrides ? secret : undefined },
-          { retryLimit: 0, startAfter: new Date(Date.now() + nextDelay * 1000) },
+          {
+            retryLimit: 0,
+            startAfter: new Date(Date.now() + nextDelay * 1000),
+          },
         );
       } catch (err) {
         logger.error(
@@ -342,7 +393,10 @@ async function stop() {
   try {
     await boss.stop({ graceful: true, timeout: 15_000 });
   } catch (err) {
-    logger.warn({ event: "webhook_queue_stop_error", err: err.message }, "graceful stop failed");
+    logger.warn(
+      { event: "webhook_queue_stop_error", err: err.message },
+      "graceful stop failed",
+    );
   }
 }
 

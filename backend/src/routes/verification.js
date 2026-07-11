@@ -87,18 +87,28 @@ function mapRequestRow(row) {
     status: row.status,
     reviewerNotes: row.reviewer_notes || null,
     reviewedBy: row.reviewed_by || null,
-    submittedAt: row.submitted_at ? new Date(row.submitted_at).toISOString() : null,
-    reviewedAt: row.reviewed_at ? new Date(row.reviewed_at).toISOString() : null,
+    submittedAt: row.submitted_at
+      ? new Date(row.submitted_at).toISOString()
+      : null,
+    reviewedAt: row.reviewed_at
+      ? new Date(row.reviewed_at).toISOString()
+      : null,
   };
 }
 
 function validateDocument(doc) {
   if (!doc || typeof doc !== "object") return "each document must be an object";
-  if (typeof doc.url !== "string" || !URL_RE.test(doc.url)) return "document.url must be an http(s) URL";
-  if (typeof doc.name !== "string" || doc.name.length < 1 || doc.name.length > 200) {
+  if (typeof doc.url !== "string" || !URL_RE.test(doc.url))
+    return "document.url must be an http(s) URL";
+  if (
+    typeof doc.name !== "string" ||
+    doc.name.length < 1 ||
+    doc.name.length > 200
+  ) {
     return "document.name must be a string (1-200 chars)";
   }
-  if (typeof doc.size === "number" && doc.size < 0) return "document.size must be >= 0";
+  if (typeof doc.size === "number" && doc.size < 0)
+    return "document.size must be >= 0";
   return null;
 }
 
@@ -111,15 +121,23 @@ router.post("/", submitLimiter, async (req, res, next) => {
     const body = req.body || {};
     const errors = [];
 
-    const orgName = typeof body.organizationName === "string" ? body.organizationName.trim() : "";
+    const orgName =
+      typeof body.organizationName === "string"
+        ? body.organizationName.trim()
+        : "";
     if (orgName.length < 2 || orgName.length > 200) {
       errors.push("organizationName must be 2-200 characters");
     }
 
     let website = null;
     if (body.organizationWebsite != null && body.organizationWebsite !== "") {
-      if (typeof body.organizationWebsite !== "string" || body.organizationWebsite.length > 500) {
-        errors.push("organizationWebsite must be a string up to 500 characters");
+      if (
+        typeof body.organizationWebsite !== "string" ||
+        body.organizationWebsite.length > 500
+      ) {
+        errors.push(
+          "organizationWebsite must be a string up to 500 characters",
+        );
       } else if (!URL_RE.test(body.organizationWebsite)) {
         errors.push("organizationWebsite must be a valid http(s) URL");
       } else {
@@ -129,40 +147,64 @@ router.post("/", submitLimiter, async (req, res, next) => {
 
     let country = null;
     if (body.organizationCountry != null && body.organizationCountry !== "") {
-      if (typeof body.organizationCountry !== "string" || body.organizationCountry.trim().length > 80) {
+      if (
+        typeof body.organizationCountry !== "string" ||
+        body.organizationCountry.trim().length > 80
+      ) {
         errors.push("organizationCountry must be a string up to 80 characters");
       } else {
         country = body.organizationCountry.trim();
       }
     }
 
-    const email = typeof body.contactEmail === "string" ? body.contactEmail.trim().toLowerCase() : "";
-    if (!EMAIL_RE.test(email)) errors.push("contactEmail must be a valid email");
+    const email =
+      typeof body.contactEmail === "string"
+        ? body.contactEmail.trim().toLowerCase()
+        : "";
+    if (!EMAIL_RE.test(email))
+      errors.push("contactEmail must be a valid email");
 
-    const walletAddress = typeof body.walletAddress === "string" ? body.walletAddress.trim() : "";
+    const walletAddress =
+      typeof body.walletAddress === "string" ? body.walletAddress.trim() : "";
     if (!STELLAR_ADDRESS_RE.test(walletAddress)) {
-      errors.push("walletAddress must be a valid Stellar address (56 chars, starts with G)");
+      errors.push(
+        "walletAddress must be a valid Stellar address (56 chars, starts with G)",
+      );
     }
 
-    const projectName = typeof body.projectName === "string" ? body.projectName.trim() : "";
+    const projectName =
+      typeof body.projectName === "string" ? body.projectName.trim() : "";
     if (projectName.length < 2 || projectName.length > 200) {
       errors.push("projectName must be 2-200 characters");
     }
 
-    const projectCategory = typeof body.projectCategory === "string" ? body.projectCategory.trim() : "";
+    const projectCategory =
+      typeof body.projectCategory === "string"
+        ? body.projectCategory.trim()
+        : "";
     if (!VALID_CATEGORIES.includes(projectCategory)) {
-      errors.push(`projectCategory must be one of: ${VALID_CATEGORIES.join(", ")}`);
+      errors.push(
+        `projectCategory must be one of: ${VALID_CATEGORIES.join(", ")}`,
+      );
     }
 
-    const projectLocation = typeof body.projectLocation === "string" ? body.projectLocation.trim() : "";
+    const projectLocation =
+      typeof body.projectLocation === "string"
+        ? body.projectLocation.trim()
+        : "";
     if (projectLocation.length < 2 || projectLocation.length > 200) {
       errors.push("projectLocation must be 2-200 characters");
     }
 
     let projectDescription = null;
     if (body.projectDescription != null && body.projectDescription !== "") {
-      if (typeof body.projectDescription !== "string" || body.projectDescription.length > 5000) {
-        errors.push("projectDescription must be a string up to 5000 characters");
+      if (
+        typeof body.projectDescription !== "string" ||
+        body.projectDescription.length > 5000
+      ) {
+        errors.push(
+          "projectDescription must be a string up to 5000 characters",
+        );
       } else {
         projectDescription = body.projectDescription.trim();
       }
@@ -174,16 +216,23 @@ router.post("/", submitLimiter, async (req, res, next) => {
     }
 
     let expectedAnnualTonnesCO2 = null;
-    if (body.expectedAnnualTonnesCO2 != null && body.expectedAnnualTonnesCO2 !== "") {
+    if (
+      body.expectedAnnualTonnesCO2 != null &&
+      body.expectedAnnualTonnesCO2 !== ""
+    ) {
       const parsed = Number.parseFloat(body.expectedAnnualTonnesCO2);
       if (!Number.isFinite(parsed) || parsed < 0) {
-        errors.push("expectedAnnualTonnesCO2 must be a non-negative number when provided");
+        errors.push(
+          "expectedAnnualTonnesCO2 must be a non-negative number when provided",
+        );
       } else {
         expectedAnnualTonnesCO2 = parsed;
       }
     }
 
-    const documents = Array.isArray(body.supportingDocuments) ? body.supportingDocuments : [];
+    const documents = Array.isArray(body.supportingDocuments)
+      ? body.supportingDocuments
+      : [];
     if (documents.length > 20) {
       errors.push("supportingDocuments must contain at most 20 entries");
     }
@@ -232,7 +281,9 @@ router.post("/", submitLimiter, async (req, res, next) => {
         projectLocation,
         projectDescription,
         co2PerXLM.toFixed(7),
-        expectedAnnualTonnesCO2 != null ? expectedAnnualTonnesCO2.toFixed(7) : null,
+        expectedAnnualTonnesCO2 != null
+          ? expectedAnnualTonnesCO2.toFixed(7)
+          : null,
         JSON.stringify(documents),
         backendName(),
         notes,
@@ -267,9 +318,12 @@ router.post("/", submitLimiter, async (req, res, next) => {
  */
 router.get("/me", async (req, res, next) => {
   try {
-    const wallet = typeof req.query.wallet === "string" ? req.query.wallet.trim() : "";
+    const wallet =
+      typeof req.query.wallet === "string" ? req.query.wallet.trim() : "";
     if (!STELLAR_ADDRESS_RE.test(wallet)) {
-      return res.status(400).json({ error: "wallet query param must be a valid Stellar address" });
+      return res
+        .status(400)
+        .json({ error: "wallet query param must be a valid Stellar address" });
     }
     const result = await pool.query(
       `SELECT * FROM verification_requests
@@ -292,9 +346,13 @@ router.get("/me", async (req, res, next) => {
  */
 router.get("/:id", async (req, res, next) => {
   try {
-    const result = await pool.query("SELECT * FROM verification_requests WHERE id = $1", [req.params.id]);
+    const result = await pool.query(
+      "SELECT * FROM verification_requests WHERE id = $1",
+      [req.params.id],
+    );
     const row = result.rows[0];
-    if (!row) return res.status(404).json({ error: "Verification request not found" });
+    if (!row)
+      return res.status(404).json({ error: "Verification request not found" });
 
     // Allow admin-readable without wallet guard.
     const auth = req.headers.authorization || "";
@@ -310,9 +368,12 @@ router.get("/:id", async (req, res, next) => {
       }
     }
 
-    const wallet = typeof req.query.wallet === "string" ? req.query.wallet.trim() : "";
+    const wallet =
+      typeof req.query.wallet === "string" ? req.query.wallet.trim() : "";
     if (!wallet || wallet !== row.wallet_address) {
-      return res.status(403).json({ error: "Provide a matching ?wallet= query param to view this request" });
+      return res.status(403).json({
+        error: "Provide a matching ?wallet= query param to view this request",
+      });
     }
     res.json({ success: true, data: mapRequestRow(row) });
   } catch (e) {
@@ -370,18 +431,29 @@ router.patch("/:id/status", adminRequired, async (req, res, next) => {
         error: `status must be one of: ${Object.keys(VALID_TRANSITIONS).join(", ")}`,
       });
     }
-    const reviewerNotesStr = typeof reviewerNotes === "string" && reviewerNotes.trim() ? reviewerNotes.trim() : null;
+    const reviewerNotesStr =
+      typeof reviewerNotes === "string" && reviewerNotes.trim()
+        ? reviewerNotes.trim()
+        : null;
     if (reviewerNotesStr && reviewerNotesStr.length > 2000) {
-      return res.status(400).json({ error: "reviewerNotes must be at most 2000 characters" });
+      return res
+        .status(400)
+        .json({ error: "reviewerNotes must be at most 2000 characters" });
     }
 
-    const existing = await pool.query("SELECT * FROM verification_requests WHERE id = $1", [req.params.id]);
+    const existing = await pool.query(
+      "SELECT * FROM verification_requests WHERE id = $1",
+      [req.params.id],
+    );
     const row = existing.rows[0];
-    if (!row) return res.status(404).json({ error: "Verification request not found" });
+    if (!row)
+      return res.status(404).json({ error: "Verification request not found" });
 
     const transitions = VALID_TRANSITIONS[row.status] || [];
     if (row.status === status) {
-      return res.status(400).json({ error: `Request is already in "${status}" state` });
+      return res
+        .status(400)
+        .json({ error: `Request is already in "${status}" state` });
     }
     if (!transitions.includes(status)) {
       return res.status(400).json({
@@ -406,7 +478,11 @@ router.patch("/:id/status", adminRequired, async (req, res, next) => {
       action: `verification.${status}`,
       targetType: "verification_request",
       targetId: req.params.id,
-      metadata: { fromStatus: row.status, toStatus: status, reviewerNotes: reviewerNotesStr },
+      metadata: {
+        fromStatus: row.status,
+        toStatus: status,
+        reviewerNotes: reviewerNotesStr,
+      },
       ipAddress: req.ip,
     });
 

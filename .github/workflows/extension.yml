@@ -3,11 +3,11 @@ name: Extension CI
 on:
   push:
     paths:
-      - 'extension/**'
+      - "extension/**"
     branches: [main, develop]
   pull_request:
     paths:
-      - 'extension/**'
+      - "extension/**"
     branches: [main]
 
 jobs:
@@ -47,8 +47,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
           cache-dependency-path: extension/package-lock.json
 
       - run: npm ci

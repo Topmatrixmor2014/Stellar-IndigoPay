@@ -39,7 +39,9 @@ function buildApp() {
   // Bypass helmet/csrf from server.js for the unit test.
   app.use("/api/verification-requests", verification);
   app.use((err, _req, res, _next) => {
-    res.status(err.status || 500).json({ error: err.message || "Internal server error" });
+    res
+      .status(err.status || 500)
+      .json({ error: err.message || "Internal server error" });
   });
   return app;
 }
@@ -82,7 +84,12 @@ const MOCK_DB_ROW = {
   co2_per_xlm: "0.0500000",
   expected_annual_tonnes_co2: "1200.0000000",
   supporting_documents: [
-    { name: "methodology.pdf", url: "https://example.com/methodology.pdf", size: 1024, backend: "local" },
+    {
+      name: "methodology.pdf",
+      url: "https://example.com/methodology.pdf",
+      size: 1024,
+      backend: "local",
+    },
   ],
   storage_backend: "local",
   notes: "Reached out after demo.",
@@ -103,7 +110,9 @@ describe("POST /api/verification-requests", () => {
   });
 
   test("persists a valid submission and returns 201", async () => {
-    const res = await request(app).post("/api/verification-requests").send(VALID_PAYLOAD);
+    const res = await request(app)
+      .post("/api/verification-requests")
+      .send(VALID_PAYLOAD);
     expect(res.status).toBe(201);
     expect(res.body.success).toBe(true);
     expect(res.body.data.id).toBe(MOCK_DB_ROW.id);
@@ -111,7 +120,9 @@ describe("POST /api/verification-requests", () => {
 
     // Persisted row includes the organizsation + impact fields we sent.
     const insertCall = pool.query.mock.calls.find(
-      ([sql]) => typeof sql === "string" && sql.startsWith("INSERT INTO verification_requests"),
+      ([sql]) =>
+        typeof sql === "string" &&
+        sql.startsWith("INSERT INTO verification_requests"),
     );
     expect(insertCall).toBeDefined();
     const values = insertCall[1];
@@ -125,9 +136,9 @@ describe("POST /api/verification-requests", () => {
     // Tick the microtask queue so the catch handler attached in the route can run.
     await new Promise((r) => setImmediate(r));
     expect(email.sendAdminVerificationNotification).toHaveBeenCalledTimes(1);
-    expect(email.sendAdminVerificationNotification.mock.calls[0][0].organizationName).toBe(
-      "Acme Climate Foundation",
-    );
+    expect(
+      email.sendAdminVerificationNotification.mock.calls[0][0].organizationName,
+    ).toBe("Acme Climate Foundation");
   });
 
   test("rejects missing organization name", async () => {
@@ -204,7 +215,9 @@ describe("GET /api/verification-requests/:id", () => {
 
   test("forbids access when wallet does not match", async () => {
     pool.query.mockResolvedValue({ rows: [MOCK_DB_ROW] });
-    const res = await request(app).get(`/api/verification-requests/${MOCK_DB_ROW.id}?wallet=GDIFFERENTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA`);
+    const res = await request(app).get(
+      `/api/verification-requests/${MOCK_DB_ROW.id}?wallet=GDIFFERENTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA`,
+    );
     expect(res.status).toBe(403);
   });
 
@@ -265,7 +278,9 @@ describe("PATCH /api/verification-requests/:id/status (admin)", () => {
     // First DB call: SELECT existing. Second: UPDATE returning new row.
     pool.query
       .mockResolvedValueOnce({ rows: [{ ...MOCK_DB_ROW, status: "pending" }] })
-      .mockResolvedValueOnce({ rows: [{ ...MOCK_DB_ROW, status: "in_review" }] });
+      .mockResolvedValueOnce({
+        rows: [{ ...MOCK_DB_ROW, status: "in_review" }],
+      });
     const token = signToken({ role: "admin", sub: "admin" }, "1h");
     const res = await request(app)
       .patch(`/api/verification-requests/${MOCK_DB_ROW.id}/status`)
@@ -276,7 +291,9 @@ describe("PATCH /api/verification-requests/:id/status (admin)", () => {
   });
 
   test("rejects an invalid transition (pending → approved)", async () => {
-    pool.query.mockResolvedValueOnce({ rows: [{ ...MOCK_DB_ROW, status: "pending" }] });
+    pool.query.mockResolvedValueOnce({
+      rows: [{ ...MOCK_DB_ROW, status: "pending" }],
+    });
     const token = signToken({ role: "admin", sub: "admin" }, "1h");
     const res = await request(app)
       .patch(`/api/verification-requests/${MOCK_DB_ROW.id}/status`)

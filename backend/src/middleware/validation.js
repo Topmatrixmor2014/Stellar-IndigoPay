@@ -7,18 +7,33 @@ function containsHtml(value) {
 }
 
 function stripHtml(value) {
-  return value.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  return value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
-function sanitizedStringField({ required = false, minLength = 1, maxLength, message = "must not contain HTML" } = {}) {
-  let schema = z.string().trim().refine((value) => !containsHtml(value), { message });
+function sanitizedStringField({
+  required = false,
+  minLength = 1,
+  maxLength,
+  message = "must not contain HTML",
+} = {}) {
+  let schema = z
+    .string()
+    .trim()
+    .refine((value) => !containsHtml(value), { message });
 
   if (maxLength) {
-    schema = schema.refine((value) => value.length <= maxLength, { message: `must be at most ${maxLength} characters` });
+    schema = schema.refine((value) => value.length <= maxLength, {
+      message: `must be at most ${maxLength} characters`,
+    });
   }
 
   if (required) {
-    schema = schema.refine((value) => value.length >= minLength, { message: `must be at least ${minLength} characters` });
+    schema = schema.refine((value) => value.length >= minLength, {
+      message: `must be at least ${minLength} characters`,
+    });
   }
 
   schema = schema.transform((value) => stripHtml(value));

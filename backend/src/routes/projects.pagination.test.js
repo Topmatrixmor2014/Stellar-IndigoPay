@@ -51,7 +51,9 @@ function buildApp() {
   app.use(express.json());
   app.use("/api/projects", projectsRouter);
   app.use((err, _req, res, _next) => {
-    res.status(err.status || 500).json({ error: err.message || "Internal server error" });
+    res
+      .status(err.status || 500)
+      .json({ error: err.message || "Internal server error" });
   });
   return app;
 }
@@ -79,7 +81,8 @@ function generate25Projects() {
       description: `Description for climate project number ${i + 1} — long enough to pass validation`,
       category: "Reforestation",
       location: "Earth",
-      wallet_address: "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF",
+      wallet_address:
+        "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF",
       goal_xlm: "10000",
       raised_xlm: "0",
       donor_count: 0,
@@ -170,7 +173,9 @@ describe("GET /api/projects — cursor-based pagination across 3 pages", () => {
           typeof possibleId === "string"
         ) {
           // Reconstruct cursor the same way the route does
-          cursor = Buffer.from(JSON.stringify({ created_at: possibleCa, id: possibleId })).toString("base64");
+          cursor = Buffer.from(
+            JSON.stringify({ created_at: possibleCa, id: possibleId }),
+          ).toString("base64");
         }
       }
 
@@ -195,8 +200,16 @@ describe("GET /api/projects — cursor-based pagination across 3 pages", () => {
 
     const ids = res.body.data.map((p) => p.id);
     expect(ids).toEqual([
-      "proj-001", "proj-002", "proj-003", "proj-004", "proj-005",
-      "proj-006", "proj-007", "proj-008", "proj-009", "proj-010",
+      "proj-001",
+      "proj-002",
+      "proj-003",
+      "proj-004",
+      "proj-005",
+      "proj-006",
+      "proj-007",
+      "proj-008",
+      "proj-009",
+      "proj-010",
     ]);
   });
 
@@ -225,8 +238,16 @@ describe("GET /api/projects — cursor-based pagination across 3 pages", () => {
 
     const ids = res.body.data.map((p) => p.id);
     expect(ids).toEqual([
-      "proj-011", "proj-012", "proj-013", "proj-014", "proj-015",
-      "proj-016", "proj-017", "proj-018", "proj-019", "proj-020",
+      "proj-011",
+      "proj-012",
+      "proj-013",
+      "proj-014",
+      "proj-015",
+      "proj-016",
+      "proj-017",
+      "proj-018",
+      "proj-019",
+      "proj-020",
     ]);
   });
 
@@ -260,7 +281,11 @@ describe("GET /api/projects — cursor-based pagination across 3 pages", () => {
 
     const ids = res.body.data.map((p) => p.id);
     expect(ids).toEqual([
-      "proj-021", "proj-022", "proj-023", "proj-024", "proj-025",
+      "proj-021",
+      "proj-022",
+      "proj-023",
+      "proj-024",
+      "proj-025",
     ]);
   });
 

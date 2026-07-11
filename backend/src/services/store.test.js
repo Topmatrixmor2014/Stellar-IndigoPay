@@ -15,7 +15,9 @@ const {
 describe("BADGE_THRESHOLDS contract spec", () => {
   test("defines exactly four tiers: seedling, tree, forest, earth", () => {
     const tiers = BADGE_THRESHOLDS.map((b) => b.tier);
-    expect(tiers).toEqual(expect.arrayContaining(["seedling", "tree", "forest", "earth"]));
+    expect(tiers).toEqual(
+      expect.arrayContaining(["seedling", "tree", "forest", "earth"]),
+    );
     expect(tiers).toHaveLength(4);
   });
 
@@ -189,7 +191,7 @@ describe("store utility functions", () => {
         badges: [{ tier: "tree" }],
         created_at: null,
         updated_at: null,
-      })
+      }),
     ).toMatchObject({
       publicKey: "GUSER",
       displayName: "Asraf",
@@ -209,7 +211,7 @@ describe("store utility functions", () => {
         title: "Update",
         body: "Body",
         created_at: null,
-      })
+      }),
     ).toMatchObject({ projectId: "project-1" });
 
     expect(
@@ -224,7 +226,7 @@ describe("store utility functions", () => {
         release_transaction_hash: null,
         created_at: null,
         updated_at: null,
-      })
+      }),
     ).toMatchObject({
       clientPublicKey: "GCLIENT",
       freelancerPublicKey: "GFREELANCER",
@@ -240,7 +242,7 @@ describe("store utility functions", () => {
         reached_at: null,
         transaction_hash: "tx123",
         created_at: null,
-      })
+      }),
     ).toMatchObject({
       projectId: "project-1",
       transactionHash: "tx123",
@@ -254,7 +256,7 @@ describe("store utility functions", () => {
         rating: 5,
         review: "Good",
         created_at: null,
-      })
+      }),
     ).toMatchObject({
       projectId: "project-1",
       donorAddress: "GDONOR",

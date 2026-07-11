@@ -3,14 +3,15 @@
  */
 "use strict";
 const express = require("express");
-const router  = express.Router();
+const router = express.Router();
 const pool = require("../db/pool");
 
 router.get("/", async (req, res, next) => {
   try {
     const limit = Math.min(parseInt(req.query.limit, 10) || 20, 100);
     const period = req.query.period || "all";
-    const sortBy = req.query.sortBy === "impactScore" ? "impact_score" : "total_donated_xlm";
+    const sortBy =
+      req.query.sortBy === "impactScore" ? "impact_score" : "total_donated_xlm";
 
     const onlyVerified = req.query.onlyVerified === "true";
 
@@ -105,7 +106,7 @@ router.get("/history", async (req, res, next) => {
        FROM monthly_leaderboard
        WHERE month >= DATE_TRUNC('month', NOW()) - ($1 - 1) * INTERVAL '1 month'
        ORDER BY month DESC, rank ASC`,
-      [months]
+      [months],
     );
 
     // Group rows by month
@@ -122,7 +123,10 @@ router.get("/history", async (req, res, next) => {
       });
     }
 
-    const history = Object.entries(grouped).map(([month, entries]) => ({ month, entries }));
+    const history = Object.entries(grouped).map(([month, entries]) => ({
+      month,
+      entries,
+    }));
     res.json({ success: true, data: history });
   } catch (e) {
     next(e);
@@ -157,11 +161,15 @@ router.post("/snapshot", async (req, res, next) => {
        HAVING COALESCE(SUM(d.amount_xlm), 0) > 0
        ORDER BY total_xlm DESC
        LIMIT $1`,
-      [limit]
+      [limit],
     );
 
     if (topResult.rows.length === 0) {
-      return res.json({ success: true, message: "No donations this month yet", inserted: 0 });
+      return res.json({
+        success: true,
+        message: "No donations this month yet",
+        inserted: 0,
+      });
     }
 
     const monthStart = new Date();
@@ -186,7 +194,14 @@ router.post("/snapshot", async (req, res, next) => {
              total_xlm_that_month  = EXCLUDED.total_xlm_that_month,
              badge                 = EXCLUDED.badge,
              rank                  = EXCLUDED.rank`,
-          [monthStr, row.public_key, row.display_name || null, row.total_xlm, badge, i + 1]
+          [
+            monthStr,
+            row.public_key,
+            row.display_name || null,
+            row.total_xlm,
+            badge,
+            i + 1,
+          ],
         );
         inserted++;
       }
