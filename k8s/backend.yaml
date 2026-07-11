@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
-  namespace: indigopay
+  namespace: stellar-indigopay
   labels:
     app: backend
     app.kubernetes.io/component: api
-    app.kubernetes.io/part-of: indigopay
+    app.kubernetes.io/part-of: stellar-indigopay
 spec:
   replicas: 2
   selector:
@@ -17,7 +17,7 @@ spec:
       labels:
         app: backend
         app.kubernetes.io/component: api
-        app.kubernetes.io/part-of: indigopay
+        app.kubernetes.io/part-of: stellar-indigopay
       # The ServiceMonitor selector below uses these labels to discover pods.
       annotations:
         prometheus.io/scrape: "true"
@@ -27,7 +27,7 @@ spec:
       terminationGracePeriodSeconds: 35
       containers:
         - name: backend
-          image: indigopay/backend:latest
+          image: stellar-indigopay/backend:latest
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -35,9 +35,9 @@ spec:
               protocol: TCP
           envFrom:
             - configMapRef:
-                name: indigopay-config
+                name: stellar-indigopay-config
             - secretRef:
-                name: indigopay-secrets
+                name: stellar-indigopay-secrets
           # Liveness: 5s boot grace + 5s failure threshold. The route
           # returns 200 as soon as process.uptime() > 5s, so the probe
           # is satisfied ~5s after boot. It will only fail if the
@@ -86,7 +86,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: backend-svc
-  namespace: indigopay
+  namespace: stellar-indigopay
   labels:
     app: backend
 spec:
@@ -104,12 +104,12 @@ spec:
 ---
 # ServiceMonitor for prometheus-operator. The Prometheus CR scrapes the
 # pod-level /metrics endpoint using the bearer token from
-# indigopay-secrets.
+# stellar-indigopay-secrets.
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: backend
-  namespace: indigopay
+  namespace: stellar-indigopay
   labels:
     app: backend
     release: prometheus
@@ -125,5 +125,5 @@ spec:
       authorization:
         type: Bearer
         credentials:
-          name: indigopay-secrets
+          name: stellar-indigopay-secrets
           key: METRICS_BEARER_TOKEN

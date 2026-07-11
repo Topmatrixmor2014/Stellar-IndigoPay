@@ -17,7 +17,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: backend
-  namespace: indigopay
+  namespace: stellar-indigopay
   labels:
     app: backend
 spec:

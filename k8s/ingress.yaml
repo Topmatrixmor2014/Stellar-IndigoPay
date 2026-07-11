@@ -1,14 +1,14 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: indigopay-ingress
-  namespace: indigopay
+  name: stellar-indigopay-ingress
+  namespace: stellar-indigopay
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
   rules:
-    - host: indigopay.local
+    - host: stellar-indigopay.local
       http:
         paths:
           - path: /api

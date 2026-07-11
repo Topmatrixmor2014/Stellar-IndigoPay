@@ -9,7 +9,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: frontend
-  namespace: indigopay
+  namespace: stellar-indigopay
   labels:
     app: frontend
 spec:
