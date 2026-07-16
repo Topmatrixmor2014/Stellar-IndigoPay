@@ -11,3 +11,17 @@
 # rulesets do not support custom JavaScript functions out-of-the-box.
 #
 extends: "spectral:oas"
+
+rules:
+  # ── Severity overrides for intentional omissions ────────────────
+  # operationId is recommended but not required — simple or internal
+  # endpoints may omit it without reducing documentation quality.
+  operation-operationId: warn
+
+  # operation-description is recommended — if the summary is
+  # sufficiently descriptive, a separate description may be omitted.
+  operation-description: warn
+
+  # Unused components are a minor housekeeping concern, not a spec
+  # validity issue. Downgraded to info to avoid CI noise.
+  oas3-unused-component: info
