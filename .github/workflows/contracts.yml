@@ -3,9 +3,13 @@ name: Contracts CI
 on:
   push:
     branches: [main, develop]
-    paths: [contracts/**]
+    paths:
+      - "contracts/**"
+      - ".github/workflows/contracts.yml"
   pull_request:
-    paths: [contracts/**]
+    paths:
+      - "contracts/**"
+      - ".github/workflows/contracts.yml"
   workflow_dispatch:
   schedule:
     # Nightly deep fuzz run -- 1 000 000 iterations every day at 03:00 UTC
